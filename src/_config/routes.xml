@@ -1,0 +1,24 @@
+<routes xmlns="http://www.xquerrail-framework.com/routing">
+  <route id="_welcome" pattern="/">
+    <default key="_controller">application:default:index</default>	
+  </route>
+   <route id="_login" pattern="/login.html">
+      <default key="_controller">application:default:logout</default>	
+   </route>
+   <route id="_logout" pattern="/logout.html">
+      <default key="_controller">application:default:logout</default>	
+   </route>
+   <route id="_search" pattern="/search/(.*[^/])">
+     <role>app_user</role>
+     <default key="_controller">application:demo</default>
+     <default key="page" type="integer">1</default>
+     <default key="query" type="string">*</default>
+  </route>
+  <route pattern="/()/(action)">
+     <default key="format">html</default>
+  </route>
+  <route pattern="/(.*[^/]).html">
+     <default key="_controller">application:default:$1</default>>
+     <format>html</format>
+  </route>
+</routes>

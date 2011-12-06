@@ -1,0 +1,25 @@
+<project name="remote" basedir="." default="about"
+    xmlns:ml="http://www.marklogic.com/ant"
+    xmlns:dav="antlib:org.apache.webdav.ant">
+  <target name="boot" depends="local">
+    <sshexec host="${server}" trust="yes"
+    	username="${remote.ssh.user}"
+    	password="${remote.ssh.password}"
+    	command="rm -rf ${remote.ml.installdir}/Admin/deploy"
+    	failonerror="false" />
+
+    <sshexec host="${server}" trust="yes"
+    	username="${remote.ssh.user}"
+    	password="${remote.ssh.password}"
+    	command="mkdir ${remote.ml.installdir}/Admin/deploy"
+    	failonerror="false" />
+
+  	<scp todir="${remote.ssh.user}:${remote.ssh.password}@${server}:${remote.ml.installdir}/Admin/deploy" trust="yes">
+      <fileset dir="${app.dir}/server-setup" includes="**/*"/>
+    </scp>    
+  	<httpmpost url="${ml.admin.uri}/deploy/deploy-config.xqy">
+  		<userCredentials domain="" host="" username="${ml.admin.user}" password="${ml.admin.password}"  />
+  		<postfile name="config" contentType="application/xml" file="${ml.config}" />
+  	</httpmpost>
+  </target>
+</project>

@@ -1,0 +1,78 @@
+<!--
+        Common Migration project settings
+        Depending on your migration process may be a combination of chaining multiple sequences of execution
+        
+-->
+<project name="migrate" basedir="." default="about"
+    xmlns:ml="http://www.marklogic.com/ant"
+    xmlns:dav="antlib:org.apache.webdav.ant">
+  <target name="appserver-off">
+    <echo>turning off appserver while we are upgrading</echo>
+    <enable-appserver enable="fn:false()" server="${appserver-name}"/>
+  </target>
+
+  <target name="r1" depends="appserver-off, clean-marklogic, deploy-marklogic, build-content">
+    <echo>Running R1 migration</echo>
+
+    <echo>Running Migratio Job 1</echo>
+    <ml:corb xccurl="${xcc}"
+            collection=""
+            module="go.xqy"
+            threads="4"
+            urismodule="get-uris.xqy"
+            moduleRoot="/migration/r2/"
+            moduleDB="${modules-db}"
+            install="false"/>
+          
+    <echo>Setup DLS retention policy...</echo>
+    <ml:query xccurl="${xcc}">
+      <fileset dir="${app.dir}/migration/r3" casesensitive="yes">
+        <include name="setup-dls-retention.xqy"/>
+      </fileset>
+    </ml:query>
+  </target>
+
+  <target name="r2" depends="local">
+    <!--
+        <echo>updating UUIDs...</echo>
+        <ml:corb xccurl="${xcc}"
+                 collection=""
+                 module="go.xqy"
+                 threads="4"
+                 urismodule="get-uris.xqy"
+                 moduleRoot="/migration/r4/update-uuids/"
+                 moduleDB="pce-modules"
+                 install="false"/>
+
+        <echo>updating standards UUIDs...</echo>
+        <ml:corb xccurl="${xcc}"
+                 collection=""
+                 module="go.xqy"
+                 threads="4"
+                 urismodule="get-uris.xqy"
+                 moduleRoot="/migration/r4/update-standard-uuids/"
+                 moduleDB="pce-modules"
+                 install="false"/>
+
+       <echo>updating intermediary UUIDs...</echo>
+       <ml:corb xccurl="${xcc}"
+                collection=""
+                module="go.xqy"
+                threads="4"
+                urismodule="get-uris.xqy"
+                moduleRoot="/migration/r4/update-intermediary-uuids/"
+                moduleDB="pce-modules"
+                install="false"/>
+
+       <echo>Updating Correlation UUIDs...</echo>
+       <ml:corb xccurl="${xcc}"
+                collection=""
+                module="go.xqy"
+                threads="4"
+                urismodule="get-uris.xqy"
+                moduleRoot="/migration/r4/update-correlation-uuids/"
+                moduleDB="pce-modules"
+                install="false"/>
+    -->
+  </target>
+</project>

@@ -1,0 +1,80 @@
+xquery version "1.0-ml";
+(:~
+ : Email Library Support for sending notifications.
+ : @author <a href="gary.vidal@marklogic.com">Gary Vidal</a.>
+~:)
+module namespace email  ="http://www.xquerrail-framework.com/lib/email";
+
+import module namespace jm = "http://www.xquerrail-framework.com/model/job"
+    at "/application/model/job-model.xqy";
+import module namespace pm = "http://www.xquerrail-framework.com/model/project"
+    at "/application/model/project-model.xqy";
+import module namespace vm = "http://www.xquerrail-framework.com/model/vendor"
+    at "/application/model/vendor-model.xqy";
+import module namespace um = "http://www.xquerrail-framework.com/model/user"
+    at "/application/model/user-model.xqy";
+            
+declare namespace rf = "URN:ietf:params:rfc822:";
+declare namespace em = "URN:ietf:params:email-xml:";
+
+declare option xdmp:mapping "false";
+
+(:~
+ : Creates and email address according to schema 
+ : @param $email - email of sender
+~:)
+declare function email:create-address(
+    $email as xs:string
+)  
+{
+  email:create-address($email,())
+};
+
+(:~
+ : Creates an email address using name and email
+ : @param $email - Email Address
+ : @param $name - Name of Recipient 
+~:)
+declare function email:create-address(
+    $email as xs:string,
+    $name as xs:string?
+)
+{
+    <em:Address>
+      <em:adrs>{$email}</em:adrs>
+      {if($name) then <em:name>{$name}</em:name> else ()}
+    </em:Address>
+};
+(:~
+ : Creates an email message
+ : @param $from - Sender address
+ : @param $to - Receipient Addresses
+ : @param $subject - Subject of the email address
+ : @param $body - Body of email 
+~:)
+declare function email:send-message(
+    $from as element(em:Address),
+    $to as element(em:Address)*,
+    $subject as xs:string,
+    $body as node()*
+)
+{
+  let $recipients := for $t in $to  return <rf:to>{$t}</rf:to>
+  let $smessage :=
+      <em:Message xmlns:em="URN:ietf:params:email-xml:" xmlns:rf="URN:ietf:params:rfc822:">
+      <rf:subject>{$subject}</rf:subject>
+      <rf:from>
+        {$from}
+      </rf:from>
+      {$recipients}
+      <em:content>
+         {$body}
+      </em:content>
+    </em:Message>
+  let $email := try {xdmp:email($smessage)} catch($ex) {$ex}
+  return
+  (
+       $email,
+       $smessage
+  )
+};

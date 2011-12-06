@@ -1,0 +1,4 @@
+<config>
+  <routing resource="%config.directory%/routes.xml"/>
+  <router resource="%kernel.directory%/marklogic/controller.web"/>
+</config>

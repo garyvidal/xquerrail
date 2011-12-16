@@ -5,7 +5,7 @@ declare default element namespace "http://www.w3.org/1999/xhtml";
         <span>The first example will show you a sortable portlets example</span>
     </div>
     <div class="three-column sortable">
-        <div class="three-col-mid">
+        <div class="three-col-mid" style="min-height:200px;">
             <div class="column col1">
                 <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all">
                     <div class="portlet-header ui-widget-header">Feeds<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
@@ -27,8 +27,7 @@ declare default element namespace "http://www.w3.org/1999/xhtml";
                 </div>
             </div>
             
-            <div class="column col2">
-                
+            <div class="column col2">               
                 <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all">
                     <div class="portlet-header ui-widget-header">Shopping<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
                     <div class="portlet-content">
@@ -38,7 +37,7 @@ declare default element namespace "http://www.w3.org/1999/xhtml";
                         <p> Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus.</p>
                     </div>
                 </div>
-                
+       
             </div>
             
             <div class="column col3">

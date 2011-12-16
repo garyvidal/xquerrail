@@ -15,6 +15,8 @@ xquery version "1.0-ml";
  : @see app/controller.xqy
  :
  :)
+import module namespace routing = "http://www.xquerrail-framework.com/routing"
+at "/_framework/routing.xqy"; 
 
 declare option xdmp:mapping "false";
 
@@ -60,19 +62,21 @@ else (:Only Route Requests to controller:)
 let $request-url := xdmp:get-request-url()
 let $request-path := xdmp:get-request-path()
 let $query := if (fn:contains($request-url, "?")) then fn:substring-after($request-url, "?") else ()
-let $log :=  xdmp:log(text { "original url:", $request-url})
+
 let $resource-path := local:get-resource-uri($request-path)
+let $route := routing:get-route($request-url)
 let $is-resource := 
     if(fn:starts-with($request-path,$resource-dir)) 
     then fn:true()
     else fn:false() 
 return
-if($is-resource) 
-then $request-url  
+if($is-resource) then  $request-url
+else if($route)  then $route
 else if($request-url eq "/") then
- fn:concat("/_kernel/marklogic/controller.web.xqy?_controller=default&amp;action=index")
+ fn:concat("/_kernel/marklogic/controllers/controller.web.xqy?_controller=default&amp;action=index")
 else
-    let $request-url :=
+let $log :=  xdmp:log(text { "original url:", $request-url})
+let $request-url :=
     		(:RESTFUL Controller should have pattern /controller-name/action?params :)
     		let $request-paths := fn:tokenize($request-path,"/")
     		let $controller-name  := ($request-paths[2],"default")[1]
@@ -95,7 +99,7 @@ else
         		 let $format := fn:string-join(fn:tokenize($action,"\.")[fn:last()],"html")[1]
     			 let $new-url :=
     				fn:string-join((
-    					"/_kernel/marklogic/controller.web.xqy?_controller=", $controller-name,
+    					"/_kernel/marklogic/controllers/controller.web.xqy?_controller=", $controller-name,
     					if ($action) then ("&amp;_action=",$action) else (), 
     					if($format) then ("&amp;_format=",$format) else (),
     					if ($query) then ("&amp;",$query) else ()
@@ -103,10 +107,10 @@ else
     			 return (xdmp:log($new-url),$new-url)
     		  else
     			(:Let all methods just hit main controller:)
-    			let $request-url := fn:replace($request-url, "^/([a-zA-Z_\-]+)\?(.*)$", "/_kernel/marklogic/controller.web.xqy/controller.xqy?_action=$1&amp;$2")
-    			let $request-url := fn:replace($request-url, "^/([a-zA-Z_\-]+)/?$", "/_kernel/marklogic/controller.web.xqy?_action=$1")
+    			let $request-url := fn:replace($request-url, "^/([a-zA-Z_\-]+)\?(.*)$", "/_kernel/marklogic/controllers/controller.web.xqy/controller.xqy?_action=$1&amp;$2")
+    			let $request-url := fn:replace($request-url, "^/([a-zA-Z_\-]+)/?$", "/_kernel/marklogic/controllers/controller.web.xqy?_action=$1")
     			return
-    			  xdmp:log(("REQ-URL",$request-url),$request-url)
+    			  (xdmp:log(("REQ-URL",$request-url)),$request-url)
     return $request-url
          
           

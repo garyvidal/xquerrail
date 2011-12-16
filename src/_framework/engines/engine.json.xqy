@@ -35,7 +35,7 @@ declare variable $custom-engine-tags as xs:QName*:=
 declare variable $custom-transform-function := 
    xdmp:function(
      xs:QName("engine:custom-transform"),
-     "/_framework/engines/engine.html.xqy"
+     "/_framework/engines/engine.json.xqy"
 );
 (:~
  : The Main Controller will call your initialize method

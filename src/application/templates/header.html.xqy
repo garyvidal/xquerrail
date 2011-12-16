@@ -2,9 +2,9 @@
 <div id="page-header">
     <div id="page-header-wrapper">
         <div id="top">
-            <a href="/" class="logo" title="Orchestra Framework">Orchestra Framework</a>
+            <a href="/" class="logo" title="XQuerrail Framework">XQuerrail Framework</a>
             <div class="welcome">
-              <?if xdmp:get-current-user() = "validator-nobody" ?>  
+              <?if xdmp:get-current-user() = "nobody" ?>  
               <span class="note">Please Login</span>
               <?else?>          
                 <span class="note">Welcome, <a href="#" 

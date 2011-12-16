@@ -12,6 +12,15 @@ declare namespace rest = "http://marklogic.com/ps/restmvc";
 declare option xdmp:mapping "false";
 
 declare variable $NL as xs:string := fn:codepoints-to-string((13,10));
+(:~Converts a set of request params to a mode instance
+~:)
+declare function model:params-to-model(
+  $model as element(domain:model),
+  $params as map:map
+) as element()?
+{
+
+};
 (:~
  :  Does an update by iterating the element structure and looking for named element 
  :  by local-name and updating it with a new value

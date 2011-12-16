@@ -3,7 +3,7 @@ declare default element namespace "http://www.w3.org/1999/xhtml";
 <div class="default-main">
   <div class="inner-page-title">
                     
-          <h2>This is a Marklogic Template view that uses AdminTasia UI Templates</h2>
+          <h2>XQuerrail Templating powered by Admintasia Templates</h2>
           <span>You can start building your next user interface with this powerful UI framework !</span>
                 </div>
                 <div class="clear"></div>
@@ -11,16 +11,9 @@ declare default element namespace "http://www.w3.org/1999/xhtml";
                     <div class="two-column">
                         <div class="column">
                             <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all">                    
-                                <div class="portlet-header ui-widget-header">New Release: Admintasia V2.1<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
+                                <div class="portlet-header ui-widget-header">Application Templates to start<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
                                 <div class="portlet-content">
-                                    <p>
-                                        <a href="http://www.admintasia.com"><b>Visit the presentation website</b></a> | <b>
-                                        <a href="http://www.admintasia.com/live-demo"><b>View Live Demonstration</b></a></b>
-                                        <br /><br />
-                    Prices start from <b>$50</b> for the <b>Regular License</b> 
-                    and <b>$299</b> for the <b>Extended License</b>. Both licenses 
-                    come with <b>support access</b> and <b>lifetime updates</b>. 
-                  </p>
+                                    Here is some content you can inject into your template.
                                 </div>
                             </div>
                         </div>
@@ -28,12 +21,8 @@ declare default element namespace "http://www.w3.org/1999/xhtml";
                             <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all">
                                 <div class="portlet-header ui-widget-header">Affiliate Program<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
                                 <div class="portlet-content">
-                                    
-                  <p> Join our affiliates program and earn 51% of every sale. 
-                    <br />
-                    <br /><b><a href="http://www.admintasia.com/affiliates/">Click here for more details about our affiliates program</a></b>.
-                                    </p>
-                                </div>
+                                     <p>Here is another content box to house information.</p>                                    
+                               </div>
                             </div>
                         </div>
                     </div>

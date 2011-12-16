@@ -1,4 +1,18 @@
-<config>
-  <routing resource="%config.directory%/routes.xml"/>
-  <router resource="%kernel.directory%/marklogic/controller.web"/>
+<config  xmlns="http://www.xquerrail-framework.com/config">
+    <controller resource="_kernel/marklogic/controllers/controller.web.xqy"/>
+    <application name="application" resource="/application/">
+        <controller resource="_kernel/marklogic/controller.web.xqy"/>
+        <engine format="json" resource="%engine.directory%/engine.json.xqy"/>
+        <engine format="html" resource="%engine.directory%/engine.html.xqy"/>
+        <routes resource="%config.directory%/routes.xml"/>
+        <interceptors>
+            <before name="interceptor:before-logger" resource="/_framework/interceptors/logging-interceptor.xqy"/>
+            <after  name="interceptor:after-logger" resource="/_framework/interceptors/logging-interceptor.xqy"/>
+        </interceptors>
+        <scaffolding>
+            <admin-theme name="blueberry"/>
+            
+        </scaffolding>
+    </application>
+    
 </config>

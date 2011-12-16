@@ -2,6 +2,7 @@ declare default element namespace "http://www.w3.org/1999/xhtml";
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+        <?include-metas?>
         <title><?title?></title>
         <script type="text/javascript" src="/web/js/jquery-1.4.2.js">//</script>
         <script type="text/javascript" src="/web/js/ui/ui.core.js">//</script>
@@ -43,7 +44,6 @@ declare default element namespace "http://www.w3.org/1999/xhtml";
                 <div id="page-content">
                     <div id="page-content-wrapper" classxxx="no-bg-image wrapper-full"> 
                         <?view?>
-                        <?template name="sidebar"?> 
                         <div class="clear"></div>
                     </div>          
                     <div class="clear"></div>

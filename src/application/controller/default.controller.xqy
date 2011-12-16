@@ -10,10 +10,12 @@ import module namespace request = "http://www.xquerrail-framework.com/request"
     
 import module namespace response = "http://www.xquerrail-framework.com/response"
     at "/_framework/response.xqy";
+
 declare function controller:initialize($request as map:map)
 {
   request:initialize($request)
 };
+
 declare function controller:main($request as map:map)
 {
   controller:index($request)
@@ -28,21 +30,20 @@ declare function controller:index($request as map:map)
     response:set-template("login"),
     response:set-view("login"),
     response:set-title("Login"),
-    response:response()
+    response:response() 
   ) else 
   (
     response:set-controller("default"),
     response:set-template("main"),
     response:set-view("home"),
     response:set-slot("headline",<div>I am a super slot</div>),
-    response:set-title("Welcome to XQuerrail"),
+    response:set-title(fn:concat("Welcome: ",xdmp:get-current-user())),
     response:add-httpmeta("cache-control","public"),
     response:response()
   )
 };
 declare function controller:portlets($request as map:map)
 {
- 
   (
     response:set-controller("default"),
     response:set-template("main"),
@@ -257,6 +258,17 @@ declare function controller:forms($request as map:map)
     response:add-httpmeta("cache-control","public"),
     response:response()
   )  
+};
+declare function controller:dialog($request as map:map)
+{
+   (
+    response:set-controller("default"),
+    response:set-template("main"),
+    response:set-view("dialog"),
+    response:set-title("Dialogs"),
+    response:add-httpmeta("cache-control","public"),
+    response:response()
+  ) 
 };
 declare function controller:tinymce($request as map:map)
 {

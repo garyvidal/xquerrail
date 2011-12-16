@@ -2,20 +2,22 @@ module namespace engine = "http://www.xquerrail-framework.com/engine";
 
 import module namespace request = "http://www.xquerrail-framework.com/request"
    at "/_framework/request.xqy";
+   
 import module namespace response = "http://www.xquerrail-framework.com/response"
    at "/_framework/response.xqy";
   
 declare namespace tag = "http://www.xquerrail-framework.com/tag";    
 
+
 declare default function namespace "http://www.w3.org/2005/xpath-functions";
 
 declare option xdmp:mapping "false";
 
-
-declare variable $engine-transformer as xdmp:function? := xdmp:function(xs:QName("engine:transformer"));
-declare variable $visitor := map:map();
+declare variable $_engine-transformer as xdmp:function? := xdmp:function(xs:QName("engine:transformer"));
+declare variable $_visitor := map:map();
 declare variable $_child-engine-tags := map:map();
 declare variable $_helpers := map:map();
+declare variable $_compiled-tags := map:map();
 
 (:~
  : The for iterator requires a global stack
@@ -27,7 +29,7 @@ declare variable $_for_vars := map:map();
 ~:)
 declare function engine:set-engine-transformer($func as xdmp:function)
 {
-   xdmp:set($engine-transformer,$func)
+   xdmp:set($_engine-transformer,$func)
 };
 
 declare function engine:register-tags($tagnames as xs:QName*)
@@ -56,7 +58,7 @@ declare function engine:tag-is-registered(
 declare function engine:consume($node)
 {
   (
-     map:put($visitor,fn:generate-id($node),"x")
+     map:put($_visitor,fn:generate-id($node),"x")
   )
 };
 (:
@@ -65,7 +67,7 @@ declare function engine:consume($node)
 declare function engine:visit($node)
 {
   (
-     map:put($visitor,fn:generate-id($node),"x"),$node
+     map:put($_visitor,fn:generate-id($node),"x"),$node
   )
 };
 (:
@@ -73,7 +75,7 @@ declare function engine:visit($node)
 :)
 declare function engine:visited($node)
 {
-    fn:exists(map:get($visitor,fn:generate-id($node)))
+    fn:exists(map:get($_visitor,fn:generate-id($node)))
 };
 
 (:~
@@ -321,7 +323,7 @@ declare function engine:transform-dynamic($node as node())
   let $is-registered := engine:tag-is-registered($engine-tag-qname)
   return 
         if($is-registered) 
-        then xdmp:apply($engine-transformer,$node)
+        then xdmp:apply($_engine-transformer,$node)
         else 
           let $name := fn:local-name($node)
           let $func-name := xs:QName(fn:concat("tag:apply"))
@@ -364,4 +366,136 @@ declare function engine:transform($node as node())
          case text() return $node
          default return $node
      )    
+};
+declare function engine:compile($node as node())
+{
+   if(engine:visited($node))
+   then  ()    
+   else(
+       typeswitch($node)
+         case processing-instruction("template") return engine:compile-template($node)
+         case processing-instruction("view") return engine:compile-view($node) 
+         case processing-instruction("if") return engine:compile-if($node)
+         case processing-instruction("for") return engine:compile-for($node)
+         case processing-instruction("has-slot") return engine:compile-has-slot($node)
+         case processing-instruction("slot") return engine:compile-slot($node)
+         case processing-instruction() return engine:compile-dynamic($node)
+         case element() return
+          if(fn:not($node//processing-instruction()))
+          then $node
+          else
+           element {fn:node-name($node)}
+           {
+             $node/@*,
+             for $n in $node/node()
+             return engine:compile($n)
+           }
+         case text() return $node
+         default return $node
+     )  
+};
+declare function engine:compile-view($node as node())
+{
+  ()
+};
+declare function engine:compile-template($node as node())
+{
+  ()
+};
+declare function engine:compile-for($node as node())
+{
+    let $for-tag := $node
+    let $endfor-tag := $for-tag/following-sibling::processing-instruction("endfor")
+    let $elsefor-tag := $for-tag/following-sibling::processing-instruction("elsefor")
+    let $overlap := $for-tag/following-sibling::processing-instruction("for")[. << $for-tag]
+    (:Validate Conditions here:)
+    let $_ := 
+       (  
+         if($overlap) 
+         then fn:error(xs:QName("TAG-ERROR"),"Overlapping <?for?> tags")
+         else (),
+         if($endfor-tag) 
+         then () 
+         else fn:error(xs:QName("TAG-ERROR"),"Missing <?endfor?> tag")
+       )   
+     
+    (:Now Worry about the values:)   
+    let $for-expr := fn:data($for-tag)
+    let $for-nodes := 
+        if($elsefor-tag) 
+        then $for-tag/following-sibling::node()[. << $elsefor-tag] 
+        else $for-tag/following-sibling::node()[. << $endfor-tag]
+    let $elsefor-nodes := 
+        if($elsefor-tag) 
+        then $elsefor-tag/following-sibling::node()[. << $endfor-tag] 
+        else ()
+    let $index-expr := fn:generate-id(<node>{xdmp:random()}</node>)
+    return
+     (
+        engine:consume($for-tag),
+        engine:consume($endfor-tag),
+        engine:consume($elsefor-tag),
+        "{",
+        if($elsefor-tag) 
+        then fn:concat(" if(fn:exists(",$for-expr,")) then (") 
+        else (),
+        "for $",$index-expr, " in ",$for-expr, " return (",
+        for $v in $for-nodes return ()(:engine:compile-for-context($for-data,$v),:),
+        for $d in $for-nodes return engine:consume($d),
+        if($elsefor-tag) 
+        then ") else ("
+        else  (),
+        if($elsefor-tag) 
+        then (for $e in $elsefor-nodes return engine:compile($e),")")
+        else (),
+        "}"
+     )
+};
+
+(:~
+ : Compiles a if tag 
+~:)
+declare function engine:compile-if($node as node())
+{
+  let $endif := $node/following-sibling::processing-instruction("endif")[1]
+  let $else  := $node/following-sibling::processing-instruction("else")[1]
+  let $overlap := $node/following-sibling::processing-instruction("if")[. << $endif]
+  let $_ := 
+     if($overlap) 
+     then fn:error(xs:QName("TAG-ERROR"),"Overlapping if tags")
+     else ()  
+  let $ifnodes := 
+        if($else) then (
+            $node/following-sibling::node()[. << $else]
+        )
+        else (
+            $node/following-sibling::node()[. << $endif]
+        )
+  let $elsenodes := 
+        if($else) then $else/following-sibling::node()[. << $endif]
+        else ()
+  return
+    (
+    engine:consume($endif),
+    engine:consume($else),
+    fn:concat("{ if (", fn:data($node)," ) then (" ),
+    for $n in $ifnodes return engine:compile($n),
+    for $n in $ifnodes return engine:consume($n),
+    ") else (",
+    for $n in $elsenodes return engine:compile($n),
+    for $n in $elsenodes return engine:consume($n),
+    ")}"
+    )
+};
+declare function engine:compile-has-slot($node as node())
+{
+ ()
+};
+declare function engine:compile-slot($node as node())
+{
+ ()
+};
+declare function engine:compile-dynamic($node as node())
+{
+ ()
 };

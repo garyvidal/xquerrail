@@ -1,0 +1,4 @@
+<application xmlns="http://www.xquerrail-framework.com/config">
+    <register name="ContentValidation" resource="%base.dir%/ContentValidation/"/>
+    <register name="application" resource="%base.dir%/application/"/>
+</application>

@@ -109,8 +109,9 @@ declare function model:get-collections()
  : Model Definition 
 ~:)
 declare variable $model:model as element(model:model) := 
-<xsl:copy-of select="."/>
+   <xsl:copy-of select="."/>
 ;
+
 (:~
  : Search Options Configuration
 ~:)

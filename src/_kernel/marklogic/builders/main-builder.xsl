@@ -9,6 +9,10 @@
  <xsl:param name="bundle" />
  <xsl:param name="namespace"/>
  <xsl:param name="domain"/>
+ 
+ <xsl:variable name="model-basepath">/models/</xsl:variable>
+ <xsl:variable name="controller-basepath">/controllers/</xsl:variable>
+ <xsl:variable name="view-basepath">/views/</xsl:variable>
 
  <xsl:variable name="base-namespace" select="concat($namespace,'/',$bundle,'/')"/>
  <xsl:variable name="model-namespace" select="concat($base-namespace,'model')"/>
@@ -19,7 +23,18 @@
  <xsl:variable name="controller-location" select="concat($application-location,'controller/')"/>
  <xsl:variable name="model-location" select="concat($application-location,'model/')"/>
  <xsl:variable name="view-location" select="concat($application-location,'view/')"/>
- 
+ <xsl:variable name="default-controller-actions">
+    <action>list</action>
+    <action>index</action> 
+    <action>create</action>
+    <action>get</action>
+    <action>update</action>
+    <action>delete</action>
+    <action>search</action>
+    <action>find</action>
+    <action>default</action>
+ </xsl:variable>
+
  <xsl:function name="util:model-uri">
    <xsl:param name="model" as="element(domain:model)"/>
    <xsl:value-of select="concat($model-location,$model/@name,'-model.xqy')"/>
@@ -63,16 +78,17 @@
  <xsl:function name="util:model-update-call-params">
     <xsl:param name="model" as="element(domain:model)"/>
     <xsl:variable name="id-elem" select="$model/(domain:element|domain:attribute)[@identity = 'true']"/>
-   $<xsl:value-of select="$id-elem/@name"/><xsl:value-of select="util:resolve-type($id-elem)"/>,<xsl:for-each select="$model//(domain:element|domain:attribute)[not(./@identity = 'true')]"> 
-   $<xsl:value-of select="./@name"/> <xsl:value-of select="util:resolve-type(.)"/><xsl:if test="position() ne last()">,</xsl:if></xsl:for-each>
+   request:param("<xsl:value-of select="$id-elem/@name"/>") as <xsl:value-of select="util:resolve-type($id-elem)"/>,<xsl:for-each select="$model//(domain:element|domain:attribute)[not(./@identity = 'true')]"> 
+   request:param("<xsl:value-of select="@name"/>") cast <xsl:value-of select="util:resolve-type(.)"/><xsl:if test="position() ne last()">,</xsl:if></xsl:for-each>
  </xsl:function>
  <xsl:function name="util:model-create-call-params">
   <xsl:param name="model" as="element(domain:model)"/>
   <xsl:variable name="id-elem" select="$model/(domain:element|domain:attribute)[@identity = 'true']"/>
-  request:param("<xsl:value-of select="$id-elem/@name"/>") cast as <xsl:value-of select="util:resolve-type($id-elem)"/>,<xsl:for-each select="$model//(domain:element|domain:attribute)[not(./@identity = 'true')]"> 
-  $<xsl:value-of select="./@name"/> <xsl:value-of select="util:resolve-type(.)"/><xsl:if test="position() ne last()">,</xsl:if>
+      <xsl:for-each select="$model//(domain:element|domain:attribute)[not(./@identity = 'true')]"> 
+      request:param("<xsl:value-of select="@name"/>") cast <xsl:value-of select="util:resolve-type(.)"/><xsl:if test="position() ne last()">,</xsl:if>
   </xsl:for-each>
  </xsl:function> 
+ 
  <!--Update Parameter Template-->    
  <xsl:function name="util:model-update-params">
   <xsl:param name="model" as="element(domain:model)"/>

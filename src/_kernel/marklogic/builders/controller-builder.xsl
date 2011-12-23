@@ -9,10 +9,13 @@
 
 <xsl:param name="package"/>
 <xsl:variable name="app-name" select="/domain:domain/domain:name"/>
-<xsl:variable name="app-namespace" select="/domain:domain/domain:namespace"/>
+<xsl:variable name="app-namespace" select="/domain:domain/domain:application-namespace"/>
+<xsl:variable name="content-namespace" select="/domain:domain/domain:content-namespace"/>
 <xsl:variable name="controller-author" select="/domain:domain/domain:author"/>
 <xsl:variable name="controller-description" select="/domain:domain/domain:description"/>
 <xsl:variable name="controller-version" select="/domain:domain/domain:version"/>
+<xsl:variable name="models" select="/domain:domain/domain:model"/>
+<xsl:variable name="controllers" select="/domain:domain/domain:controller"/>
 <xsl:include href="main-builder.xsl"/>
  
 <xsl:template match="/">
@@ -25,8 +28,8 @@
 </xsl:template>
  
 <xsl:template match="domain:controller">
-<!-- <xsl:result-document href="{$package}/controllers/{./domain:name}:controller.xqy">-->
- <xsl:result-document href="../../../{$app-name}/controllers/{./@name}.xqy">(:@AUTO-GENERATED@:)
+ <xsl:message>Generating Controller: <xsl:value-of select="@name"/></xsl:message>
+ <xsl:result-document href="../../../{$app-name}/controller/{./@name}.controller.xqy">(:@AUTO-GENERATED@:)
 xquery version "1.0-ml";
 (:~
  : Controller :  <xsl:value-of select="@name"/> 
@@ -43,15 +46,25 @@ import module namespace response =  "http://www.xquerrail-framework.com/response
 import module namespace request =  "http://www.xquerrail-framework.com/request"
    at "../../_framework/request.xqy";
 
-(:Default Imports:)
-declare namespace search = "http://marklogic.com/appservices/search";
-<xsl:apply-templates select="*" mode="controller-header"/>
-<xsl:apply-templates select="." mode="controller-header"/>
+import module namespace search = "http://marklogic.com/appservices/search"
+   at "/MarkLogic/appservices/search/search.xqy";
+   
+  <xsl:apply-templates select="." mode="controller-header"/>
+  
+  <xsl:apply-templates select="*" mode="controller-header"/>
+  
 
 (:Options Definition:)
 declare option xdmp:mapping "false";
 
 declare variable $collation := "http://marklogic.com/collation/codepoint";
+
+(:~Controllers Must Be initialized with Request~:)
+declare function controller:initialize($request as map:map)
+{
+   request:initialize($request)
+   response:initialize($request)
+};
 
  <!-- Controller Required Functions --> 
 (:Controller Required Functions:)
@@ -67,6 +80,7 @@ declare variable $collation := "http://marklogic.com/collation/codepoint";
   <xsl:with-param name="controller" select="."/>
  </xsl:call-template>
  
+<xsl:if test="@auto"> 
 <!-- Controller Web Templates -->
 (:Controller HTML Functions:)
  <xsl:call-template name="index-template">
@@ -117,7 +131,7 @@ declare variable $collation := "http://marklogic.com/collation/codepoint";
  <xsl:call-template name="search-template">
   <xsl:with-param name="controller" select="."/>
  </xsl:call-template>
- 
+</xsl:if>
 <!--End Controller Generation-->
 </xsl:result-document>
 </xsl:template>
@@ -159,8 +173,7 @@ declare function controller:main($request)
 <xsl:template name="info-template">
    <xsl:param name="controller" select="."/>
   declare function controller:info() { 
-  <info>
-    
+  <info>  
   
   </info>
 };
@@ -190,8 +203,7 @@ declare function controller:index()
    let $get := controller:show()
    return
    (
-        response:data("context",$update),
-        <xsl:apply-templates select="$controller/dependencies"/>,
+        response:data("context",$update),<xsl:apply-templates select="$controller/dependencies"/>
         response:template("main"),
         response:view("new"),  
         response:flush()
@@ -339,16 +351,9 @@ declare function controller:find()
  
 <!--REST Service Builder Templates -->
 <xsl:template match="domain:controller" mode="controller-header">
-(:~
- : Controller Definition 
-~:)
-declare variable $domain:controller as element(domain:controller) := 
-<xsl:copy-of select="."/>
-;
-(:~
- : Search Options Configuration
-~:)
-
+<!--Add Additional includes and models here-->
+  import module namespace model = "<xsl:value-of select="$app-namespace"/>/model/<xsl:value-of select="@name"/>"
+     at "..<xsl:value-of select="$model-basepath"/><xsl:value-of select="@name"/>.model.xqy";
 </xsl:template>
 
 <xsl:template match="domain:namespace" mode="controller-header">
@@ -360,13 +365,24 @@ declare namespace <xsl:value-of select="@prefix"/> = "<xsl:value-of select="@uri
 (:~
  : Returns a list of <xsl:value-of select="@name" />
 ~:)    
-declare function controller:<xsl:value-of select="@name"/>() as map:map 
+declare function controller:list-<xsl:value-of select="@name"/>() as map:map 
 {
-<xsl:element name="{@name}">
-<xsl:copy-of select="node()" exclude-result-prefixes="#all" copy-namespaces="no" />
-</xsl:element> 
+   <xsl:element name="{@name}">
+    <xsl:copy-of select="node()" exclude-result-prefixes="#all" copy-namespaces="no" />
+   </xsl:element> 
 }; 
 </xsl:template>
+
+ <xsl:template name="create-template" xml:space="true">
+  <xsl:param name="controller"/>
+  (:~
+  : Create <xsl:value-of select="$controller/@name"/>
+  ~:) 
+  declare function controller:create() {
+  model:create(<xsl:value-of select="util:model-create-call-params($models[@name = $controller/@model])"/>
+  )  
+  };
+ </xsl:template>
  
 <xsl:template name="update-template">
  <xsl:param name="controller"/>
@@ -375,22 +391,10 @@ declare function controller:<xsl:value-of select="@name"/>() as map:map
 ~:) 
 declare function controller:update()
 {
-      model:update(<xsl:value-of select="util:model-call-update-params"/>)
+      model:update(<xsl:value-of select="util:model-update-call-params"/>)
 };
 </xsl:template>
 
-<xsl:template name="create-template" xml:space="true">
-  <xsl:param name="controller"/>
-(:~
- : Create <xsl:value-of select="$controller/@name"/>
-~:) 
-declare function controller:create() {
-   model:create(
-      <xsl:value-of select="util:model-create-call-params($controller)"/>
-   )  
-};
-</xsl:template>
- 
  <!--Delete Template-->
  <xsl:template name="delete-template">
  <xsl:param name="controller" as="element()"/>
@@ -419,6 +423,7 @@ declare function controller:get()
 };
  </xsl:template>
  
+ <!--Search Template--> 
  <xsl:template name="search-template">
   <xsl:param name="controller"/>
 (:~
@@ -429,6 +434,7 @@ declare function controller:get()
 ~:)
 declare function controller:search()
 {
+ 
    model:search(
      request:param("query"),
      request:param("start"),
@@ -437,6 +443,7 @@ declare function controller:search()
    )
 };
  </xsl:template>
+
  <!--
   ============================================================
   XSL FUNCTIONS

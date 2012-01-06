@@ -1,0 +1,15 @@
+rails.xq - 
+
+
+Running Demo Application
+------------------------
+
+* Create a database
+
+* Create an appserver pointing code code base /src/
+
+* set url rewriter to /rewriter.xqy
+
+* Use application-level security 
+
+* login your app with a user on your system

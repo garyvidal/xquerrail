@@ -1,32 +1,12 @@
-(:
- : Copyright 2011 - Gary Vidal
- :
- : Licensed     under the Apache License, Version 2.0 (the "License");
- : you may not use this file except in compliance with the License.
- : You may obtain a copy of the License at
- :
- :    http://www.apache.org/licenses/LICENSE-2.0
- :
- : Unless required by applicable law or agreed to in writing, software
- : distributed under the License is distributed on an "AS IS" BASIS,
- : WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- : See the License for the specific language governing permissions and
- : limitations under the License.
- :)
-
-
-
 xquery version "1.0-ml";
 
 (:~
  : This request controls all serialization of request map 
- : - All HTTP request elements 
- : are returned in a single map object.
- : @author : Gary Vidal
+ : - All HTTP request elements in a single map:map type.
 ~:)
 module namespace request = "http://www.xquerrail-framework.com/request";
 
-import module namespace json = "http://marklogic.com/json"  at "/application/lib/json.xqy";
+import module namespace json = "http://marklogic.com/json"  at "/lib/json.xqy";
 
 declare variable $BODY              := "request:body";
 declare variable $BODY-XML          := "request:body-xml";
@@ -41,11 +21,13 @@ declare variable $USERID            := "request:userid";
 declare variable $PATH              := "request:path";
 declare variable $URL               := "request:url";
 declare variable $CONTEXT           := "request:context";
+declare variable $APPLICATION       := "request:application";
 declare variable $CONTROLLER        := "request:controller";
 declare variable $ACTION            := "request:action";
 declare variable $FORMAT            := "request:format";
 declare variable $ROUTE             := "request:route";
 declare variable $VIEW              := "request:view";
+declare variable $PARTIAL           := "request:partial";
 declare variable $HEADER-PREFIX     := "request:header::";
 declare variable $PARAM-PREFIX      := "request:field::";
 declare variable $PARAM-CONTENT-TYPE-PREFIX := "request:field-content-type::";
@@ -74,6 +56,10 @@ declare function request:hex-decode($hexBin as xs:hexBinary, $length as xs:integ
     return
         fn:codepoints-to-string($bytes)
 };
+
+(:~
+ : Returns the map:map of the request
+~:)
 declare function request:request()
 {
   $request
@@ -82,44 +68,63 @@ declare function request:request()
 (:~
  :  Wraps the http response into a map:map
  :  Accessing the map can be used the following keys
- :  map:get($response, "rest:field:xxx")
+ :  map:get($response, "field:xxx")
  :  Accessors:
  :      request:header::xxxx
  :      request:field::xxxx
  :      request:body
 ~:)
 declare function request:initialize($_request) {
- xdmp:set($request:request, $_request) (:NO-OP just keeps an empty map:)
+  xdmp:set($request:request, $_request) (:NO-OP just keeps an empty map:)
 };
 
 (:~
- : 
+ :  Parses the map pulling all the required information from http request 
 ~:)
 declare function request:parse($parameters) as map:map {
    let $request := map:map()
+   
+   (:Insert all custom headers:)
    let $headers :=            
         for $i in xdmp:get-request-header-names()
         return
             for $j in xdmp:get-request-header($i)
             return
                map:put($request, fn:concat($HEADER-PREFIX,$i),$j)
+   (:Map All common request information:)
    let $rests := 
       ( 
-        map:put($request,$CONTROLLER,xdmp:get-request-field("_controller","default")),
-        map:put($request,$ACTION,xdmp:get-request-field("_action","main")),
-        map:put($request,$VIEW,xdmp:get-request-field("_view","default")),
-        map:put($request,$URL, xdmp:get-request-field("_url","")) 
+        map:put($request, $APPLICATION,xdmp:get-request-field("_application","application")),
+        map:put($request, $CONTROLLER, xdmp:get-request-field("_controller","default")),
+        map:put($request, $ACTION,     xdmp:get-request-field("_action","main")),
+        map:put($request, $FORMAT,     xdmp:get-request-field("_format","xml")),
+        map:put($request, $VIEW,       xdmp:get-request-field("_view","default")),
+        map:put($request, $URL,        xdmp:get-request-field("_url","")),
+        map:put($request, $ROUTE,      xdmp:get-request-field("_route","")),
+        map:put($request, $PARTIAL,    xdmp:get-request-field("_partial","false")),
+        map:put($request, $METHOD,     xdmp:get-request-method()),
+        map:put($request, $PATH,       xdmp:get-request-path()),
+        map:put($request, $URL,        xdmp:get-request-url()),
+        map:put($request, $PROTOCOL,   xdmp:get-request-protocol()),
+        map:put($request, $USERNAME,   xdmp:get-request-username()),
+        map:put($request, $USERID,     xdmp:get-request-user())
       )
    let $fields := 
-         for $i in xdmp:get-request-field-names()[fn:not(. = ("_controller","_action","_view","_context","_format","_url","_route"))]
+         for $i in xdmp:get-request-field-names()[fn:not(. = ("_controller","_action","_view","_context","_format","_url","_route","_partial"))]
          let $fieldname := fn:concat($PARAM-PREFIX,$i)
          let $filename := xdmp:get-request-field-filename($i)
          let $content-type := xdmp:get-request-field-content-type($i)
          return
+            (:Load All Request Fields:)
             for $j in xdmp:get-request-field($i)
             let $filename-key := fn:concat($PARAM-FILENAME-PREFIX,$i)
-            return 
-                (
+            let $x := 
+                 if(fn:matches($j,"^(\{|\[)*(\}|\])$","mix")) 
+                 then 
+                     let $jsonMap := xdmp:from-json(fn:replace($j,"(&#13;|&#10;)","")) 
+                     return request:convert-json-map($jsonMap)
+                 else $j
+            return (
                     if(map:get($request,$fieldname)) then
                     (
                          map:put($request,$fieldname,
@@ -130,50 +135,65 @@ declare function request:parse($parameters) as map:map {
                        map:put($request, $fieldname,$j)
                 ,(:Write out the filename info:) 
                 if($filename) then
-                  (
-                     map:put($request,fn:concat($PARAM-FILENAME-PREFIX,$i),$filename),
-                     map:put($request,fn:concat($PARAM-CONTENT-TYPE-PREFIX),$content-type)
-                  ) 
+                (
+                   map:put($request,fn:concat($PARAM-FILENAME-PREFIX,$i),$filename),
+                   map:put($request,fn:concat($PARAM-CONTENT-TYPE-PREFIX,$i),$content-type)
+                ) 
                 else  ()   
-              )
-   
-   let $rest := (
-      map:put($request, $METHOD,xdmp:get-request-method()),
-      map:put($request, $PATH,xdmp:get-request-path()),
-      map:put($request, $URL,xdmp:get-request-url()),
-      map:put($request, $PROTOCOL,xdmp:get-request-protocol()),
-      map:put($request, $USERNAME,xdmp:get-request-username()),
-      map:put($request, $USERID,xdmp:get-request-user())
-   ) 
-   let $accept-types := xdmp:uri-format(xdmp:get-request-header("Content-Type"))   
-   let $_ := map:put($request, $BODY,xdmp:get-request-body($accept-types))
+            )
+ 
+        let $_content-type := fn:normalize-space(fn:tokenize(xdmp:get-request-header("Content-Type"), ";")[1])
+        let $accept-types := xdmp:uri-format($_content-type)
+        let $_ := xdmp:log($_content-type)
+        let $_ := 
+             if ($_content-type = "application/json" or fn:contains($_content-type,"application/json"))  
+             then map:put($request, $BODY, json:jsonToXML( xdmp:quote(xdmp:get-request-body()/node()) ))
+             else  map:put($request, $BODY, xdmp:get-request-body($accept-types))
    return $request
 };
 
 (:~
- : 
+ : Get the application from the request
+~:)
+declare function request:application(){
+  map:get($request,$APPLICATION)
+};
+
+(:~
+ :  Gets the controller from the request
 ~:)
 declare function request:controller() {
     map:get($request,$CONTROLLER)
 };
+
 (:~
  :  Gets that action Parameters of the request
 ~:)
 declare function request:action() {
     map:get($request,$ACTION)
 };
+
 (:~
- : Selects the file format of the reqeust
+ : Selects the file format of the requestt
 ~:)
 declare function request:format() {
    map:get($request,$FORMAT)
 };
+
 (:~
  : Gets the route selected for the request
 ~:)
 declare function request:route() {
    map:get($request,$ROUTE)
 };
+
+(:~
+ : Gets the view selected for the request
+~:)
+declare function request:view() {
+   map:get($request,$VIEW)
+};
+
 (:~
  : Returns the method for a given request
  : the method returns the http verb such as POST,GET,DELETE
@@ -182,52 +202,83 @@ declare function request:route() {
 declare function request:method() {
     map:get($request,$METHOD)
 };
+
 (:~
- : 
+ :  Get the original Path of the request
 ~:)
 declare function request:path() {
     map:get($request,$PATH)
 };
+
 (:~
- : 
+ :  Get the protocal of the request
 ~:)
-declare function request:protocol($request as map:map) {
+declare function request:protocol() {
     map:get($request,$PROTOCOL)
 };
+
 (:~
- : Returns the body element of an http:request
+ : Returns the body element of an http:request. Use the request:body-type() 
+ : function to determine the underlying datatype
 ~:)
 declare function request:body() {
     map:get($request,$BODY)
 };
+
 (:~
- : 
+ :  Returns the body type of the given request such as (xml, binary, text) 
 ~:)
-declare function request:body-type($request as map:map){
+declare function request:body-type(){
     map:get($request,$BODY-TYPE)
 };
+
 (:~
- :  Returns the list of params
+ : Returns if a request is a partial request common in ajax calls
 ~:)
-declare function request:params() {
+declare function request:partial(){
+  let $is-partial := map:get($request,$PARTIAL)
+  return
+    if($is-partial) then
+      if($is-partial eq "true") 
+      then fn:true()
+      else fn:false()
+    else 
+      fn:false()
+};
+
+(:~
+ :  Returns the list of parameters of just parameters in a map
+~:)
+declare function request:params()  as map:map{
     let $new-map := map:map()
     let $_ := 
-        for $key in map:keys($request)[fn:starts-with(.,$PARAM-PREFIX)]
-        return 
-            map:put($new-map,fn:substring-after($PARAM-PREFIX,$key),map:get($request,$key))
+        (
+            for $key in map:keys($request)[fn:starts-with(.,$PARAM-PREFIX)]
+            return 
+                map:put($new-map,fn:substring-after($key,$PARAM-PREFIX
+                ),map:get($request,$key)),
+            (:Add param with format $key:filename key:content-type:) 
+            for $key in map:keys($request)[fn:starts-with(.,$PARAM-FILENAME-PREFIX)]
+            return map:put($new-map, fn:concat(fn:substring-after($key,$PARAM-FILENAME-PREFIX),"::filename"),map:get($request,$key))
+            ,
+            for $key in map:keys($request)[fn:starts-with(.,$PARAM-CONTENT-TYPE-PREFIX)]
+            return map:put($new-map, fn:concat(fn:substring-after($key,$PARAM-CONTENT-TYPE-PREFIX),"::content-type"),map:get($request,$key))
+        )    
     return
         $new-map
 };
+
 (:~
- :
+ : Returns a list parameter names from request as sequence of string values
 ~:)
 declare function request:param-names()
 {
     for $key in map:keys($request)[fn:starts-with(.,$PARAM-PREFIX)]
     return fn:substring-after($key, $PARAM-PREFIX)
 };
+
 (:~
- : 
+ :  Gets a parameter value by name
 ~:)
 declare function request:param($name as xs:string) {
    let $key-name := fn:concat($PARAM-PREFIX,$name)
@@ -246,9 +297,42 @@ declare function request:param($name as xs:string,$default as item()*) {
     then $field
     else $default
 };
-
 (:~
- : 
+ : Returns a parameter casted as the type you specify.
+ : Use the generic type of the asset to resolve as the underlying type
+~:)
+declare function request:param-as(
+    $name as xs:string,
+    $type as xs:string,
+    $default as item()
+) as item()*
+{
+    let $value := request:param($name,$default)
+    return 
+      if($type eq "xs:integer" and $value castable as xs:integer) 
+      then $value cast as xs:integer
+      else if($type eq "xs:unsignedInteger" and $value castable as xs:unsignedInt) 
+      then $value cast as xs:unsignedInt
+      else if($type eq "xs:long" and $value castable as xs:long) 
+      then $value cast as xs:long
+      else if($type eq "xs:unsignedLong" and $value castable as xs:unsignedLong) 
+      then $value cast as xs:unsignedLong
+      else if($type eq "xs:decimal" and $value castable as xs:decimal)
+      then $value cast as xs:decimal
+      else if($type eq "xs:float" and $value castable as xs:float) 
+      then $value cast as xs:float
+      else if($type eq "xs:double" and $value castable as xs:double)
+      then $value cast as xs:double
+      else if($type eq "xs:boolean" and $value castable as xs:boolean)
+      then $value cast as xs:boolean
+      else if($type eq "xs:string" and $value castable as xs:string)
+      then $value cast as xs:string
+      else if($type eq "element" and $value instance of element())
+      then $value
+      else fn:error(xs:QName("PARAM-EXCEPTION"),"Parameter Type is not supported",($type,$name))
+};
+(:~
+ :  Returns the parameters of the request as a map
 ~:)
 declare function request:params-as-map()
 {
@@ -264,13 +348,15 @@ declare function request:params-as-map()
 };
 
 (:~
- :
+ :  Returns the filename for the param
 ~:)
-declare function request:param-filename($request as map:map,$name as xs:string) {
+declare function request:param-filename($name as xs:string) {
     map:get($request,fn:concat($PARAM-FILENAME-PREFIX,$name))
 };
 (:~
- :
+ :  Returns the associated content-type for the given param
+ :  In cases where the request has multipart/mime data on the form
+ :  you can extract the type based request from client
 ~:)
 declare function request:param-content-type(
 $request as map:map,
@@ -279,6 +365,7 @@ $field as xs:string
 {
    map:get($request,fn:concat($PARAM-CONTENT-TYPE-PREFIX,$field))
 };
+
 (:~
  : Gets a all response header object
 ~:)
@@ -293,7 +380,8 @@ declare function request:get-headers() {
 };
 
 (:~
- : 
+ : Gets a specific header parameter by name 
+ :  @param $name - Name of the header parameter (ie. Content-Length)
 ~:)
 declare function request:get-header($name as xs:string) {
    let $key-name := fn:concat($HEADER-PREFIX,$name)
@@ -302,7 +390,9 @@ declare function request:get-header($name as xs:string) {
 };
 
 (:~
- : 
+ :  Gets a specific header parameter by name and its default value if not present
+ :  @param $name - Name of the header parameter (ie. Content-Length)
+ :  @param $defualt - Default value if header parameter is not present.
 ~:)
 declare function request:get-header($name as xs:string,$default as xs:anyAtomicType) {
   if(request:get-header($request,$name))
@@ -310,20 +400,24 @@ declare function request:get-header($name as xs:string,$default as xs:anyAtomicT
   else $default
 };
 
-(:Common Request Header PARAM wrapper:)
+(:Common HTTP Request Header PARAMs wrapper:)
+
+(:~
+ : Returns the given Accept-Language from the HTTP request
+~:)
 declare function request:locale()
 {
   map:get($request,fn:concat($HEADER-PREFIX,"Accept-Language"))
 };
 (:~
- :
+ : Returns the Content-Length header param
 ~:)
 declare function request:content-length()
 { 
-  ()
+   map:get($request,fn:concat($HEADER-PREFIX,"Content-Length"))
 };
 (:~
- :
+ : Returns the User-Agent header from a given request
 ~:)
 declare function request:user-agent()
 {
@@ -331,7 +425,7 @@ declare function request:user-agent()
 };
 
 (:~
- :
+ : Returns the Referer header from a given request
 ~:)
 declare function request:referer()
 {
@@ -339,33 +433,45 @@ declare function request:referer()
 };
 
 (:~
- :
+ : Returns the Accept-Encoding header from a given request
 ~:)
 declare function request:encoding()
 {
     map:get($request,fn:concat($HEADER-PREFIX,"Accept-Encoding"))  
 };
 
+(:~
+ : Returns the Connection header from a given request
+~:)
 declare function request:connection()
 {
     map:get($request,fn:concat($HEADER-PREFIX,"Connection"))  
 };
-
+(:~
+ : Returns the Authorization Header from the request
+~:)
 declare function request:authorization()
 {
     map:get($request,fn:concat($HEADER-PREFIX,"Authorization"))  
 };
-
+(:~
+ : Returns the Cookies from the request
+~:)
 declare function request:cookies()
 {
     map:get($request,fn:concat($HEADER-PREFIX,"Cookie"))     
 };
+
+(:~
+ : Returns the Cookies by name from the request
+ : @param $name - name of cookie
+~:)
 declare function request:cookie($name)
 {
    request:cookies()
 };
 (:~
- :
+ :  Using JQGrid you can parse a query from field using simple language, parses from JSON into CTS Query
 ~:)
 declare function request:build-query($params)
 {
@@ -409,6 +515,9 @@ declare function request:build-query($params)
   else $value-query
 };
 
+(:~
+ : Returns the parse Query from JQGrid 
+~:)
 declare function request:parse-query()  
 {
  let $filters  := 
@@ -424,4 +533,16 @@ declare function request:parse-query()
   else ()
   return
      request:build-query($filters)
+};
+(:~
+ : Converts a JSON map into a request parameter
+~:)
+declare private function request:convert-json-map($map as map:map) {
+    for $key in map:keys($map)
+    let $val := map:get($map,$key)
+    return
+        element {$key} {
+            if($val instance of map:map) then request:convert-json-map($val) else $val
+        }
+
 };

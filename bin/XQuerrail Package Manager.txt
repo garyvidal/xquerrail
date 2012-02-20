@@ -1,0 +1,92 @@
+xQuirrel Package Manager Command Line Helper
+==============================================
+ Creating a new Application
+==============================================
+[Create a new application]
+>xpm create application {application-name}
+
+echo Creating Application Directories
+  {application-name}/config/
+  {application-name}/config/routes.xml
+  {application-name}/config/config.xml
+  {application-name}/config/environment.xml
+  {application-name}/controllers/
+  {application-name}/domain/
+  {application-name}/domain/domain.xml
+  {application-name}/lib/
+  {application-name}/models/
+  {application-name}/scripts/
+  {application-name}/stylesheets/
+  {application-name}/images/
+  {application-name}/views/
+ Registering Application:
+   
+[Switching to application]  
+>use {application-name}
+
+==============================================
+ Creating new domain objects (controllers,models)
+==============================================
+[Creating a new Model]
+xpm create model {model-name} 
+  -xsd Use an XSD to create the models
+  -(e)xtend {basemodel}
+  
+[Creating a new Controller]  
+xpm create controller {controller-name} 
+  -(m)odel {model-name} -ismulti true|false
+
+==============================================
+ Package Management and Deployment
+==============================================
+[Package the application]
+xpm package {application-name}
+
+[Deploy Application]
+xpm deploy application {environment}
+  -(c)ache true|false
+  -(p)ack true|false
+  -(o)bfuscate true|false
+  -(pr) - Pack Resources such as (js|css)
+  -(v) version package when installing to support compability mode.
+
+==============================================
+ Plugin Management
+==============================================
+[List Plugin]
+xpm list-plugins -url {url-name}
+
+[Install Plugin]
+xpm install-plugin -plugin {plugin-name}
+
+[Remove a plugin]
+xpm remove-plugin -plugin {plugin-name}
+
+==============================================
+ I18N Support
+==============================================
+xpm generate i18n 
+
+echo:
+  Generating i18n Files
+     {application-name}/resources/application.en.xml
+     {application-name}/scripts/application.en.js
+
+==============================================
+Application Scaffolding
+==============================================
+xpm generate 
+  - (c)ontroller {controller-name} 
+  - (m)odel - Include model generation
+  - (v)iew - Include views
+  
+==============================================
+Compilation Targets
+==============================================
+[Compile Templates into Pure XQuery Code]
+xpm compile templates
+  echo : 
+     Compiling Templates
+
+[Compile views into pure XQuery code]
+xpm compile views

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<i18n lang="en_us">
-<message key="application:welcome">Welcome {0}</message>
-<message key="application:firstname">First Name</message>
-<message key="application:lastname">Last Name</message>
-<message key="application:copyright">Address</message>
-</i18n>

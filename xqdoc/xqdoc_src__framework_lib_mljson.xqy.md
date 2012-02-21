@@ -1,0 +1,335 @@
+# library module: http://marklogic.com/json
+
+
+## Table of Contents
+
+* Variables: [$newLineRegex](#var_newLineRegex), [$analyzeString](#var_analyzeString), [$isSupported](#var_isSupported)
+* Functions: [parse\#2](#func_parse_2), [parse\#1](#func_parse_1), [serialize\#1](#func_serialize_1), [serialize\#2](#func_serialize_2), [document\#1](#func_document_1), [object\#1](#func_object_1), [o\#1](#func_o_1), [object\#0](#func_object_0), [o\#0](#func_o_0), [array\#1](#func_array_1), [a\#1](#func_a_1), [array\#0](#func_array_0), [a\#0](#func_a_0), [date\#1](#func_date_1), [xml\#1](#func_xml_1), [null\#0](#func_null_0), [escapeNCName\#1](#func_escapeNCName_1), [unescapeNCName\#1](#func_unescapeNCName_1), [castAs\#2](#func_castAs_2), [isSupported\#0](#func_isSupported_0), [rangeIndexValues\#5](#func_rangeIndexValues_5)
+
+
+## Variables
+
+### <a name="var_newLineRegex"/> $newLineRegex
+```xquery
+$newLineRegex as 
+```
+
+### <a name="var_analyzeString"/> $analyzeString
+```xquery
+$analyzeString as 
+```
+
+### <a name="var_isSupported"/> $isSupported
+```xquery
+$isSupported as 
+```
+
+
+
+## Functions
+
+### <a name="func_parse_2"/> parse\#2
+```xquery
+parse(
+    $json as xs:string,
+    $enableExtensions as xs:boolean
+) as  element(json:json)
+```
+
+#### Params
+
+* json as  xs:string
+
+* enableExtensions as  xs:boolean
+
+
+#### Returns
+*  element(json:json)
+
+### <a name="func_parse_1"/> parse\#1
+```xquery
+parse(
+    $json as xs:string
+) as  element(json:json)
+```
+
+#### Params
+
+* json as  xs:string
+
+
+#### Returns
+*  element(json:json)
+
+### <a name="func_serialize_1"/> serialize\#1
+```xquery
+serialize(
+    $element as node()
+) as  xs:string
+```
+
+#### Params
+
+* element as  node()
+
+
+#### Returns
+*  xs:string
+
+### <a name="func_serialize_2"/> serialize\#2
+```xquery
+serialize(
+    $element as node(),
+    $jsonPCallback as xs:string?
+) as  xs:string
+```
+
+#### Params
+
+* element as  node()
+
+* jsonPCallback as  xs:string?
+
+
+#### Returns
+*  xs:string
+
+### <a name="func_document_1"/> document\#1
+```xquery
+document(
+    $value as item()
+) as  element(json:json)
+```
+
+#### Params
+
+* value as  item()
+
+
+#### Returns
+*  element(json:json)
+
+### <a name="func_object_1"/> object\#1
+```xquery
+object(
+    $keyValues as item()*
+) as  element(json:item)
+```
+
+#### Params
+
+* keyValues as  item()\*
+
+
+#### Returns
+*  element(json:item)
+
+### <a name="func_o_1"/> o\#1
+```xquery
+o(
+    $keyValues as item()*
+) as  element(json:item)
+```
+
+#### Params
+
+* keyValues as  item()\*
+
+
+#### Returns
+*  element(json:item)
+
+### <a name="func_object_0"/> object\#0
+```xquery
+object(
+) as  element(json:item)
+```
+
+#### Returns
+*  element(json:item)
+
+### <a name="func_o_0"/> o\#0
+```xquery
+o(
+) as  element(json:item)
+```
+
+#### Returns
+*  element(json:item)
+
+### <a name="func_array_1"/> array\#1
+```xquery
+array(
+    $items as item()*
+) as  element(json:item)
+```
+
+#### Params
+
+* items as  item()\*
+
+
+#### Returns
+*  element(json:item)
+
+### <a name="func_a_1"/> a\#1
+```xquery
+a(
+    $items as item()*
+) as  element(json:item)
+```
+
+#### Params
+
+* items as  item()\*
+
+
+#### Returns
+*  element(json:item)
+
+### <a name="func_array_0"/> array\#0
+```xquery
+array(
+) as  element(json:item)
+```
+
+#### Returns
+*  element(json:item)
+
+### <a name="func_a_0"/> a\#0
+```xquery
+a(
+) as  element(json:item)
+```
+
+#### Returns
+*  element(json:item)
+
+### <a name="func_date_1"/> date\#1
+```xquery
+date(
+    $value as xs:anySimpleType
+) as  element(json:item)
+```
+
+#### Params
+
+* value as  xs:anySimpleType
+
+
+#### Returns
+*  element(json:item)
+
+### <a name="func_xml_1"/> xml\#1
+```xquery
+xml(
+    $value as element()
+) as  element(json:item)
+```
+
+#### Params
+
+* value as  element()
+
+
+#### Returns
+*  element(json:item)
+
+### <a name="func_null_0"/> null\#0
+```xquery
+null(
+) as  element(json:item)
+```
+
+#### Returns
+*  element(json:item)
+
+### <a name="func_escapeNCName_1"/> escapeNCName\#1
+```xquery
+escapeNCName(
+    $val as xs:string
+) as  xs:string
+```
+
+#### Params
+
+* val as  xs:string
+
+
+#### Returns
+*  xs:string
+
+### <a name="func_unescapeNCName_1"/> unescapeNCName\#1
+```xquery
+unescapeNCName(
+    $val as xs:string
+) as  xs:string
+```
+
+#### Params
+
+* val as  xs:string
+
+
+#### Returns
+*  xs:string
+
+### <a name="func_castAs_2"/> castAs\#2
+```xquery
+castAs(
+    $key as xs:string,
+    $enableExtensions as xs:boolean
+) as  xs:string?
+```
+
+#### Params
+
+* key as  xs:string
+
+* enableExtensions as  xs:boolean
+
+
+#### Returns
+*  xs:string?
+
+### <a name="func_isSupported_0"/> isSupported\#0
+```xquery
+isSupported(
+) as  xs:boolean
+```
+
+#### Returns
+*  xs:boolean
+
+### <a name="func_rangeIndexValues_5"/> rangeIndexValues\#5
+```xquery
+rangeIndexValues(
+    $key as xs:string,
+    $type as xs:string,
+    $query as cts:query?,
+    $options as xs:string*,
+    $limit as xs:integer?
+) as  xs:anyAtomicType*
+```
+
+#### Params
+
+* key as  xs:string
+
+* type as  xs:string
+
+* query as  cts:query?
+
+* options as  xs:string\*
+
+* limit as  xs:integer?
+
+
+#### Returns
+*  xs:anyAtomicType\*
+
+
+
+
+
+*Generated by [xquerydoc](https://github.com/xquery/xquerydoc)*

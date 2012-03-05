@@ -2,8 +2,11 @@
    <route id="_resources" pattern="^/resources/*" is-resource="true">
       <prepend></prepend>
    </route>
-   <route id="_xray" pattern="^/xray(.*)" is-resource="true">
-       <to>/lib/xray/index.xqy</to>
+   <route id="_xray" pattern="^/xray(/index\.html)?$" is-resource="true">
+       <to>/lib/xray/index.html</to>
+   </route>
+   <route id="_xray_assets" pattern="^/xray/.*" is-resource="true">
+      <prepend>/lib</prepend>
    </route>
    <!--Default Controller Routes-->   
    <route id="_default" pattern="^/(index\.html)?$">

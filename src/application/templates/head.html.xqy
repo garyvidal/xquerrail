@@ -7,12 +7,11 @@
         <link href="/resources/css/ui/ui.base.css" rel="stylesheet" media="all" />
 
         <link href="/resources/css/themes/black_rose/ui.css" rel="stylesheet" title="style" media="all" />
-        <?if xdmp:get-current-user() eq "validator-nobody"?>
+        <?if response:user() = config:anonymous-user(response:application())?>
         <link href="/resources/css/ui/ui.login.css" rel="stylesheet" title="style" media="all" />   
         <?endif?>
         <link href="/resources/css/ui/ui.jqgrid.css" rel="stylesheet" title="style" media="all"/>
         <link href="/resources/css/ui/ui.layout.css" rel="stylesheet" title="style" media="all"/>
-        
         <?controller-stylesheet?>
         <script type="text/javascript" src="/resources/js/jquery-1.4.2.js"></script>
         <script type="text/javascript" src="/resources/js/ui/ui.core.js"></script>

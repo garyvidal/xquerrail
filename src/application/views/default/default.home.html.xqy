@@ -1,12 +1,11 @@
 xquery version "1.0-ml";
 declare default element namespace "http://www.w3.org/1999/xhtml";
 <div class="default-main">
-  <div class="inner-page-title">
-                    
-          <h2>XQuerrail Framework Getting Started</h2>
-          <span>You can start building your next user interface with this powerful UI framework !</span>
-                </div>
-                <div class="clear"></div>
+  <div class="inner-page-title">             
+     <h2>XQuerrail Framework Getting Started</h2>
+     <span>You can start building your next user interface with this powerful UI framework !</span>
+  </div>
+          <div class="clear"></div>
                 <div class="content-box">
                     <div class="two-column">
                         <div class="column">

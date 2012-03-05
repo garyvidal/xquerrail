@@ -858,5 +858,13 @@
       "/>
     </sequential>
   </macrodef>
-  
+  <macrodef name="run-xqdocs">
+    <attribute name="files"/>
+    <attribute name="local"/>
+    <sequential>
+      <xslt in="test.xml" out="xslt2-test.xml" style="xslt2-test.xsl" force="true">
+         <classpath location="/home/ap/saxon/saxon8.jar" />
+      </xslt>
+    </sequential>
+  </macrodef>
 </project>

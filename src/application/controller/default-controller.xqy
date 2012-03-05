@@ -24,7 +24,7 @@ declare function controller:main()
 
 declare function controller:index()
 {
-  if(xdmp:get-current-user() = ("nobody","validator-nobody")) then
+  if(xdmp:get-current-user() = ("anonymous-user")) then
   (
     response:set-controller("default"),
     response:set-action("home"),

@@ -14,5 +14,4 @@ declare variable $tests as xs:string? := xdmp:get-request-field("tests");
 (: output format xml|html|text :)
 declare variable $format as xs:string := xdmp:get-request-field("format", "html");
 
-
 xray:run-tests($dir, $modules, $tests, $format)

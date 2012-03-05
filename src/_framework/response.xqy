@@ -28,6 +28,7 @@ declare variable $FLASH       := "response:flash";
 declare variable $BASE        := "response:base";
 declare variable $MODEL       := "response:model";
 
+declare variable $USER        := "response:user";
 (:Default Prefix for Slots:)
 declare variable $HEADER       := "response:header::";
 declare variable $PARAMETER    := "response:parameter::";
@@ -105,9 +106,18 @@ declare private function response:set-defaults($_request)
         if(fn:exists(response:controller()))  then () else response:set-controller(request:controller()),
         if(fn:exists(response:action()))      then () else response:set-action(request:action()),
         if(fn:exists(response:format()))      then () else response:set-action(request:format()),
-        if(fn:exists(response:partial()))     then () else response:set-partial(request:partial())
+        if(fn:exists(response:partial()))     then () else response:set-partial(request:partial()),
+        if(fn:exists(response:user()))     then () else response:set-user(request:user())
      )
    return ()
+};
+declare function response:set-user($user)
+{
+   map:put($response,$USER,$user)
+};
+declare function response:user()
+{
+   map:get($response,$USER)
 };
 (:~
  : The Flash message is a convenient may to store information 

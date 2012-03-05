@@ -1,6 +1,6 @@
 xquery version "1.0-ml";
 
-module namespace interceptor = "http://www.xquerrail-framework.com/interceptor";
+module namespace interceptor = "http://www.xquerrail-framework.com/interceptor/profiler";
 
 declare function interceptor:name()
 {
@@ -9,11 +9,13 @@ declare function interceptor:name()
 declare function interceptor:implements() as xs:QName*
 {
    (
-     xs:QName("interceptor:invoke-after"),
-     xs:QName("interceptor:invoke-before")
+     xs:QName("interceptor:before-request"),
+     xs:QName("interceptor:after-request"),
+     xs:QName("interceptor:before-response"),
+     xs:QName("interceptor:after-response")
    )
 };
-declare function interceptor:invoke-before($request as map:map)
+declare function interceptor:before-request($request as map:map)
 {
   try {
   (:Do something interesting:)

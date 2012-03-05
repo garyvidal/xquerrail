@@ -1,0 +1,27 @@
+.elements ul
+{
+    padding: 8px 0 0 8px;
+    margin: 0px;
+    width: 480px;
+    float: left;
+    position: relative;
+}
+.elements ul li
+{
+    background: #fff;
+    color: #fff;
+    height: 90px;
+    margin: 0 8px 8px 0;
+    padding: 0;
+    padding-top: 62px;
+    position: relative;
+    width: 132px;
+}
+
+.elements li
+
+{
+    float: left;
+    list-style: none;
+}
+.demo-tab {min-height:400px;border:1px solid #222028;}

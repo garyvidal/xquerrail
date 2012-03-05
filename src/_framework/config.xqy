@@ -13,6 +13,8 @@ declare namespace routing = "http://www.xquerrail-framework.com/routing";
 
 declare variable $CONFIG := xdmp:invoke("/_config/config.xml");
 declare variable $ENGINE-PATH := "/_framework/engines";
+declare variable $DEFAULT-ANONYMOUS-USER := "anonymous-user";
+
 
 (:Standard Error Messages:)
 declare variable $ERROR-RESOURCE-CONFIGURATION := xs:QName("ERROR-RESOURCE-CONFIGURATION");
@@ -33,7 +35,7 @@ declare function config:resource-directory() as xs:string
    if(fn:not($CONFIG/config:resource-directory))
    then "/resources/"
    else fn:data($CONFIG/config:resource-directory/@resource)
-};
+}; 
 
 (:~
  : Returns the default action 
@@ -45,7 +47,7 @@ declare function config:default-action()
 
 (:~
  : Returns the default format
-:)
+ :)
 declare function config:default-format()
 {
   fn:string($CONFIG/config:default-format/@value)
@@ -53,7 +55,7 @@ declare function config:default-format()
 
 (:~
  : returns the default dispatcher for entire framework.
-~:)
+ :)
 declare function config:get-dispatcher()
 {
   fn:string($CONFIG/config:dispatcher/@resource)
@@ -62,7 +64,7 @@ declare function config:get-dispatcher()
 (:~
  : returns the application configuration for a given application by name
  : @param $application-name - Application name
-~:)
+ :)
 declare function config:get-application($application-name as xs:string)
 {
    $CONFIG/config:application[@name eq $application-name]
@@ -77,8 +79,16 @@ declare function config:application-directory($name)
 };
 
 (:~
+ : Gets the default anonymous user
+ :)
+declare function config:anonymous-user($application-name)
+{
+   fn:data($CONFIG/config:anonymous-user/@value)
+};
+
+(:~
  :  Get the domain for a given asset
-~:)
+ :)
 declare function config:get-domain($application-name)
 {
   let $app-path := config:application-directory($application-name)
@@ -88,7 +98,7 @@ declare function config:get-domain($application-name)
 
 (:~
  : Returns the routes configuration file 
-:)
+ :)
 declare function config:get-routes()
 {
   xdmp:invoke($CONFIG/config:routes/@resource) 
@@ -96,7 +106,7 @@ declare function config:get-routes()
 
 (:~
  : Returns the engine for processing requests satisfying the request
-~:)
+ :)
 declare function config:get-engine($response as map:map)
 {
    let $_ := response:set-response($response)
@@ -110,6 +120,9 @@ declare function config:get-engine($response as map:map)
      else fn:string($CONFIG/config:default-engine/@value)
 };
 
+(:~
+ : Returns the engine for processing requests satisfying the request
+ :)
 declare function config:get-model-xqy-path($model-name as xs:string) {
 
     let $modelSuffix := fn:data($CONFIG/config:model-suffix/@value)

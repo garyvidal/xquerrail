@@ -7,7 +7,9 @@ xquery version "1.0-ml";
 module namespace request = "http://www.xquerrail-framework.com/request";
 
 import module namespace json = "http://marklogic.com/json"  at "/lib/json.xqy";
-
+import module namespace config = "http://www.xquerrail-framework.com/config" 
+  at "/_framework/config.xqy";
+  
 declare variable $BODY              := "request:body";
 declare variable $BODY-XML          := "request:body-xml";
 declare variable $BODY-TEXT         := "request:body-text";
@@ -469,6 +471,15 @@ declare function request:cookies()
 declare function request:cookie($name)
 {
    request:cookies()
+};
+
+declare function request:user()
+{
+   xdmp:get-current-user()
+};
+declare function request:anonymous-user()
+{
+  config:anonymous-user(request:application())
 };
 (:~
  :  Using JQGrid you can parse a query from field using simple language, parses from JSON into CTS Query

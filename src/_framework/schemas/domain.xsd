@@ -3,8 +3,8 @@
     xmlns="http://www.xquerrail-framework.com/domain"
     xmlns:domain="http://www.xqerrail-framework.com/domain"
     xmlns:builder="http://www.xquerrail-framework.com/builder"
+    xmlns:ui="http://www.xquerrail-framework.com/ui"
     targetNamespace="http://www.xquerrail-framework.com/domain" elementFormDefault="qualified">
-
     <xs:element name="domain" type="domainType"/>
     <xs:complexType name="domainType">
         <xs:sequence>
@@ -99,11 +99,9 @@
                   <xs:attributeGroup ref="constraintAttributes"/>
               </xs:complexType>
             </xs:element>
-            <xs:element name="ui" minOccurs="0" maxOccurs="1">
-                <xs:complexType>
-                    <xs:attributeGroup ref="uiAttributes"/>
-                </xs:complexType>
-            </xs:element>
+            <xs:choice minOccurs="0" maxOccurs="1">
+                <xs:element name="ui" type="uiType"  minOccurs="0" maxOccurs="1" />
+            </xs:choice>
         </xs:sequence>
         <xs:attributeGroup ref="fieldAttributes"/>
     </xs:complexType>
@@ -316,4 +314,65 @@
             <xs:enumeration value="timestamp"/>
         </xs:restriction>
     </xs:simpleType>
+    
+    
+    <!--UI Domain Experimental-->
+    <xs:complexType name="uiType">
+        <xs:choice maxOccurs="1">
+            <xs:element name="gridColumns" type="gridColumnsType"/>
+            <xs:element name="gridColumn" type="gridColumnType"/>
+        </xs:choice>
+        <xs:attributeGroup ref="uiTypeAttributes"/>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="gridColumnsType">
+        <xs:sequence>
+            <xs:element name="gridColumn" type="gridColumnType"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="gridColumnType">
+        <xs:attributeGroup ref="gridColumnAttributes"/>
+    </xs:complexType>
+    <xs:attributeGroup name="uiTypeAttributes">
+        <xs:attribute name="id" type="xs:Name"/>
+        <xs:attribute name="type" type="uiFieldType"/>
+        <xs:attribute name="label" type="xs:string"/>
+        <xs:attribute name="class" type="xs:string"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="gridColumnAttributes">
+        <xs:attribute name="name" type="xs:string"/>
+        <xs:attribute name="index" type="xs:string"/>
+        <xs:attribute name="label" type="xs:string"/>
+        <xs:attribute name="editable" type="xs:boolean"/>
+        
+    </xs:attributeGroup>
+    <xs:simpleType name="uiFieldType">
+        <xs:restriction base="xs:Name">
+            <xs:enumeration value="textbox"/>
+            <xs:enumeration value="selectbox"/>
+            <xs:enumeration value="checkbox"/>
+            <xs:enumeration value="fileupload"/>    
+            <xs:enumeration value="grid"/>
+            <xs:enumeration value="datepicker"/>
+            <xs:enumeration value="datepager"/>
+            <xs:enumeration value="timepicker"/>
+            <xs:enumeration value="code-editor"/>
+            <xs:enumeration value="html-editor"/>
+            <xs:enumeration value="slider"/>
+            <xs:enumeration value="multicolumn"/>
+            <xs:enumeration value="radiolist"/>
+            <xs:enumeration value="checkboxlist"/>
+            <xs:enumeration value="list"/>
+            <xs:enumeration value="rating"/>
+            <xs:enumeration value="inputmask"/>
+            <xs:enumeration value="model"/>
+        </xs:restriction>
+
+    </xs:simpleType>
+    <xs:simpleType name="uiContainerType">
+        <xs:restriction base="xs:Name">
+            <xs:enumeration value="panel"/>
+        </xs:restriction>
+    </xs:simpleType>    
 </xs:schema>

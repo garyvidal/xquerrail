@@ -181,7 +181,7 @@ declare function dispatcher:render($response,$request)
                 let $map := response:flush()
                 let $_   := map:put($map,"error",$ex)
                 return 
-                <maphtml>{$map}</maphtml>
+                    $ex
               }
           else if($format eq "html") then 
             (:Initialize the HTML Response:)
@@ -210,7 +210,7 @@ declare function dispatcher:render($response,$request)
                 let $map := response:flush()
                 let $_   := map:put($map,"error",$ex)
                 return 
-                <mapjson>{$map}</mapjson>
+                  $ex
               }
          else $response     
 };

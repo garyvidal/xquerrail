@@ -58,6 +58,8 @@ declare function get-route($url as xs:string)
              fn:concat($matching-route/routing:prepend,$path,"?",$params)
         else fn:error($config:ERROR-RESOURCE-CONFIGURATION,"Route @is-resource requires (to,replace,prepend)",$matching-route)
       else if($matching-route) then
+        (: check specified method matches actual method :) 
+        let $check_method := if ( fn:string($matching-route/@method) = $request-method) then () else ( fn:error(xs:QName("INVALID_METHOD"), "Route method does not match request method") ) 
         let $controller := $matching-route/routing:default[@key eq "_controller"]
         let $parts      := fn:tokenize(fn:normalize-space($controller),":")
         let $add-params := 

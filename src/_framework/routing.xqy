@@ -46,7 +46,8 @@ declare function get-route($url as xs:string)
   let $request-method := fn:lower-case(xdmp:get-request-method())
   let $matching-routes := $routes//routing:route[fn:matches($path,./@pattern,"six")]
   let $matching-route := 
-    (for $route in $matching-routes return  $route)[1]
+    (for $route in $matching-routes return  if (fn:string($route/@method) eq $request-method) then $route else () )[1]
+ 
   let $is-resource := $matching-route/@is-resource
   let $route := 
       if($is-resource eq "true") then
@@ -58,8 +59,7 @@ declare function get-route($url as xs:string)
              fn:concat($matching-route/routing:prepend,$path,"?",$params)
         else fn:error($config:ERROR-RESOURCE-CONFIGURATION,"Route @is-resource requires (to,replace,prepend)",$matching-route)
       else if($matching-route) then
-        (: check specified method matches actual method :) 
-        let $check_method := if ( fn:string($matching-route/@method) = $request-method) then () else ( fn:error(xs:QName("INVALID_METHOD"), "Route method does not match request method") ) 
+        
         let $controller := $matching-route/routing:default[@key eq "_controller"]
         let $parts      := fn:tokenize(fn:normalize-space($controller),":")
         let $add-params := 

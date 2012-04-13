@@ -2,21 +2,21 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.xquerrail-framework.com/domain file:../../_framework/schemas/domain.xsd">
     <name>application</name>
-    <content-namespace prefix="phyaura" namespace-uri="http://www.xquerrail-framework.com/phyaura"/>
-    <application-namespace prefix="phyaura" namespace-uri="http://www.xquerrail-framework.com/phyaura"/>
-    <description>XQuerrail phyaura Application</description>
+    <content-namespace prefix="application" namespace-uri="http://www.xquerrail-framework.com/application"/>
+    <application-namespace prefix="application" namespace-uri="http://www.xquerrail-framework.com/application"/>
+    <description>XQuerrail Demo Application</description>
     <author>Gary Vidal</author>
     <version>1.0</version>
     <roles>
         <role name="-admin" type="admin"/>
-        <role name="phyaura-editor" type="editor"/>
-        <role name="phyaura-user" type="user"/>
-        <role name="phyaura-nobody" type="anonymous"/>
-        <role name="phyaura-create" type="create"/>
-        <role name="phyaura-read" type="read"/>
-        <role name="phyaura-write" type="write"/>
-        <role name="phyaura-delete" type="delete"/>
-        <role name="phyaura-execute" type="execute"/>
+        <role name="application-editor" type="editor"/>
+        <role name="application-user" type="user"/>
+        <role name="application-nobody" type="anonymous"/>
+        <role name="application-create" type="create"/>
+        <role name="application-read" type="read"/>
+        <role name="application-write" type="write"/>
+        <role name="application-delete" type="delete"/>
+        <role name="application-execute" type="execute"/>
     </roles>
     <model name="base" description="Base Extension Class" persistence="abstract">
         <element name="uuid" type="identity" identity="true" label="Globally Unique Identifier">

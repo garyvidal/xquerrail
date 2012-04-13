@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://www.xquerrail-framework.com/config">
+    <plugin name="wijmo" type="ui" resource="/plugins/wijmo/plugin.xqy"/>
+    <plugin name="backbone" type="ui" resource="/plugins/backbone/plugin.xqy"/>
+</config>

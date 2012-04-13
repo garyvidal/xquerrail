@@ -5,7 +5,7 @@
             <a href="/" class="logo" title="XQuerrail Framework"></a>
             <h2 class="logo">XQuerrail Framework</h2>        
             <div class="welcome">
-              <?if xdmp:get-current-user() = "validator-nobody" ?>  
+              <?if fn:not(xdmp:get-current-user() = "admin") ?>  
               <span class="note">Please Login</span>
               <?else?>          
                 <span class="note">Welcome, <a href="#" title="Welcome, {xdmp:get-current-user()}">{xdmp:get-current-user()}</a></span>
@@ -24,11 +24,11 @@
                 <?endif?>
             </div>
         </div>
-        <?if fn:not(xdmp:get-current-user() = "validator-nobody")?>       
+        <?if fn:not(xdmp:get-current-user() = "anonymous-user")?>       
         <?template name="navigation"?>
         <div id="search-bar">
             <form method="post" action="http://www.google.com/">
-                <input type="text" name="q" value="live search demo" />
+                <input type="text" name="q" value="" />
             </form>
         </div>
         <?endif?>

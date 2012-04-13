@@ -6,10 +6,12 @@ xquery version "1.0-ml";
 ~:)
 module namespace request = "http://www.xquerrail-framework.com/request";
 
-import module namespace json = "http://marklogic.com/json"  at "/lib/json.xqy";
+import module namespace json = "http://www.xquerrail-framework/parsers/json"  at "/_framework/lib/json.xqy";
 import module namespace config = "http://www.xquerrail-framework.com/config" 
   at "/_framework/config.xqy";
-  
+
+declare option xdmp:mapping "false";
+
 declare variable $BODY              := "request:body";
 declare variable $BODY-XML          := "request:body-xml";
 declare variable $BODY-TEXT         := "request:body-text";
@@ -32,6 +34,8 @@ declare variable $VIEW              := "request:view";
 declare variable $PARTIAL           := "request:partial";
 declare variable $HEADER-PREFIX     := "request:header::";
 declare variable $PARAM-PREFIX      := "request:field::";
+declare variable $REDIRECT          := "request:redirect";
+
 declare variable $PARAM-CONTENT-TYPE-PREFIX := "request:field-content-type::";
 declare variable $PARAM-FILENAME-PREFIX   := "request:field-filename::";
 
@@ -66,7 +70,11 @@ declare function request:request()
 {
   $request
 };
-
+declare function request:join($params as map:map)
+{
+   let $_ := xdmp:set($request, $request + ($request - $params) )
+   return $request
+};
 (:~
  :  Wraps the http response into a map:map
  :  Accessing the map can be used the following keys
@@ -76,15 +84,14 @@ declare function request:request()
  :      request:field::xxxx
  :      request:body
 ~:)
-declare function request:initialize($_request) {
-  xdmp:set($request:request, $_request) (:NO-OP just keeps an empty map:)
+declare function request:initialize($_request as map:map) {
+  xdmp:set($request:request, $request:request + $_request)
 };
 
 (:~
  :  Parses the map pulling all the required information from http request 
 ~:)
 declare function request:parse($parameters) as map:map {
-   let $request := map:map()
    
    (:Insert all custom headers:)
    let $headers :=            
@@ -149,8 +156,9 @@ declare function request:parse($parameters) as map:map {
         let $_ := xdmp:log($_content-type)
         let $_ := 
              if ($_content-type = "application/json" or fn:contains($_content-type,"application/json"))  
-             then map:put($request, $BODY, json:jsonToXML( xdmp:quote(xdmp:get-request-body()/node()) ))
+             then map:put($request, $BODY, json:parse( xdmp:quote(xdmp:get-request-body()/node()) ))
              else  map:put($request, $BODY, xdmp:get-request-body($accept-types))
+        let $_ := map:put($request,"foo","foo")
    return $request
 };
 
@@ -534,7 +542,7 @@ declare function request:parse-query()
  let $filters  := 
   if(request:param("_search", "false") = "true") 
   then if(request:param("filters",())) 
-       then json:jsonToXML(request:param($request,"filters"))
+       then json:parse(request:param($request,"filters"))
        else 
         <item>
            <field>{request:param($request,"searchField")}</field>
@@ -556,4 +564,12 @@ declare private function request:convert-json-map($map as map:map) {
             if($val instance of map:map) then request:convert-json-map($val) else $val
         }
 
+};
+declare function request:set-redirect($uri)
+{
+   map:put($request,$REDIRECT,fn:data($uri))
+};
+declare function request:redirect()  as xs:string?
+{
+  map:get($request,$REDIRECT)
 };

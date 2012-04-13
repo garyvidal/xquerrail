@@ -18,9 +18,7 @@ jQuery(document).ready(function() {
 	});
 	
 	// Live Search
-	
-	jQuery('#search-bar input[name="q"]').liveSearch({url: 'live_search.php?q='});
-	
+	   jQuery('#search-bar input[name="q"]').liveSearch({url: '/'+ $("#controller").val() + '/find?_partial=true&q='});
 	//Hover states on the static widgets
 
 	jQuery('.ui-state-default').hover(

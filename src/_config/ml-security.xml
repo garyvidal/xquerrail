@@ -1,0 +1,24 @@
+xquery version "1.0-ml";
+<config xmlns="http://www.xquerrail-framework.com/config">
+    <login-url url="/default/login.html"/>
+    <use-csrf value="true"/>
+    <anonymous-user value="anonymous"/>
+    <scope context="application:default:login">
+        <allow-role>anonymous</allow-role>
+    </scope>
+    <scope context="application:default:logout">
+        <allow-role>anonymous</allow-role>
+    </scope>
+    <scope context="application:default:*">
+        <deny-role>anonymous</deny-role>
+        <allow-role>*</allow-role>
+    </scope>
+    <scope context="*">
+        <allow-role>cndam-reader</allow-role>
+        <allow-role>cndam-writer</allow-role>
+        <allow-role>cndam-executor</allow-role>
+        <allow-role>cndam-loader</allow-role>
+        <allow-role>admin</allow-role>
+        <deny-role>anonymous</deny-role>
+    </scope>
+</config>

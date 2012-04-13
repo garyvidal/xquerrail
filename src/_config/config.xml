@@ -1,37 +1,46 @@
 <config xmlns="http://www.xquerrail-framework.com/config">
-    <routes resource="/_config/routes.xml"/>
+    <!--Configurations-->
+    <routes-config  resource="/_config/routes.xml"/>
+    <routing-module resource="/_framework/routing.xqy"/>
+    <interceptor-config resource="/_config/interceptor.xml"/>
+    <environment-config resource="/_config/env.xml"/>
+    <plugin-config resource="/_config/plugin.xml"/>
     
-    <dispatcher resource="/_framework/dispatchers/dispatcher.web.xqy"/>
-    
-    <default-controller name="default"/>
     <controller-suffix value="-controller"/>
-    <controller-scripts-directory value="/resources/scripts/"/>
-    
+    <controller-scripts-directory value="/resources/scripts/"/> 
+    <controller-stylesheet-directory value="/resources/stylesheets"/>
+    <error-handler resource="/_framework/error.xqy"/>    
     <model-suffix value="-model"/>
-    
     <library-suffix value="-lib"/>
     
     <anonymous-user value="anonymous-user"/>
     
-    <!--Register Default Values for engine-->
-    <default-engine value="engine.html"/>
-    <default-format value="html"/>
-    <default-application value="application"/>
+    <dispatcher resource="/_framework/dispatchers/dispatcher.web.xqy"/>
     
-    <!--Register Your Application Here-->
+    <!--Register Default Values for engine-->
+    
+    <default-engine value="engine.html"/>
+    <default-application value="application"/>
+    <default-controller value="default"/> 
+    <default-action value="index"/>    
+    <default-format value="html"/>
+    <default-template-directory resource="/_framework/base/views/"/>
+    <default-view-directory resources="/_framework/base/templates/"/>    
+    <!--Register    Your Application Here-->
     <application name="application" namespace="http://www.xquerrail-framework.com/demo" uri="/application">
         <domain resource="/application/domains/application-domain.xml" />
     </application>
+    
+
     <!--Interceptors-->
-    <interceptors>
-        <interceptor name="security" resource="/_framework/interceptors/interceptor.logging.xqy" 
-            before-request="true" after-request="true" before-response="true" after-response="true"
-        />
-        <interceptor name="logging" resource="/_framework/interceptors/interceptor.logging.xqy" 
-            before-request="true" after-request="true" before-response="true" after-response="true"
-        />
-        <interceptor name="profiler" resource="/_framework/interceptors/interceptor.profiler.xqy" 
-            before-request="true" after-request="true" before-response="true" after-response="true"
+    <interceptors config="/_config/interceptor.xml">
+        <interceptor 
+            name="ml-security" 
+            resource="/_config/ml-security.xml"
+            before-request="false" 
+            after-request="true" 
+            before-response="false" 
+            after-response="false"
         />
     </interceptors>
 </config>

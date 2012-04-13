@@ -1,19 +1,17 @@
 declare default element namespace "http://www.w3.org/1999/xhtml";
-<template>
+<div id="login-container">
 <div id="tabs">
     <ul>
-        <li><a href="#login">Login</a></li>
-        <li><a href="#tabs-2">Register</a></li>
-        <li><a href="#tabs-3">Recover password</a></li>
+        <li><a href="#login-tab">Login</a></li>
+        <li><a href="#recover-tab">Recover password</a></li>
     </ul>
-    <div id="login">
-           <?if fn:exists(response:flash()) and response:flash() ne ""?>
+    <div id="login-tab">
+           <?if response:has-flash()?>
            <div class="response-msg error ui-corner-all">
-               <span>Login Error</span>
-               <?flash-message?>
+               <span>Login Error <?flash-message name="login"?></span>
            </div>
            <?endif?>
-        <form action="default/login">
+        <form action="/default/login.html">
             <ul>
                 <li>
                     <label for="username" class="desc">         
@@ -39,19 +37,8 @@ declare default element namespace "http://www.w3.org/1999/xhtml";
             </ul>
         </form>
     </div>
-    <div id="tabs-2">
-      <!--
-        <div class="other-box gray-box ui-corner-all">
-            <div class="cont ui-corner-all tooltip" title="Example tooltip!">
-                <h3>Example information message</h3>
-                <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.</p>
-            </div>
-        </div>
-        -->
-        <p>You can put a register form here.</p>
-    </div>
-    <div id="tabs-3">
-        <form action="dashboard.html">
+    <div id="recover-tab">
+        <form action="/default/index.html">
             <ul>
                 <li>
                     <label for="email" class="desc">
@@ -80,4 +67,4 @@ declare default element namespace "http://www.w3.org/1999/xhtml";
     }});
     </script>
 
-</template>/*
+</div>

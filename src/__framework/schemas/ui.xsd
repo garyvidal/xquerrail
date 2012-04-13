@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="www.xquerrail-framework.com/domain"
+    targetNamespace="www.xquerrail-framework.com/domain" elementFormDefault="qualified"> 
+    <xs:complexType name="uiTypeType">
+        <xs:choice maxOccurs="1">
+            <xs:element name="gridColumns" type="gridColumnsType"/>
+            <xs:element name="gridColumn" type="gridColumnType"/>
+        </xs:choice>
+        <xs:attributeGroup ref="uiTypeAttributes"/>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="gridColumnsType">
+        <xs:sequence>
+            <xs:element name="gridColumn" type="gridColumnType"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="gridColumnType">
+        <xs:attributeGroup ref="gridColumnAttributes"/>
+    </xs:complexType>
+    <xs:attributeGroup name="uiTypeAttributes">
+        <xs:attribute name="id" type="xs:Name"/>
+        <xs:attribute name="type" type="uiType"/>
+        <xs:attribute name="label" type="xs:string"/>
+        <xs:attribute name="class" type="xs:string"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="gridColumnAttributes">
+        <xs:attribute name="name" type="xs:string"/>
+        <xs:attribute name="index" type="xs:string"/>
+        <xs:attribute name="label" type="xs:string"/>
+        <xs:attribute name="editable" type="xs:boolean"/>
+        
+    </xs:attributeGroup>
+    <xs:simpleType name="uiType">
+        <xs:restriction base="xs:Name">
+            <xs:enumeration value="textbox"/>
+            <xs:enumeration value="selectbox"/>
+            <xs:enumeration value="checkbox"/>
+            <xs:enumeration value="fileupload"/>    
+            <xs:enumeration value="grid"/>
+            <xs:enumeration value="datepicker"/>
+            <xs:enumeration value="datepager"/>
+            <xs:enumeration value="timepicker"/>
+            <xs:enumeration value="code-editor"/>
+            <xs:enumeration value="html-editor"/>
+            <xs:enumeration value="slider"/>
+            <xs:enumeration value="multicolumn"/>
+            <xs:enumeration value="radiolist"/>
+            <xs:enumeration value="checkboxlist"/>
+            <xs:enumeration value="list"/>
+            <xs:enumeration value="rating"/>
+            <xs:enumeration value="inputmask"/>
+            <xs:enumeration value="model"/>
+        </xs:restriction>
+    </xs:simpleType>
+  
+</xs:schema>

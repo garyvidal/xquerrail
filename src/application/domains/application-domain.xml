@@ -2,29 +2,34 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.xquerrail-framework.com/domain file:../../_framework/schemas/domain.xsd">
     <name>application</name>
-    <content-namespace prefix="demo" namespace-uri="http://www.xquerrail-framework.com/demo"/>
-    <application-namespace prefix="demo" namespace-uri="http://www.xquerrail-framework.com/demo"/>
-    <description>XQuerrail Demo Application</description>
+    <content-namespace prefix="phyaura" namespace-uri="http://www.xquerrail-framework.com/phyaura"/>
+    <application-namespace prefix="phyaura" namespace-uri="http://www.xquerrail-framework.com/phyaura"/>
+    <description>XQuerrail phyaura Application</description>
     <author>Gary Vidal</author>
     <version>1.0</version>
     <roles>
-        <role name="demo-admin" type="admin"/>
-        <role name="demo-editor" type="editor"/>
-        <role name="demo-user" type="user"/>
-        <role name="demo-nobody" type="anonymous"/>
-        <role name="demo-create" type="create"/>
-        <role name="demo-read" type="read"/>
-        <role name="demo-write" type="write"/>
-        <role name="demo-delete" type="delete"/>
-        <role name="demo-execute" type="execute"/>
+        <role name="-admin" type="admin"/>
+        <role name="phyaura-editor" type="editor"/>
+        <role name="phyaura-user" type="user"/>
+        <role name="phyaura-nobody" type="anonymous"/>
+        <role name="phyaura-create" type="create"/>
+        <role name="phyaura-read" type="read"/>
+        <role name="phyaura-write" type="write"/>
+        <role name="phyaura-delete" type="delete"/>
+        <role name="phyaura-execute" type="execute"/>
     </roles>
-
+    <model name="base" description="Base Extension Class" persistence="abstract">
+        <element name="uuid" type="identity" identity="true" label="Globally Unique Identifier">
+            <navigation  searchable="true" sortable="true" facetable="true" />
+            <constraint required="true"  />
+            <ui type="hidden"/>
+        </element>
+    </model>
     <!-- Georgraphic Related Models -->
     <model name="countryCode" description="Country Code Controlled Vocabulary" 
-        persistence="document" key="id" keyLabel="name">
+        persistence="document" key="id" keyLabel="name" extends="base">
         <document root="countryCodes">/codetables/countryCodes.xml</document>
-        <declare-namespace prefix="demo" namespace-uri="www.xquerrail-framework.com/demo/application"/>
-        <element name="id" type="" identity="true" label="ISO Country Code">
+        <element name="id" type="string" label="ISO Country Code">
             <navigation  searchable="true" sortable="true" facetable="true" />
             <constraint required="true"  />
         </element>
@@ -35,12 +40,15 @@
         <element name="ISO3" type="string" label="ISO 3">
             <navigation  searchable="true" sortable="true" />
             <constraint required="true" />
-        </element>           
+        </element>       
+        <element name="isOnWatchList" type="boolean" label="Is On Watch List">
+            <navigation  searchable="true" sortable="true"  />
+            <constraint required="true" />
+        </element>          
     </model>
-
-    <model name="timezone" description="Timezones Configuration" persistence="document">
+    
+    <model name="timezone" description="Timezones Configuration" persistence="document" key="id" keyLabel="name">
         <document root="timezones">/codetables/timezones.xml</document>
-        <declare-namespace prefix="demo" namespace-uri="www.xquerrail-framework.com/demo/application"/>
         <element name="id" type="string" identity="true" label="ID">
             <navigation searchable="true" sortable="true" facetable="true"/>
             <constraint required="true"/>
@@ -57,12 +65,11 @@
 
     <model name="locale" description="Locales" persistence="document">
         <document root="locales">/codetables/locales.xml</document>
-        <declare-namespace prefix="demo" namespace-uri="www.xquerrail-framework.com/demo/application"/>
-        <element name="id" type="string" identity="true">
+        <element name="id" type="string" identity="true" label="ID">
             <navigation searchable="true" sortable="true" facetable="true"/>
             <constraint required="true"/>
         </element>
-        <element name="name" type="string">
+        <element name="name" type="string" label="Name" default="">
             <navigation searchable="true" sortable="true"/>
             <constraint required="true"/>
         </element>
@@ -113,189 +120,11 @@
             <constraint  required="true"/>            
         </element>
     </model>     
-    
-    <model name="taxonomy" description="Taxonomies" persistence="directory" key="taxonomyID" keyLabel="taxonomyName">
-        <directory>/taxonomies/</directory>
-        <element name="taxonomyID" type="string" identity="true" label="Taxonomy ID">
-            <navigation searchable="true" sortable="true" />
-            <constraint  required="true" />            
-        </element>
-        <element name="taxonomyName" type="string" label="Name">
-            <navigation searchable="true" sortable="true" />
-            <constraint  required="true" />
-        </element>
-        <element name="matchingRule" type="query" label="Matching Rule">
-            <navigation searchable="true" sortable="true" />
-            <constraint  required="true" />
-        </element>
-        <element name="taxonomyType" type="reference" reference="model:taxonomyType:reference" label="Type">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>
-        </element>            
-    </model>
-    
-    <model name="concept" description="Concept" persistence="directory" key="conceptID" keyLabel="conceptName">
-        <directory>/concepts/</directory>
-        <element name="conceptID" type="string" identity="true" label="Concept ID">
-            <navigation searchable="true" sortable="true" />
-            <constraint  required="true" />            
-        </element>
-        
-        <element name="conceptName" type="string" label="Name">
-            <navigation searchable="true" sortable="true" />
-            <constraint  required="true" />
-        </element>
-        
-        <element name="matchingRule" type="query" label="Matching Rule">
-            <navigation searchable="true" sortable="true" />
-            <constraint  required="true" />
-        </element>
-        
-        <element name="taxonomy" type="reference" reference="model:taxonomy:reference" label="Parent Taxonomy">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>
-        </element>            
-        
-        <element name="coordinate" type="string" label="Coordinate (X,Y)">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>
-        </element> 
-        
-    </model>
-    
-    <model name="taxonomyType" description="Taxonomy Type" persistence="document" label="Taxonomy Type" key="taxonomyTypeCode" keyLabel="taxonomyTypeName">
-        <document root="taxonomyTypes">/config/taxonomyTypes.xml</document>
-        <import-model name="user"/> 
-        <element name="taxonomyTypeCode" type="string" identity="true" label="Type Code">
-            <navigation searchable="true" sortable="true" />
-            <constraint  required="true" />             
-        </element>
-        <element name="taxonomyTypeName" type="string" label="Name">
-            <navigation searchable="true" sortable="true" />
-            <constraint  required="true" />
-        </element>      
-    </model>
-    
-    <model name="vocabularyTerm" description="Vocabulary Terms" persistence="directory" key="preferredTerm" keyLabel="preferredTerm">
-        <directory>/terms/</directory>
-        <import-model name="user"/>
-        <element name="preferredTerm" type="string" identity="true" label="Preferred Term">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>
-        </element>
-        <element name="nonPreferredTerm" type="string" label="Non-Preferred Term">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="false"/>
-        </element>        
-        <element name="description" type="string" label="Description">
-            <navigation searchable="true" sortable="true"/>
-            <constraint required="false"/>
-        </element> 
-        <element name="matchingQuery" type="query" label="Matching Query">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="false"/>
-        </element>
-        <!--Add your customizations-->
-    </model>
-    
-    <model name="designer" description="Describes individuals who design fashion" persistence="document" key="designerName" keyLabel="designerName">
-        <document root="designers">/vocabularies/designer.xml</document>
-        <element name="designerName" type="string" label="Designer Name" identity="true">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>            
-        </element>
-        <element name="preferredTerm" type="string" label="Preferred Terms">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>                
-        </element>
-        <element name="nonPreferredTerm" type="string" label="Non Preferred Term">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>               
-        </element>
-    </model>
-    
-    <model name="company" description="Describes Companies in Fashion" persistence="document" key="companyName" keyLabel="companyName">
-        <document root="companies">/vocabularies/companies.xml</document>
-        <element name="companyName" type="string" label="Company Name" identity="true">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>            
-        </element>
-        <element name="designer" type="reference" reference="model:designer:reference" label="Associated Designer" occurence="?">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>            
-        </element>  
-        <element name="preferredTerm" type="string" label="Preferred Terms">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>                
-        </element>
-        <element name="nonPreferredTerm" type="string" label="Non Preferred Term">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>               
-        </element>
-    </model>
-    <model name="colors" description="" persistence="document" key="colorName" keyLabel="colorName">
-        <document root="colors">/vocabularies/colors.xml</document>
-        <element name="colorName" type="string" label="Color Name" identity="true">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>            
-        </element>
-        <element name="preferredTerm" type="string" label="Preferred Terms">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>                
-        </element>
-        <element name="nonPreferredTerm" type="string" label="Non Preferred Term">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>               
-        </element>
-    </model>  
-    <model name="trend" description="" persistence="document" key="trendName" keyLabel="trendName">
-        <document root="trends">/vocabularies/trends.xml</document>
-        <element name="trendName" type="string" label="Trend Name" identity="true">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>            
-        </element>
-        <element name="preferredTerm" type="string" label="Preferred Terms">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>                
-        </element>
-        <element name="nonPreferredTerm" type="string" label="Non Preferred Term">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>               
-        </element>
-    </model>
-    <model name="fabric" description="" persistence="document" key="fabricName" keyLabel="fabricName" label="Fabrics">
-        <document root="fabrics">/vocabularies/fabrics.xml</document>
-        <element name="fabricName" type="string" label="Fabric Name" identity="true">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>            
-        </element>
-        <element name="preferredTerm" type="string" label="Preferred Terms">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>                
-        </element>
-        <element name="nonPreferredTerm" type="string" label="Non Preferred Term">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>               
-        </element>
-        <element name="foo" type="string" label="Foo Bar">
-            <navigation searchable="true" sortable="true" />
-            <constraint  required="true" />               
-        </element>
-    </model>      
     <!-- Geographic Related Controllers -->
     <controller name="countryCodes" model="countryCode" label="Country Codes"/>
     <controller name="timezones" model="timezone" label="Time Zones"/>
     <controller name="locales" model="locale" label="Locales"/>
     <controller name="users" model="user" label="Users"/>
     <controller name="roles" model="role" label="Roles"/>
-    <controller name="taxonomyType" model="taxonomyType" label="Taxonomy Types"/>
-    <controller name="taxonomy" model="taxonomy" label="Taxonomies"/>
-    <controller name="concepts" model="concept" label="Concept"/>   
-    <controller name="terms" model="vocabularyTerm" label="Vocabulary Terms"/>
-    <controller name="trends" model="trend" label="Trends"/>
-    <controller name="fabrics" model="fabric" label="Fabrics"/>
-    <!--Controlled Vocabularies-->
-    <controller name="designers" model="designer" label="Designers"/>   
-    <controller name="companies" model="company" label="Companies"/>
-    <controller name="colors" model="colors" label="Colors"/>
+ 
 </domain>

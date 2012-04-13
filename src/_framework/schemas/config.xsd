@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+    xmlns="http://www.xquerrail-framework.com/config"
+    xmlns:domain="http://www.xqerrail-framework.com/config"
+    targetNamespace="http://www.xquerrail-framework.com/config" 
+    elementFormDefault="qualified"> 
+
+   <xs:complexType name="resourceConfigElement">
+       <xs:attributeGroup ref="configResourceAttributes"></xs:attributeGroup>   
+   </xs:complexType>
+   
+    <xs:complexType name="valueConfigElement">
+       <xs:attributeGroup ref="configValueAttributes"></xs:attributeGroup>
+   </xs:complexType>
+   
+    <xs:complexType name="namespacePropertyElement">
+       <xs:attributeGroup ref="namespacePropertyAttributes"></xs:attributeGroup>
+   </xs:complexType> 
+    
+   <xs:attributeGroup name="configValueAttributes">
+       <xs:attribute name="value" type="xs:string"/>
+   </xs:attributeGroup>
+   
+    <xs:attributeGroup name="configResourceAttributes">
+       <xs:attribute name="resource" type="xs:anyURI"/>
+       <xs:attribute name="dbresource" type="xs:anyURI"/>
+   </xs:attributeGroup>
+    
+   <xs:attributeGroup name="namespacePropertyAttributes">
+       <xs:attribute name="prefix" type="xs:NCName"/>
+       <xs:attribute name="namespace-uri" type="xs:anyURI"/>
+   </xs:attributeGroup> 
+    
+   <xs:attributeGroup name="interceptorAttributes">
+       <xs:attributeGroup ref="configResourceAttributes">
+           
+       </xs:attributeGroup>
+       <xs:attribute name="name" type="xs:NCName">
+           
+       </xs:attribute>
+       <xs:attribute name="before-request" type="xs:boolean">
+           
+       </xs:attribute>
+       <xs:attribute name="after-request" type="xs:boolean">
+           
+       </xs:attribute>
+       <xs:attribute name="before-response" type="xs:boolean">
+           
+       </xs:attribute>
+       <xs:attribute name="after-response" type="xs:boolean">
+           
+       </xs:attribute>
+   </xs:attributeGroup>
+</xs:schema>

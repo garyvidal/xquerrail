@@ -1,71 +1,68 @@
-declare default element namespace "http://www.w3.org/1999/xhtml";
-
-<ul id="navigation" style="font-size:.8em;">
-<!--
+<ul id="navigation" style="font-size:.8em;" xmlns="http://www.w3.org/1999/xhtml">
 <li>
-  <a href="#">Demo Stuff</a>
+  <a href="#">Demo</a>
   <ul>    
     <li>
-        <a href="dashboard" class="sf-with-ul">Dashboard</a>
+        <a href="/demo/index" class="sf-with-ul">Dashboard</a>
         <ul>
             <li><a href="/">Demo Stuff</a></li>
-            <li><a href="/default/search">Search Interface</a></li>
+            <li><a href="/demo/search">Search Interface</a></li>
             <li>
-                <a href="/default/forms">Forms</a>
+                <a href="/demo/forms">Forms</a>
                 <ul>
-                    <li><a href="/default/validate">Form validation</a></li>
-                    <li><a href="/default/table_modal"><b>Add to table modal</b></a></li>
-                    <li><a href="/default/editinplace"><b>Edit in Place</b></a></li>
-                    <li><a href="/default/tinymce"><b>WYSIWYG Editor</b></a></li>
+                    <li><a href="/demo/validate">Form validation</a></li>
+                    <li><a href="/demo/table_modal"><b>Add to table modal</b></a></li>
+                    <li><a href="/demo/editinplace"><b>Edit in Place</b></a></li>
+                    <li><a href="/demo/tinymce"><b>WYSIWYG Editor</b></a></li>
                 </ul>
             </li>
             <li>
-                <a href="/default/tables">Tables</a>
+                <a href="/demo/tables">Tables</a>
                 <ul>
-                    <li><a href="/default/tables">Sortable Tables</a></li>
-                    <li><a href="/default/flexigrid"><b>FlexiGrid</b></a></li>
+                    <li><a href="/demo/tables">Sortable Tables</a></li>
+                    <li><a href="/demo/flexigrid"><b>FlexiGrid</b></a></li>
                 </ul>
             </li>
             <li>
                 <a href="#">Widgets</a>
                     <ul>
-                    <li><a href="/default/accordion">Accordion</a></li>
-                    <li><a href="/default/flexigrid"><b>FlexiGrid</b></a></li>
-                    <li><a href="/default/editinplace"><b>Edit in Place</b></a></li>
-                    <li><a href="/default/tinymce"><b>WYSIWYG Editor</b></a></li>
-                    <li><a href="/default/charts"><b>Charts</b></a></li>
-                    <li><a href="/default/tabs">Tabs</a></li>
-                    <li><a href="/default/slider">Slider</a></li>
-                    <li><a href="/default/datepicker">Datepicker</a></li>
-                    <li><a href="/default/progress">Progress Bar</a></li>
-                    <li><a href="/default/dialog">Dialogs and Modals</a></li>
-                    <li><a href="/default/overlays">Overlays</a></li>
-                    <li><a href="/default/photo_manager">Photo Manager</a></li>
-                    <li><a href="/default/file_browser">File Browser</a></li>
+                    <li><a href="/demo/accordion">Accordion</a></li>
+                    <li><a href="/demo/flexigrid"><b>FlexiGrid</b></a></li>
+                    <li><a href="/demo/editinplace"><b>Edit in Place</b></a></li>
+                    <li><a href="/demo/tinymce"><b>WYSIWYG Editor</b></a></li>
+                    <li><a href="/demo/charts"><b>Charts</b></a></li>
+                    <li><a href="/demo/tabs">Tabs</a></li>
+                    <li><a href="/demo/slider">Slider</a></li>
+                    <li><a href="/demo/datepicker">Datepicker</a></li>
+                    <li><a href="/demo/progress">Progress Bar</a></li>
+                    <li><a href="/demo/dialog">Dialogs and Modals</a></li>
+                    <li><a href="/demo/overlays">Overlays</a></li>
+                    <li><a href="/demo/photo_manager">Photo Manager</a></li>
+                    <li><a href="/demo/file_browser">File Browser</a></li>
                 </ul>
             </li>
-            <li><a href="/default/msg">Response Messages</a></li>
-            <li><a href="/default/icons">Icons</a></li>
-            <li><a href="/default/icons">Buttons and Elements</a></li>
-            <li><a href="/default/logout">Logout (Login Page)</a></li>
+            <li><a href="/demo/msg">Response Messages</a></li>
+            <li><a href="/demo/icons">Icons</a></li>
+            <li><a href="/demo/icons">Buttons and Elements</a></li>
+            <li><a href="/demo/logout">Logout (Login Page)</a></li>
 
         </ul>
     </li>
-    <li><a href="/default/gallery">Photo Gallery</a></li>
+    <li><a href="/demo/gallery">Photo Gallery</a></li>
     <li>
         <a href="#" class="sf-with-ul">Layout Options</a>
         <ul>
             <li>
-                <a href="/default/three-columns-layout">Three columns</a>
+                <a href="/demo/three-columns-layout">Three columns</a>
             </li>
             <li>
-                <a href="/default/two-column-layout">Two columns</a>
+                <a href="/demo/two-column-layout">Two columns</a>
             </li>
             <li>
-                <a href="/default/no-rounded">No rounded corners</a>
+                <a href="/demo/no-rounded">No rounded corners</a>
             </li>
             <li>
-                <a href="/default/content_boxes">Available content boxes</a>
+                <a href="/demo/content_boxes">Available content boxes</a>
             </li>
         </ul>
     </li>
@@ -73,10 +70,10 @@ declare default element namespace "http://www.w3.org/1999/xhtml";
         <a href="#" class="sf-with-ul">Theme Options</a>
         <ul>
             <li>
-                <a href="/default/page-left-sidebar">Page with left sidebar</a>
+                <a href="/demo/page-left-sidebar">Page with left sidebar</a>
             </li>
             <li>
-                <a href="/default/page_dynamic_sidebar">Page with dynamic sidebar</a>
+                <a href="/demo/page_dynamic_sidebar">Page with dynamic sidebar</a>
             </li>
             <li>
                 <a href="#">Avaiable Themes</a>
@@ -106,47 +103,26 @@ declare default element namespace "http://www.w3.org/1999/xhtml";
     <li>
         <a href="#" class="sf-with-ul">Widgets</a>
         <ul>
-            <li><a href="/default/accordion">Accordion</a></li>
-            <li><a href="/default/flexigrid"><b>FlexiGrid</b></a></li>
-            <li><a href="/default/editinplace"><b>Edit in Place</b></a></li>
-            <li><a href="/default/tinymce"><b>WYSIWYG Editor</b></a></li>
-            <li><a href="/default/charts"><b>Charts</b></a></li>
-            <li><a href="/default/tabs">Tabs</a></li>
-            <li><a href="/default/slider">Slider</a></li>
-            <li><a href="/default/datepicker">Datepicker</a></li>
-            <li><a href="/default/progress">Progress Bar</a></li>
-            <li><a href="/default/dialog">Dialogs and Modals</a></li>
-            <li><a href="/default/overlays">Overlays</a></li>
-            <li><a href="/default/photo_manager">Photo Manager</a></li>
-            <li><a href="/default/file_browser">File Browser</a></li>
+            <li><a href="/demo/accordion">Accordion</a></li>
+            <li><a href="/demo/flexigrid"><b>FlexiGrid</b></a></li>
+            <li><a href="/demo/editinplace"><b>Edit in Place</b></a></li>
+            <li><a href="/demo/tinymce"><b>WYSIWYG Editor</b></a></li>
+            <li><a href="/demo/charts"><b>Charts</b></a></li>
+            <li><a href="/demo/tabs">Tabs</a></li>
+            <li><a href="/demo/slider">Slider</a></li>
+            <li><a href="/demo/datepicker">Datepicker</a></li>
+            <li><a href="/demo/progress">Progress Bar</a></li>
+            <li><a href="/demo/dialog">Dialogs and Modals</a></li>
+            <li><a href="/demo/overlays">Overlays</a></li>
+            <li><a href="/demo/photo_manager">Photo Manager</a></li>
+            <li><a href="/demo/file_browser">File Browser</a></li>
         </ul>
     </li> 
     </ul>
     </li>
- -->
- <li>
-      <a href="#">System Configuration</a>
-      <ul>
-        <li><a href="/vocabularies/index.html">Controlled Vocabularies</a>
-            <ul>
-              <li><a href="/designers/index.html">Designer Persons</a></li>
-              <li><a href="/companies/index.html">Designer Companies</a></li>
-              <li><a href="/colors/index.html">Colors</a></li>
-              <li><a href="/fabrics/index.html">Fabrics</a></li>
-              <li><a href="/trends/index.html">Trends</a></li>
-            </ul>
-        </li>
-        <li><a href="/system/index.html">Users and Roles</a>
-            <ul>
-              <li><a href="/users/index.html">Users</a></li>
-              <li><a href="/roles/index.html">Roles</a></li>
-            </ul>
-        </li>
-      </ul>
-    </li>
-    <li><a href="">Controllers</a>
-      <ul>
-         <?controller-list?>        
-      </ul>
-    </li>
+<li><a href="">Controllers</a>
+  <ul>
+     <?controller-list?>        
+  </ul>
+</li>
 </ul>

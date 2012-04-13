@@ -16,6 +16,9 @@ declare default element namespace "http://www.w3.org/1999/xhtml";
             </div>          
         </div> 
         <div class="clear"></div>
-        <?template name="footer"?>    
+        <?template name="footer"?> 
+        <div id="console">
+        <h2>Console</h2>
+        <ul id="msg"></ul></div>      
     </body>
 </html>

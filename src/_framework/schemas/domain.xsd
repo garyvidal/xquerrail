@@ -60,6 +60,11 @@
                     <xs:element name="container" type="containerType" minOccurs="0" maxOccurs="unbounded"/>
                     <xs:element name="optionlist" type="optionListType" minOccurs="0" maxOccurs="unbounded"/>
                 </xs:choice>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                   <xs:element name="collection" type="xs:string">
+                       
+                   </xs:element>
+                </xs:choice>  
                 <xs:element name="hasMany" type="relationType" minOccurs="0" maxOccurs="unbounded"/>                
             </xs:sequence>
             <xs:attributeGroup ref="modelBaseAttributes"/>
@@ -84,9 +89,16 @@
                     </xs:simpleContent>
                 </xs:complexType>
             </xs:element>
+            
+            <xs:element name="binaryDirectory" minOccurs="0" maxOccurs="1">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:pattern value="/.*/"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
         </xs:sequence>
     </xs:group>
-    
     <xs:complexType name="fieldType">
         <xs:sequence minOccurs="0" maxOccurs="3">
             <xs:element name="navigation" minOccurs="0" maxOccurs="1">
@@ -114,6 +126,7 @@
             <xs:element name="element" type="fieldType"/>
             <xs:element name="attribute" type="fieldType"/>
         </xs:choice>
+        <xs:attributeGroup ref="containerAttributes"/>
     </xs:complexType>
     
     <xs:complexType name="optionListType">
@@ -166,8 +179,10 @@
         <xs:attribute name="namespace" type="xs:anyURI"/>
         <xs:attribute name="description" type="xs:string"/>
         <xs:attribute name="label" type="xs:string"/>
+        <xs:attribute name="class" type="xs:string"/>
         <xs:attribute name="key" type="xs:IDREF" />
         <xs:attribute name="keyLabel" type="xs:IDREF" />
+        <xs:attribute name="extends" type="xs:IDREF"/>
         <xs:attribute name="persistence">
             <xs:simpleType>
                 <xs:restriction base="xs:string">
@@ -198,8 +213,14 @@
             </xs:simpleType>
         </xs:attribute>
     </xs:attributeGroup>
+    <xs:attributeGroup name="containerAttributes">
+        <xs:attribute name="name" type="xs:QName"></xs:attribute>
+        <xs:attribute name="namespace" type="xs:anyURI"/>
+        <xs:attribute name="label" type="xs:string"/>
+    </xs:attributeGroup>
     <xs:attributeGroup name="uiAttributes">
         <xs:attribute name="uiName" type="xs:Name"/>
+        <xs:attribute name="type" type="xs:Name"/>
         <xs:attribute name="editType" type="xs:string"/>
         <xs:attribute name="displayType" type="xs:string"/>
         <xs:attribute name="gridAlignment" type="xs:string"/>
@@ -216,7 +237,7 @@
         <xs:attribute name="validator">
             <xs:simpleType>
                 <xs:restriction base="xs:string">
-                    <xs:pattern value="\i\c*:(model|lib):\i\c*"/>
+                    <xs:pattern value="\i\c*:(model|lib|framework):\i\c*"/>
                 </xs:restriction>
             </xs:simpleType>
         </xs:attribute>
@@ -234,6 +255,16 @@
         <xs:attribute name="findable" type="xs:boolean"/>
         <xs:attribute name="exportable" type="xs:boolean"/>
         <xs:attribute name="importable" type="xs:boolean"/>
+        <xs:attribute name="search-type">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="range"/>
+                    <xs:enumeration value="value"/>
+                    <xs:enumeration value="word"/>
+                    <xs:enumeration value="none"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
         <xs:attribute name="editor">
             <xs:simpleType>
                  <xs:restriction base="xs:string">
@@ -318,7 +349,7 @@
     
     <!--UI Domain Experimental-->
     <xs:complexType name="uiType">
-        <xs:choice maxOccurs="1">
+        <xs:choice minOccurs="0" maxOccurs="1">
             <xs:element name="gridColumns" type="gridColumnsType"/>
             <xs:element name="gridColumn" type="gridColumnType"/>
         </xs:choice>
@@ -327,25 +358,33 @@
     
     
     <xs:complexType name="gridColumnsType">
-        <xs:sequence>
-            <xs:element name="gridColumn" type="gridColumnType"/>
+        <xs:sequence >
+            <xs:element name="gridColumn" type="gridColumnType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="gridColumnType">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:any processContents="lax" namespace="##targetNamespace"/>
+        </xs:sequence>
         <xs:attributeGroup ref="gridColumnAttributes"/>
     </xs:complexType>
+    
     <xs:attributeGroup name="uiTypeAttributes">
         <xs:attribute name="id" type="xs:Name"/>
         <xs:attribute name="type" type="uiFieldType"/>
         <xs:attribute name="label" type="xs:string"/>
         <xs:attribute name="class" type="xs:string"/>
+        <xs:attribute name="repeatable" type="xs:boolean"/>
+        <xs:attribute name="listable" type="xs:boolean"/>
     </xs:attributeGroup>
+    
     <xs:attributeGroup name="gridColumnAttributes">
         <xs:attribute name="name" type="xs:string"/>
         <xs:attribute name="index" type="xs:string"/>
         <xs:attribute name="label" type="xs:string"/>
         <xs:attribute name="editable" type="xs:boolean"/>
-        
+        <xs:attribute name="edittype" type="uiFieldType"/>
+        <xs:attribute name="displaytype" type="uiFieldType"/>
     </xs:attributeGroup>
     <xs:simpleType name="uiFieldType">
         <xs:restriction base="xs:Name">
@@ -367,8 +406,9 @@
             <xs:enumeration value="rating"/>
             <xs:enumeration value="inputmask"/>
             <xs:enumeration value="model"/>
+            <xs:enumeration value="hidden"/>
+            <xs:enumeration value="text"/>
         </xs:restriction>
-
     </xs:simpleType>
     <xs:simpleType name="uiContainerType">
         <xs:restriction base="xs:Name">

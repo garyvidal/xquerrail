@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://www.xquerrail-framework.com/config/interceptor">
+   <scope id="login" context="application:default:login" action="before-request">
+      <interceptor name="framework:interceptor:ml-security"/>
+   </scope>
+   <scope id="login" context="application:default:default" action="before-request">
+      <interceptor name="framework:interceptor:ml-security"/>
+   </scope>
+   <scope id="_securable" context="*" scope="after-request">
+      <interceptor name="framework:interceptor:ml-security"/>
+   </scope>
+</config>

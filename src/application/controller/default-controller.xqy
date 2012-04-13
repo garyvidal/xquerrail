@@ -23,25 +23,52 @@ declare function controller:main()
 };
 
 declare function controller:index()
-{
-  if(xdmp:get-current-user() = ("anonymous-user")) then
-  (
+{(
     response:set-controller("default"),
-    response:set-action("home"),
-    response:set-template("login"),
-    response:set-view("login"),
-    response:set-title("Login"),
-    response:flush() 
-  ) else 
-  (
-    response:set-controller("default"),
+    response:set-action("index"),
     response:set-template("main"),
-    response:set-view("home"),
+    response:set-view("index"),
+    
     response:set-title(fn:concat("Welcome: ",xdmp:get-current-user())),
     response:add-httpmeta("cache-control","public"),
     response:flush()
-  )
+)};
+declare function controller:login()
+{
+ let $username   := request:param("username") 
+ let $password := request:param("password")
+ return 
+    if($username ne "" or $password ne "") then 
+       let $is-logged-in := xdmp:login($username,$password)
+       return
+       if($is-logged-in) then (
+           response:redirect("default","index"),
+           response:flush()
+        ) else ( 
+           response:set-flash("login","Invalid Username or Password"),
+           response:set-controller("default"),
+           response:set-template("login"),
+           response:set-view("login"),
+           response:set-title("Login"),
+           response:response()
+     )
+     else (
+       response:set-controller("default"),
+       response:set-template("login"),
+       response:set-view("login"),
+       response:set-title("Login"),
+       response:response()
+    )
 };
+
+declare function controller:logout()
+{(
+    xdmp:logout(),
+    response:redirect("/"),
+    response:flush()
+)};
+
+
 declare function controller:portlets()
 {
   (
@@ -93,28 +120,7 @@ declare function controller:search()
     response:flush()
   )
 };  
-declare function controller:login()
-{
-  let $user := request:param("username")
-  let $password := request:param("password")
-  let $return-url := request:param("returnUrl")
-  let $_ := xdmp:login($user,$password)
-  return
-  (
-      response:set-controller("default"),
-      if($return-url ne "") 
-      then response:redirect($return-url)
-      else response:redirect("/"),
-       response:flush()
-  )
-};
 
-declare function controller:logout()
-{(
-    xdmp:logout(),
-    response:redirect("/"),
-    response:flush()
-)};
 declare function controller:accordion()
 {
  

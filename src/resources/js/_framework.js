@@ -29,10 +29,22 @@ function showForm(controller, idfield, id) {
 function editForm(controller, id) {
     var url = "/" + controller + "/edit.html?_partial=true&uuid=" + id;
     jQuery.get(url, function (data) {
+        jQuery('#form-content').html(data); 
+    }).error(function(data){
         jQuery('#form-content').html(data);
     });
 }
+// Sends the partial form back to UI
+function importForm(controller, id) {
+    var url = "/" + controller + "/export.html?_partial=true&uuid=" + id;
+    alert(url)
+}
 
+// Sends the partial form back to UI
+function exportForm(controller, id) {
+    var url = "/" + controller + "/export.html?_partial=true&uuid=" + id;
+    alert(url);
+}
 // Convert a form to a map of name:value sets for each field
 function convertFormSerilizationArray(formname) {
     var serializedArray = jQuery('#' + formname).serializeArray();
@@ -50,6 +62,7 @@ function convertFormSerilizationArray(formname) {
     });    
     return map;
 }
+
 function validateSave(formName, gridId) {
 
     var c = confirm("Are you sure you want to save these changes?");

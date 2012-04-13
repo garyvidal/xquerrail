@@ -20,16 +20,14 @@ xquery version "1.0-ml";
  : The controller is used to send all request with the action parameter to the action method name in the REST interface.
  : Reformat the incoming search request parameters as elements.
  : <br/>For example, given the rewritten URL:
- : <br/><![CDATA[http://host:port/ app/controller.xqy?action=search&term=science&from-grade=1&to-grade=12]]>
- : <br/>The controller would call the rest-method on the server as:
- : <br/><![CDATA[search(<params><from-grade>1</from-grade><to-grade>12</to-grade></params>)]]>
  : <br/>Return the rest function output.
  :
  :)
-import module namespace request  = "http://www.xquerrail-framework.com/request"  at "/_framework/request.xqy";
-import module namespace response = "http://www.xquerrail-framework.com/response" at "/_framework/response.xqy";
-import module namespace config   = "http://www.xquerrail-framework.com/config"   at "/_framework/config.xqy";
-import module namespace base     = "http://www.xquerrail-framework.com/controller/base" at "/_framework/base/base-controller.xqy";
+import module namespace request     = "http://www.xquerrail-framework.com/request"     at "/_framework/request.xqy";
+import module namespace response    = "http://www.xquerrail-framework.com/response"    at "/_framework/response.xqy";
+import module namespace config      = "http://www.xquerrail-framework.com/config"      at "/_framework/config.xqy";
+import module namespace interceptor = "http://www.xquerrail-framework.com/interceptor" at "/_framework/interceptor.xqy";
+import module namespace base        = "http://www.xquerrail-framework.com/controller/base" at "/_framework/base/base-controller.xqy";
 
 declare namespace dispatcher     = "http://www.xquerrail-framework.com/dispatcher";
 declare namespace controller     = "http://www.xquerrail-framework.com/controller";
@@ -41,49 +39,12 @@ declare namespace error          = "http://marklogic.com/xdmp/error";
 declare variable $controller:REPORT-HTML-ERRORS as xs:boolean := fn:true();
 
 declare option xdmp:mapping "false";
-
 declare option xdmp:output "indent=yes";
 declare option xdmp:output "method=xml";
 declare option xdmp:ouput "omit-xml-declaration=yes";
 
 (:~
-: handle formatting the error message as html or as element(error)
-: @param $response-text The string message of the error
-: @return element containing error
-:)
-declare function dispatcher:report-error(
-   $response-code as xs:integer, 
-   $title as xs:string, 
-   $response-text as xs:string
-) as element()
-{
-  if ($controller:REPORT-HTML-ERRORS) then
-    dispatcher:html-wrapper($response-code, $title, $response-text)
-  else
-    <error code="{$response-code}" title="{$title}">{$response-text}</error>
-};
-
-(:~
-: Wrap the specified string in html for friendly message display.
-: @param $response-text The string message of the errror
-: @return element(htm:html) An element(htm:html) containing the html response.
-:)
-declare function dispatcher:html-wrapper(
-    $response-code as xs:integer, 
-    $title as xs:string, 
-    $response-text as xs:string) as element()
-{
-  xdmp:add-response-header("Content-Type", "text/html"),
-  <html xmlns="http://www.w3.org/1999/xhtml">
-    <head><title>HTTP {$response-code}{' '}{$title}</title></head>
-    <body>
-		<h3>{$response-code}{' '}{$title}</h3>
-		<p>{$response-text}</p>
-	</body>
-  </html>
-};
-(:~
- : Returns wether the controller exists or not
+ : Returns whether the controller exists or not
 ~:)
 declare function dispatcher:controller-exists($controller-uri as xs:string) as xs:boolean {
 	if (xdmp:modules-database()) then
@@ -95,6 +56,7 @@ declare function dispatcher:controller-exists($controller-uri as xs:string) as x
 	else
 		xdmp:uri-is-file($controller-uri)
 };
+
 declare function dispatcher:view-exists($view-uri as xs:string) as xs:boolean
 {
 	if (xdmp:modules-database()) then
@@ -106,17 +68,42 @@ declare function dispatcher:view-exists($view-uri as xs:string) as xs:boolean
 	else
 		xdmp:uri-is-file($view-uri)
 };
+
+(:~
+ :  Returns an errorcode for a given response/request.
+ :  If defined the routing will use the application error handler
+ :  or if not will use the framework internal one.
+ :  @param $ex - Error XML response
+~:)
+declare function dispatcher:error(
+$ex as element(error:error)
+){
+  let $error-map := map:map()
+  let $request := if(request:request() instance of map:map) then request:request() else map:map()
+  let $_:= 
+    (
+     map:put($error-map,"error",$ex),
+     map:put($error-map,"request",request:request()),
+     map:put($error-map,"response",response:response())
+    )
+  return (
+      xdmp:log(("Error::[",$ex,"]")),
+      xdmp:invoke( config:error-handler(),(xs:QName("_ERROR"),$error-map))
+  )
+};
+
+
 (:~
  :  Executes a named controller using REST methods interface
 ~:)
-declare function dispatcher:controller()
+declare function dispatcher:invoke-controller()
 { 
-   let $application as xs:string := request:application()
-   let $controller as xs:string := request:controller()
-   let $action as xs:string  := request:action()
-   let $route  as xs:string  := request:route()
-   let $controller-location := fn:concat(config:get-application($application)/@uri,'/controller/', $controller,'-controller.xqy')
-   let $controller-uri      := fn:concat(config:get-application($application)/@namespace,'/controller/', $controller)
+   let $application as xs:string? := (request:application(),config:default-application())[1]
+   let $controller as xs:string   := (request:controller(),config:default-controller())[1]
+   let $action as xs:string       := (request:action(),config:default-action())[1]
+   let $route  as xs:string?      := request:route()
+   let $controller-location       := fn:concat(config:get-application($application)/@uri,'/controller/', $controller,'-controller.xqy')
+   let $controller-uri            := fn:concat(config:get-application($application)/@namespace,'/controller/', $controller)
    let $results := 
      if(dispatcher:controller-exists($controller-location))
      then 
@@ -131,7 +118,8 @@ declare function dispatcher:controller()
              xdmp:eval($stmt,
              (xs:QName("request"),request:request()),
                <options xmlns="xdmp:eval">
-               </options>)
+               </options>
+             )
      else base:invoke($action)
     return     
           $results
@@ -140,7 +128,7 @@ declare function dispatcher:controller()
 (:~
  : Renders the output 
 ~:)
-declare function dispatcher:render($response,$request)
+declare function dispatcher:invoke-response($response,$request)
 {
     let $application := request:application()
     let $controller := request:controller()
@@ -151,18 +139,14 @@ declare function dispatcher:render($response,$request)
     if($response instance of map:map) then 
            if(response:set-response($response,$request)) then 
               let $engine := config:get-engine($response)
-              let $engine-uri := fn:concat($config:ENGINE-PATH,"/",$engine,".xqy")
+              let $engine-uri := fn:concat($config:DEFAULT-ENGINE-PATH,"/",$engine,".xqy")
               let $engine-func := xdmp:function(xs:QName("engine:initialize"),$engine-uri)
               let $_ := 
                   if(fn:not(dispatcher:view-exists($view-uri))) 
                   then response:set-base(fn:true())
                   else () 
               return
-              try {
                 xdmp:apply($engine-func,response:flush(),$request)
-              } catch($ex) {
-                xdmp:quote(<maphtml>{response:response(),$ex}</maphtml>)
-              }
            else $response         
       else 
          if($format eq "json") then 
@@ -172,20 +156,12 @@ declare function dispatcher:render($response,$request)
             let $_ :=  (response:set-body($response))
             let $response := response:response()
             let $engine := config:get-engine($response)
-            let $engine-uri := fn:concat($config:ENGINE-PATH,"/",$engine,".xqy")
+            let $engine-uri := fn:concat($config:DEFAULT-ENGINE-PATH,"/",$engine,".xqy")
             let $engine-func := xdmp:function(xs:QName("engine:initialize"),$engine-uri)
             return
-              try {
                 xdmp:apply($engine-func,$response,$request)
-              } catch($ex) {
-                let $map := response:flush()
-                let $_   := map:put($map,"error",$ex)
-                return 
-                    $ex
-              }
           else if($format eq "html") then 
             (:Initialize the HTML Response:)
-            
             let $_ := response:set-response(map:map(),$request)
             let $_ := (
                 response:set-format("html"),
@@ -201,23 +177,44 @@ declare function dispatcher:render($response,$request)
             let $_ :=  (response:set-body($response))
             let $response := response:response()
             let $engine := config:get-engine($response)
-            let $engine-uri := fn:concat($config:ENGINE-PATH,"/",$engine,".xqy")
+            let $engine-uri := fn:concat($config:DEFAULT-ENGINE-PATH,"/",$engine,".xqy")
             let $engine-func := xdmp:function(xs:QName("engine:initialize"),$engine-uri)
             return
-              try {
                 xdmp:apply($engine-func,$response,$request)
-              } catch($ex) {
-                let $map := response:flush()
-                let $_   := map:put($map,"error",$ex)
-                return 
-                  $ex
-              }
-         else $response     
+         else if($response) 
+         then $response
+         else <html/>         
 };
-let $request := request:parse(())
-let $initialize := request:initialize($request)
-let $response := dispatcher:controller()
-return 
-   dispatcher:render($response,$request)
+try {
+   (:Initialize Interceptors:)
+   let $init := interceptor:before-request()
+   return
+       if(fn:normalize-space(request:redirect()) ne "" and fn:exists(request:redirect()))
+       then  (
+         (),
+         xdmp:log(xdmp:log(string-join(("dispatcher::after-request-aaa::[",request:redirect(),"]"),""))
+       ))  
+         
+       else 
+         let $request := request:parse(())
+         return
+             let $request  := interceptor:after-request()
+             let $log := xdmp:log(string-join(("dispatcher::after-request-xxx::[",request:redirect(),"]"),""))
+             return (
+               if(fn:normalize-space(request:redirect()) ne ""  and fn:exists(request:redirect()))
+               then xdmp:redirect-response(request:redirect())
+               else (),
+                  let $response  := (
+                    interceptor:before-response(),
+                    dispatcher:invoke-controller()
+                  )
+                  return (
+                    dispatcher:invoke-response($response,$request),
+                    interceptor:after-response()
+                  )
+              )
+} catch($ex) {(
+   dispatcher:error($ex)
+   )
+}
 
-   

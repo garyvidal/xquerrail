@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Tree - Expand On Hover</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content=" mouseover" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="ComponentOne" />
+    
+    <link href="../../themes/rocket/jquery-wijmo.css" rel="stylesheet" type="text/css" />
+    
+    <link href="../../themes/wijmo/jquery.wijmo-open.2.0.0.css" rel="stylesheet" type="text/css" />
+    <link href="../../themes/wijmo/jquery.wijmo.wijtree.css" rel="stylesheet" type="text/css" />
+    <script src="../../external/jquery-1.7.1.min.js" type="text/javascript"></script>
+    <script src="../../external/jquery-ui-1.8.17.custom.min.js" type="text/javascript"></script>
+    <script src="../../external/jquery.wijmo-open.all.2.0.0.min.js" type="text/javascript"></script>
+    <script src="../../Wijmo/jquery.wijmo.wijtree.js" type="text/javascript"></script>
+    <script id="scriptInit" type="text/javascript">
+        $(document).ready(function () {
+            var tv = $("#tree").wijtree({
+                expandCollapseHoverUsed: true,
+                expandAnimation: {},
+                collapseAnimation: {}
+            });
+        });       
+    </script>
+</head>
+<body class="demo-single">
+    <div class="container">
+        <div class="header">
+            <h2>
+                Expand On Hover</h2>
+        </div>
+        <div class="main demo">
+            <!-- Begin demo markup -->
+            <div>
+                <ul id="tree">
+                    <li class="folder"><a><span>Folder 1</span></a>
+                        <ul>
+                            <li class="folder"><a><span>Folder 1.1</span></a>
+                                <ul>
+                                    <li class="file"><a><span>File 1.1</span></a></li>
+                                    <li class="file"><a><span>File 1.2</span></a></li>
+                                    <li class="file"><a><span>File 1.3</span></a></li>
+                                    <li class="file"><a><span>File 1.4</span></a></li>
+                                    <li class="file"><a><span>File 1.5</span></a></li>
+                                </ul>
+                            </li>
+                            <li class="file"><a><span>File 1.2</span></a></li>
+                            <li class="file"><a><span>File 1.3</span></a></li>
+                            <li class="file"><a><span>File 1.4</span></a></li>
+                            <li class="file"><a><span>File 1.5</span></a></li>
+                        </ul>
+                    </li>
+                    <li class="folder"><a><span>Folder 2</span></a>
+                        <ul>
+                            <li class="file"><a><span>File 2.1</span></a></li>
+                            <li class="file"><a><span>File 2.2</span></a></li>
+                            <li class="file"><a><span>File 2.3</span></a></li>
+                            <li class="file"><a><span>File 2.4</span></a></li>
+                            <li class="file"><a><span>File 2.5</span></a></li>
+                        </ul>
+                    </li>
+                    <li class="folder"><a><span>Folder 3</span></a>
+                        <ul>
+                            <li class="file"><a><span>File 3.1</span></a></li>
+                            <li class="file"><a><span>File 3.2</span></a></li>
+                            <li class="file"><a><span>File 3.3</span></a></li>
+                            <li class="file"><a><span>File 3.4</span></a></li>
+                            <li class="file"><a><span>File 3.5</span></a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <!-- End demo markup -->
+            <div class="demo-options">
+                <!-- Begin options markup -->
+                <!-- End options markup -->
+            </div>
+        </div>
+        <div class="footer demo-description">
+		<p>
+		This sample illustrates how to set up the wijtree widget to collapse upon mouse hover, which is simple with Wijmo: just set the expandCollapseHoverUsed option to true. You can also set the animations for both expanding and collapsing by setting the expandAnimation and collapseAnimation options.
+		</p>
+        </div>
+    </div>
+</body>
+</html>

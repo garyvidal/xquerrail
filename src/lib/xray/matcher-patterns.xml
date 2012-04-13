@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<matchers>
-    <matcher name="amount">^(\d{1,2}\s?\d\/\d|\s?\d\/\d|\d+)</matcher>
-    <matcher name="unit" color="#ccc999" background="">(tablespoon(s)?|teaspoon(s)?|cup(s)?|tbsp|tsp|ounce(s)?|pound(s)?|stick|large)</matcher>
-    <matcher name=""
-</matchers>

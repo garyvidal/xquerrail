@@ -100,16 +100,16 @@ declare function response:set-response($_response as map:map,$_request as map:ma
 declare private function response:set-defaults($_request)
 {
    let $_ := request:initialize($_request)
-   let $_ := 
-     (
-        if(fn:exists(response:application())) then () else response:set-application(request:application()),
-        if(fn:exists(response:controller()))  then () else response:set-controller(request:controller()),
-        if(fn:exists(response:action()))      then () else response:set-action(request:action()),
-        if(fn:exists(response:format()))      then () else response:set-action(request:format()),
-        if(fn:exists(response:partial()))     then () else response:set-partial(request:partial()),
-        if(fn:exists(response:user()))     then () else response:set-user(request:user())
-     )
-   return ()
+   return 
+    if(fn:exists($_request)) then (
+        if(fn:exists(response:application())) then () else response:set-application(fn:data(request:application())),
+        if(fn:exists(response:controller()))  then () else response:set-controller(fn:data(request:controller())),
+        if(fn:exists(response:action()))      then () else response:set-action(fn:data(request:action())),
+        if(fn:exists(response:format()))      then () else response:set-action(fn:data(request:format())),
+        if(fn:exists(response:partial()))     then () else response:set-partial(fn:data(request:partial())),
+        if(fn:exists(response:user()))     then () else response:set-user(fn:data(request:user()))
+   ) else ()
+
 };
 declare function response:set-user($user)
 {
@@ -118,6 +118,9 @@ declare function response:set-user($user)
 declare function response:user()
 {
    map:get($response,$USER)
+};
+declare function response:has-flash(){
+   fn:exists(map:get($response,$FLASH))
 };
 (:~
  : The Flash message is a convenient may to store information 

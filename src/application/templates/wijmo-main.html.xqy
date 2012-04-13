@@ -33,6 +33,9 @@ declare default element namespace "http://www.w3.org/1999/xhtml";
     <body>
         <div id="page_wrapper">
            <div class="clear"></div>
+           <div id="page-header">
+            <?template name="wijmo-theme"?>
+           </div>
            <div id="page-layout">
                 <div id="page-content">
                     <div id="page-content-wrapper" class="no-bg-image wrapper-full">

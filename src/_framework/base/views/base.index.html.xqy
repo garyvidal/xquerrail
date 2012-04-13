@@ -3,7 +3,7 @@ xquery version "1.0-ml";
 declare default element namespace "http://www.w3.org/1999/xhtml";
 import module namespace response = "http://www.xquerrail-framework.com/response" at "/_framework/response.xqy";
 
-declare namespace domain = "http://www.xquerrail-framework.com/domain";
+import module namespace domain = "http://www.xquerrail-framework.com/domain" at "/_framework/domain.xqy";
 
 declare option xdmp:output "indent-untyped=yes";
 declare variable $response as map:map external;
@@ -36,6 +36,7 @@ let $gridCols :=
 let $editButtons := fn:string(<stmt>{{new:true,edit:true,show:true,delete:true,import:true,export:true}}</stmt>)
 let $uuidMap :=  fn:string(<stmt>{{ name:'uuid', label:'UUID', index:'uuid',hidden:true }}</stmt>)
 let $gridColsStr := fn:string-join(($uuidMap,$gridCols),",")
+let $uuidKey := domain:get-field-key($domain-model/domain:element[@name = "uuid"])
 
 return
 <div xmlns="http://www.w3.org/1999/xhtml" class="body-wrapper">
@@ -82,7 +83,7 @@ return
                 xmlReader : xmlListReaderSettings('{$modelName}s','{$modelName}'),
                 onSelectRow: function(id){{ 
                     if(id){{ 
-                       editForm('{response:controller()}',id,true);
+                       editForm('{fn:concat("/",response:controller(),"/edit.html?", $uuidKey, "=")}',id,true);
                     }} 
                     return true;
                 }}
@@ -91,8 +92,8 @@ return
             /*initialize your grid model*/
             $(document).ready(function(){{
                initListGrid("#{response:controller()}_table",gridModel)
-               initToolbar(toolbarMode);
-               initLayout();
+               //initToolbar(toolbarMode);
+               //initLayout();
             }});
             var controller = '{response:controller()}';
            </script>

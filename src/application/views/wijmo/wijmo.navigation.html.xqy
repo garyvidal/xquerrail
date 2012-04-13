@@ -2,7 +2,7 @@ xquery version "1.0";
 
 import module namespace wijmo = "http://www.xquerrail-framework.com/helper/wijmo" 
    at "/_framework/helpers/wijmo.xqy";
-  
+   
 import module namespace js = "http://www.xquerrail-framework.com/helper/javascript" 
    at "/_framework/helpers/javascript.xqy";
   
@@ -28,7 +28,7 @@ import module namespace js = "http://www.xquerrail-framework.com/helper/javascri
          </div>
          <div id="pager-tab" class="demo-tab">
              <h2>Pager</h2>
-             {wijmo:pager-template()}
+             {wijmo:pager-template()} 
          </div>     
     </div>    
     <script type="text/javascript"> 

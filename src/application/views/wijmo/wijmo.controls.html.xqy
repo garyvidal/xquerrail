@@ -22,7 +22,7 @@ import module namespace js = "http://www.xquerrail-framework.com/helper/javascri
     <script type="text/javascript"> 
       jQuery(window).ready(function(){{
          {fn:data(wijmo:tabs("#control-tabs",(
-           js:pair("alignment",js:string("left")),
+           js:pair("alignment",js:string("top")),
            js:pair("sortable",js:boolean(fn:true()))
          )
          ))}

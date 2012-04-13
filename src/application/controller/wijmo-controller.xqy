@@ -1,4 +1,3 @@
-
 xquery version "1.0-ml";
 (:~
  : Demo Controller used for templates and inspiration
@@ -58,4 +57,13 @@ declare function controller:controls()
     response:set-view("controls"),
     response:set-title("Wijmo Control Tests"),
     response:flush()      
+)};
+declare function controller:javascript()
+{(
+   response:set-controller("wijmo"),
+    response:set-action("javascript"),
+    response:set-template("wijmo-main"),
+    response:set-view("javascript"),
+    response:set-title("Javascript Tests"),
+    response:flush()     
 )};

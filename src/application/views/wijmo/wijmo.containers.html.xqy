@@ -74,7 +74,7 @@ import module namespace js = "http://www.xquerrail-framework.com/helper/javascri
             </div>
         </div>
      </div>
-     {wijmo:expander("expander-test",(
+     {wijmo:expander("#expander-test",(
          js:pair("expanded",js:boolean(fn:false())),
          js:pair("allowExpand",js:boolean("true")),
          js:pair("afterExpand",js:function("e","alert('After Expand');"))
@@ -83,7 +83,7 @@ import module namespace js = "http://www.xquerrail-framework.com/helper/javascri
 <script type="text/javascript"> 
   jQuery(window).ready(function(){{
      {fn:data(wijmo:tabs("#tabs",(
-       js:pair("alignment",js:string("left")),
+       js:pair("alignment",js:string("right")),
        js:pair("sortable",js:boolean(fn:true()))
      )
      ))}

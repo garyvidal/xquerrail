@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+    xmlns="http://www.xquerrail-framework.com/routing"
+    xmlns:routing = "http://www.xquerrail-framework.com/routing"
+    elementFormDefault="qualified"
+    targetNamespace="http://www.xquerrail-framework.com/routing"> 
+<xs:element name="routes">
+    <xs:complexType>
+        <xs:sequence minOccurs="1" maxOccurs="unbounded">
+            <xs:element name="route" type="routeType"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:element>
+<xs:complexType name="routeType">
+    <xs:choice>
+        <xs:element name="default">
+           <xs:complexType>
+               <xs:simpleContent>
+                   <xs:extension base="xs:string">
+                       <xs:attributeGroup ref="defaultAttributes"/>
+                   </xs:extension>
+               </xs:simpleContent>
+           </xs:complexType>
+        </xs:element>
+    </xs:choice>
+</xs:complexType>
+<xs:attributeGroup name="defaultAttributes">
+    <xs:attribute name="id" type="xs:ID"/>
+    <xs:attribute name="pattern" type="xs:string"/>
+    <xs:attribute name="method">
+        <xs:simpleType>
+            <xs:restriction base="xs:string">
+                <xs:enumeration value="post"/>
+                <xs:enumeration value="put"/>
+                <xs:enumeration value="get"/>
+                <xs:enumeration value="delete"/>
+                <xs:enumeration value="head"/>
+                <xs:enumeration value="option"/>
+            </xs:restriction>
+        </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="is-resource" type="xs:boolean">
+    </xs:attribute>   
+</xs:attributeGroup>
+</xs:schema>

@@ -13,6 +13,29 @@ function xmlListReaderSettings(rootField, rowField) {
     return settings;
 }
 
+function initializeGrid(selector,url,reader){
+   $(selector).wijgrid({
+                data : new wijdatasource({
+                    proxy : new wijhttpproxy({
+                        url : url,
+                        dataType: "xml",
+                        data: {
+                            featureClass: "P",
+                            style: "full",
+                            maxRows: 50
+                        },
+                        key: "geonames"
+                    }),
+                    reader: new wijarrayreader([
+                     { name: "label", mapping: function (item) { return item.name + (item.adminName1 ? ", " + item.adminName1 : "") + ", " + item.countryName } },
+                     { name: "name", mapping: "name" },
+                     { name: "countryCode", mapping: "countryCode" },
+                     { name: "continentCode", mapping: "continentCode" }
+                  ])
+                })
+            });
+
+}
 function showForm(controller, idfield, id) {
     $.ajax({
         url: '/' + controller + '/show.html',

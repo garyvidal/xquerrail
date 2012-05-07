@@ -61,6 +61,10 @@
       <default key="_controller">application:$1:edit:xml</default>
       <param key="id">$2</param>
    </route>
+   <route id="default_article" pattern="^/articles/(.*)/?$">
+      <default key="_controller">application:article:show:html</default> 
+      <param key="title">$1</param>      
+   </route>
    <!--Default Routes-->
    <route id="default_index" pattern="^/(\i\c*)/?$">
       <default key="_controller">application:$1:index:html</default>      

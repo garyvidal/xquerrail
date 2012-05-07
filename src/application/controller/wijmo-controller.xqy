@@ -49,6 +49,7 @@ declare function controller:navigation()
     response:set-title("Wijmo Navigation Tests"),
     response:flush() 
 )};
+
 declare function controller:controls()
 {(
     response:set-controller("wijmo"),
@@ -58,6 +59,7 @@ declare function controller:controls()
     response:set-title("Wijmo Control Tests"),
     response:flush()      
 )};
+
 declare function controller:javascript()
 {(
    response:set-controller("wijmo"),
@@ -65,5 +67,24 @@ declare function controller:javascript()
     response:set-template("wijmo-main"),
     response:set-view("javascript"),
     response:set-title("Javascript Tests"),
+    response:flush()     
+)};
+
+declare function controller:visualizations()
+{(
+   response:set-controller("wijmo"),
+    response:set-action("visualizations"),
+    response:set-template("wijmo-main"),
+    response:set-view("visualizations"),
+    response:set-title("Visualization Example"),
+    response:flush()     
+)};
+declare function controller:grids()
+{(
+   response:set-controller("wijmo"),
+    response:set-action("grids"),
+    response:set-template("wijmo-main"),
+    response:set-view("grids"),
+    response:set-title("Grid Control"),
     response:flush()     
 )};

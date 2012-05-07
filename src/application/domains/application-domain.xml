@@ -7,17 +7,6 @@
     <description>XQuerrail Demo Application</description>
     <author>Gary Vidal</author>
     <version>1.0</version>
-    <roles>
-        <role name="-admin" type="admin"/>
-        <role name="application-editor" type="editor"/>
-        <role name="application-user" type="user"/>
-        <role name="application-nobody" type="anonymous"/>
-        <role name="application-create" type="create"/>
-        <role name="application-read" type="read"/>
-        <role name="application-write" type="write"/>
-        <role name="application-delete" type="delete"/>
-        <role name="application-execute" type="execute"/>
-    </roles>
     <model name="base" description="Base Extension Class" persistence="abstract">
         <element name="uuid" type="identity" identity="true" label="Globally Unique Identifier">
             <navigation  searchable="true" sortable="true" facetable="true" />
@@ -43,6 +32,28 @@
         </element>       
         <element name="isOnWatchList" type="boolean" label="Is On Watch List">
             <navigation  searchable="true" sortable="true"  />
+            <constraint required="true" />
+        </element>          
+    </model>
+    
+    <!-- Georgraphic Related Models -->
+    <model name="company" description="Companies" 
+        persistence="document" key="id" keyLabel="name" extends="base">
+        <document root="companies">/codetables/companies.xml</document>
+        <element name="CompanyID" type="string" label="Company ID">
+            <navigation  searchable="true" sortable="true" facetable="true"  />
+            <constraint required="true"  />
+        </element>
+        <element name="CompanyName" type="string" label="Company Name" >
+            <navigation searchable="true" sortable="true"  />
+            <constraint required="true" />
+        </element>
+        <element name="CountryCode" type="reference" reference="model:countryCode:reference" label="Country">
+            <navigation  searchable="true" sortable="true" />
+            <constraint required="true" />
+        </element>               
+        <element name="IsLoser" type="boolean" label="Is a Loser?">
+            <navigation  searchable="true" sortable="true" />
             <constraint required="true" />
         </element>          
     </model>
@@ -108,8 +119,8 @@
             <constraint required="true"/>
         </element>
         <element name="roleName" type="string" label="Role Name">
-            <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>
+            <navigation searchable="true" sortable="true" />
+            <constraint  required="true" />
         </element>
         <element name="roleDescription" type="string" label="Role Description">
             <navigation searchable="true" sortable="true"/>
@@ -126,5 +137,5 @@
     <controller name="locales" model="locale" label="Locales"/>
     <controller name="users" model="user" label="Users"/>
     <controller name="roles" model="role" label="Roles"/>
- 
+    <controller name="companies" model="company" label="Companies"/>
 </domain>

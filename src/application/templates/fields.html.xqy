@@ -11,8 +11,6 @@ declare variable $response as map:map external;
 let $init := response:initialize($response)
 let $domain-model := response:model()
 return
-    <div class="editPanel">
-        {
-          form:build-form($domain-model,$response)
-        }
-    </div>
+    <div class="editPanel">{
+        form:build-form($domain-model,$response)
+    }</div>

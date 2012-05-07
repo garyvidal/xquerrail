@@ -12,6 +12,7 @@ import module namespace js = "http://www.xquerrail-framework.com/helper/javascri
         <li><a href="/wijmo/navigation.html?_partial=true">Navigation</a></li>
         <li><a href="/wijmo/controls.html?_partial=true">Controls</a></li>
         <li><a href="/wijmo/visualizations.html?_partial=true">Visualizations</a></li>
+        <li><a href="/wijmo/grids.html?_partial=true">Grids</a></li>
         <li><a href="/wijmo/javascript.html?_partial=true">Javascript</a></li>
     </ul>
 </div>    

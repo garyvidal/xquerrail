@@ -691,13 +691,15 @@ declare function wijmo:grid(
    $options as item()
 ){(
    
-
 )};
-
+declare function wijmo:grid-options(
+  $options as item()
+){
+ ()
+};
 declare function wijmo:gridColumn(
   $options as item()
-) 
-{(
+) {(
    
 )};
 

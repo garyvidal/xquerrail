@@ -2,23 +2,30 @@
     <!--Configurations-->
     <routes-config  resource="/_config/routes.xml"/>
     <routing-module resource="/_framework/routing.xqy"/>
+    
     <interceptor-config resource="/_config/interceptor.xml"/>
+    <interceptor-module resource="/_framework/interceptor.xqy"/>
+    
     <environment-config resource="/_config/env.xml"/>
+    
     <plugin-config resource="/_config/plugin.xml"/>
     
-    <controller-suffix value="-controller"/>
-    <controller-scripts-directory value="/resources/scripts/"/> 
+    
+    <controller-scripts-directory value="/resources/scripts"/> 
     <controller-stylesheet-directory value="/resources/stylesheets"/>
+    
     <error-handler resource="/_framework/error.xqy"/>    
+    
+    <!--Suffix Configuration-->
+    <controller-suffix value="-controller"/>
     <model-suffix value="-model"/>
     <library-suffix value="-lib"/>
-    
-    <anonymous-user value="anonymous-user"/>
+
+    <anonymous-user value="anonymous-user"/> 
     
     <dispatcher resource="/_framework/dispatchers/dispatcher.web.xqy"/>
     
     <!--Register Default Values for engine-->
-    
     <default-engine value="engine.html"/>
     <default-application value="application"/>
     <default-controller value="default"/> 
@@ -26,9 +33,12 @@
     <default-format value="html"/>
     <default-template-directory resource="/_framework/base/views/"/>
     <default-view-directory resources="/_framework/base/templates/"/>    
-    <!--Register    Your Application Here-->
+    
+    <!--Register Your Application Here-->
     <application name="application" namespace="http://www.xquerrail-framework.com/demo" uri="/application">
         <domain resource="/application/domains/application-domain.xml" />
+        <script-directory value="/application/scripts"/>
+        <stylesheet-directory value="/application/stylesheets"/>
     </application>
     
 

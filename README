@@ -6,9 +6,14 @@ Running Demo Application
 
 * Create a database
 
+* Create an anonymous role and anonymous user
+**  Do not set to admin role or you will just bypass all security.  admin role overrides all roles.
+** 
+
 * Create an appserver pointing code code base /src/
 
-* set url rewriter to /rewriter.xqy
+* set url rewriter to /_framework/rewriter.xqy
+
 
 * Use application-level security 
 

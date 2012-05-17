@@ -10,7 +10,6 @@
     
     <plugin-config resource="/_config/plugin.xml"/>
     
-    
     <controller-scripts-directory value="/resources/scripts"/> 
     <controller-stylesheet-directory value="/resources/stylesheets"/>
     
@@ -41,6 +40,11 @@
         <stylesheet-directory value="/application/stylesheets"/>
     </application>
     
+    <application name="test" namespace="http://www.xquerrail-framework.com/test" uri="/test-application">
+        <domain resource="/test-application/domains/application-domain.xml"/>
+        <script-directory value="/test-application/scripts"/>
+        <stylesheet-directory value="/test-application/stylesheets"/>
+    </application>
 
     <!--Interceptors-->
     <interceptors config="/_config/interceptor.xml">

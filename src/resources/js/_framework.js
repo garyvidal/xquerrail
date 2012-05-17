@@ -66,7 +66,6 @@ function importForm(controller, id) {
 // Sends the partial form back to UI
 function exportForm(controller, id) {
     var url = "/" + controller + "/export.html?_partial=true&uuid=" + id;
-    alert(url);
 }
 // Convert a form to a map of name:value sets for each field
 function convertFormSerilizationArray(formname) {

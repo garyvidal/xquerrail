@@ -147,9 +147,11 @@ declare function engine:transform-controller-stylesheet($node)
  :)
 declare function engine:transform-controller-list($node)
 {
+   <ul>{
    for $controller in domain:get-controllers("application")
    return
      <li><a href="/{$controller/@name}/index.html">{(fn:data($controller/@label),fn:data($controller/@name))[1]}</a></li>
+   }</ul>
 };
 (:~
  : Custom Transformer handles HTML specific templates and

@@ -14,12 +14,22 @@ import module namespace request = "http://www.xquerrail-framework.com/request"
 import module namespace response = "http://www.xquerrail-framework.com/response"
    at "/_framework/response.xqy";
    
-import module namespace json="http://marklogic.com/json" at "/lib/json.xqy";
+
+import module namespace model = "http://www.xquerrail-framework.com/model"
+   at "/_framework/model.xqy";
+
+import module namespace domain = "http://www.xquerrail-framework.com/domain"
+   at "/_framework/domain.xqy";
+   
+import module namespace json = "http://marklogic.com/json" 
+   at "/_framework/lib/mljson.xqy";
+
+import module namespace js = "http://www.xquerrail-framework.com/helper/javascript"
+   at "/_framework/helpers/javascript.xqy";
+   
 
 declare namespace tag = "http://www.xquerrail-framework.com/tag";  
-declare namespace domain = "http://www.xquerrail-framework.com/domain";
 
-declare default element namespace "http://www.w3.org/1999/xhtml";
 declare default function namespace "http://www.w3.org/2005/xpath-functions";
 
 declare option xdmp:output "method=xml";
@@ -95,17 +105,28 @@ declare function engine:recursive-transform($node,$model)
 
 declare function engine:render-json($node)
 {  
-json:xmlToJSON(
- <json type="object">
-   {
-     for $x in $node//element()[fn:not(./element())]
-     return 
-       element {fn:local-name($x)} {
-         attribute type{"string"},
-         $x/text()
-       }
-   }
-   </json>)
+   let $is-listable := $node instance of element(list)
+   let $model := 
+      if($is-listable)
+      then domain:get-domain-model($node/@type)
+      else domain:get-domain-model(fn:local-name($node)) 
+   return
+     if($is-listable and $model) then  
+         js:o((       
+            js:pair("currentpage",$node/currentpage cast as xs:integer),
+            js:pair("pagesize",$node/pagesize cast as xs:integer),
+            js:pair("totalpages",$node/totalpages cast as xs:integer),
+            js:pair("totalrecords",$node/totalrecords cast as xs:integer),
+            js:na($node/@type,(
+               for $n in $node/*[local-name(.) eq $model/@name]
+               return 
+                   model:to-json($model,$n)
+            ))
+         ))
+
+     else if($model) then
+        model:to-json(response:model(),response:body())
+     else fn:error(xs:QName("JSON-PROCESSING-ERROR"),"Cannot generate JSON response without model")
 };
 (:~
   Handle your custom tags in this method or the method you have assigned  

@@ -33,6 +33,7 @@ declare function controller:index()
     response:add-httpmeta("cache-control","public"),
     response:flush()
 )};
+
 declare function controller:login()
 {
  let $username   := request:param("username") 

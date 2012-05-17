@@ -2,8 +2,9 @@
    <route id="_resources" pattern="^/resources/*" is-resource="true">
       <prepend></prepend>
    </route>
-   <route id="_xray" pattern="^/lib/xray" is-resource="true">
-      <prepend></prepend>
+   
+   <route id="_xray" pattern="^/(xray)" is-resource="true">
+      <prepend>/_framework/lib</prepend>
    </route>
 
    <route id="_login" pattern="^/login.html">
@@ -14,36 +15,15 @@
       <default key="_controller">application:default:logout:html</default>
    </route>
 
-   <route id="_thumbnails" pattern="^/thumbnails(.*)">
-      <default key="_controller">application:default:thumbnail:binary</default>
-      <param key="thumb-uri">$1</param>
-   </route>
    <route id="_default" pattern="^/$">
       <default key="_controller">application:default:index:html</default>
    </route>
-   <route id="_default" pattern="^/staging/?$">
-      <default key="_controller">application:default:staging:html</default>
-   </route>
-   <route id="_validationManager" pattern="^/validationManager/?$">
-      <default key="_controller">application:validationManager:index:html</default>
-   </route>
-   <route id="_validationManager" pattern="^/validationManager/(\i\c*[^\.])\.(xml|json)/?$">
-      <default key="_controller">application:validationManager:$1:$2</default>
-   </route>
-   <route id="_packageManager" pattern="^/packageManager/(\i\c*[^\.])\.(xml|json)/?$">
-      <default key="_controller">application:packageManager:$1:$2</default>
-   </route>
-   
-   <route id="_assets" pattern="^/assets(\i\c*[^\.])\.(xml|json)/?$">
-      <default key="_controller">application:assets:$1:$2</default>
-   </route>
-   
-   <route id="_admin" pattern="^/admin/?$">
-      <default key="_controller">application:default:admin:html</default>
-   </route>   
+
+
    <route id="_listxml" pattern="^/(\i\c*)/list.xml$">
       <default key="_controller">application:$1:list:xml</default>
    </route>  
+
    <route id="_lookup" pattern="^/(\i\c*[^/])/lookup\.(xml|json)$">
       <default key="_controller">application:$1:lookup:$2</default>
    </route>
@@ -72,11 +52,11 @@
    <route id="default_index_format" pattern="^/(\i\c*)/(\i\c*).(json|html)$">
       <default key="_controller">application:$1:$2:$3</default>      
    </route>   
-   <route id="_default_get" pattern="^/(.*[^/])/(\i\c*[^/])\.(json|html)$" method="get">
+   <route id="_default_get" pattern="^/(.*[^/])/(\i\c*[^/])\.(json|html|xml)$" method="get">
       <default key="_controller">application:$1:get:$3</default>
    </route>
    
-   <route id="_default_update" pattern="^/(.*[^/])/(\i\c*[^/])\.(json|html)$" method="post">
+   <route id="_default_update" pattern="^/(.*[^/])/(\i\c*[^/])\.(json|html|xml)$" method="post">
       <default key="_controller">application:$1:update:$3</default>
    </route>   
    

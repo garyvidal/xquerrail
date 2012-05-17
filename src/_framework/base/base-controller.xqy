@@ -234,8 +234,8 @@ declare function controller:show()
 
 declare function controller:new()
 {(  
-    response:set-template("edit"),
-    response:set-view("edit"),  
+    response:set-template("main"),
+    response:set-view("new"),  
     response:flush()
 )}; 
 
@@ -308,7 +308,7 @@ declare function controller:post()
 {
     let $model := controller:model()
     let $uuidField := $model/domain:element[@name = "uuid"]
-    let $key := domain:get-field-key($uuidField)
+    let $key := domain:get-field-id($uuidField)
         
     let $uuid := fn:data(request:body()//*[fn:local-name(.) = $key])
     let $product :=     

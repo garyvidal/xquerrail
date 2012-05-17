@@ -57,7 +57,7 @@ declare function utils:relative-path(
   $path as xs:string
 ) as xs:string
 {
-  fn:replace($path, xdmp:modules-root(), "/")
+  fn:replace(fn:replace($path,"\\","/"), fn:replace(xdmp:modules-root(),"\\","/"), "/")
 };
 
 

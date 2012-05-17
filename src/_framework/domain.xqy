@@ -31,7 +31,7 @@ declare function domain:resolve-datatype($field)
      case element(point) return "cts:point"
      case element(string) return "xs:string"
      case element(integer) return "xs:integer"
-     case element(int) return "xs:integer"
+     case element(int) return "xs:int"
      case element(long) return "xs:long"
      case element(double) return "xs:double"
      case element(decimal) return "xs:decimal"
@@ -118,14 +118,23 @@ $application-name as xs:string
 };
 
 declare function domain:get-default-application(){
-   "application"
-};
-declare function domain:get-default-namespace($application-name as xs:string) {
-    let $application := config:get-domain($application-name)
-    return 
-    $application/domain:content-namespace
+    config:default-application()
 };
 
+declare function domain:get-default-namespace(
+$application-name as xs:string
+) {
+    let $application := config:get-domain($application-name)
+    return 
+       $application/domain:content-namespace
+};
+
+declare function domain:get-in-scope-namespaces(
+$application-name as xs:string
+) as element(namespace)
+{
+  ()   
+};
 declare function domain:get-namespaces($application-name as xs:string) {
     let $application := config:get-domain($application-name)
     return 
@@ -146,6 +155,7 @@ declare function domain:get-node-key($node as node()) {
     let $items := $node/(ancestor-or-self::attribute() | ancestor-or-self::*)
     return
         fn:concat(
+         $node/@name,
          "__",
          xdmp:md5(
             fn:string-join(
@@ -156,9 +166,9 @@ declare function domain:get-node-key($node as node()) {
          )))
 };
 
-declare function domain:get-field-key($context as node()) {
+declare function domain:get-field-id($context as node()) {
     let $items := $context/ancestor-or-self::*[fn:node-name($context) = $DOMAIN-FIELDS]
-    let $ns := ($context/@namespace, $context/ancestor::domain:model/@namespace,$context/ancestor::domain:domain/domain:content-namespace)[1]
+    let $ns := domain:get-field-namespace($context)
     let $path := 
     fn:string-join(
         for $item in $items
@@ -167,18 +177,34 @@ declare function domain:get-field-key($context as node()) {
         ,"/"
     )
     return 
-    fn:concat("__", xdmp:md5($path))
+    fn:concat($context/@name,"__", xdmp:md5($path))
 };
 
+declare function domain:get-field-namespace(
+$field as node()
+) as xs:string?
+{(
+   $field/(@namespace-uri|@namespace)/fn:string(),
+   $field/ancestor::domain:model/(@namespace-uri|@namespace)/fn:string(),
+   $field/ancestor::domain:domain/domain:content-namespace/(@namespace-uri|/text()),
+   "")[1]
+};
 
-declare function domain:get-field-value($model, $key, $current-node) {
-    let $xpath := domain:get-field-xpath($model,$key)
-    let $value :=       
-        if($xpath) 
-        then xdmp:value(fn:concat("$current-node",$xpath))
-        else ()
-    return 
-        $value
+declare function domain:get-field-value(
+   $model as element(), 
+   $key as xs:string, 
+   $current-node as node()?
+) {
+    if($current-node) then 
+         let $xpath := domain:get-field-xpath($model,$key)
+         let $value :=       
+             if($xpath) 
+             then try{ xdmp:value(fn:concat("$current-node",$xpath))} catch($ex){$ex}
+             else ()
+         return 
+             $value
+     else ()
+
 };
 
 
@@ -187,24 +213,24 @@ declare function domain:get-field-xpath($model, $key) {
 };
 
 declare function domain:get-field-xpath($model, $key, $level) { 
-     let $elementField := 
-         $model/descendant-or-self::*[fn:node-name(.) = $DOMAIN-NODE-FIELDS][$key = domain:get-field-key(.)]    
-    
-     let $ns := ($elementField/@namespace, 
-                 $elementField/ancestor::domain:model/@namespace,
-                 $elementField/ancestor::domain:domain/domain:content-namespace)[1]     
-                 
+     let $elementField := $model/descendant-or-self::*[fn:node-name(.) = $DOMAIN-NODE-FIELDS][$key = domain:get-field-id(.)]    
+     (:let $level := if($elementField instance of element(domain:attribute)) then 1 else $level:)
+     let $ns := domain:get-field-namespace($model) 
      let $path := 
         fn:string-join(
         for $chain in ($elementField/ancestor-or-self::*[fn:node-name(.) = $DOMAIN-FIELDS])[$level to fn:last()]
         return
-           fn:concat("[fn:local-name(.) eq '",$chain/@name,"' and fn:namespace-uri(.) eq '",$ns,"']")
-        , "/*")
+           if($chain instance of element(domain:element))
+           then fn:concat("*:",$chain/@name)
+           else if($chain instance of element(domain:attribute)) 
+                then fn:concat("@",$chain/@name)
+                else ()
+        , "/")
 
     return 
         if(fn:normalize-space($path) eq "") 
         then () 
-        else fn:concat("/*",$path)
+        else fn:concat("/",$path)
 };
 
 declare function domain:build-value-map($doc as node()?,$retain as xs:string*) 
@@ -240,13 +266,11 @@ declare function domain:recurse($node as node()?,$map as map:map, $retain as xs:
  return $map
 };
 
-
 declare function domain:get-key-by-model-xpath($path as xs:string) 
 as xs:string?
 {
 
     let $domain := config:get-domain("application")
-    
     let $subpath :=
     fn:string-join(
         for $item at $pos in fn:tokenize($path, "/")[2 to fn:last()]
@@ -264,20 +288,22 @@ as xs:string?
           else $item
          return 
         fn:concat('*[@name ="', $item, '"]')
-     , "/")
-    
-    
+     , "/")    
     let $xpath := if ($subpath) then fn:concat( "/", $subpath) else ()
     let $key := 
         if($xpath) then 
             let $stmt := fn:string(<stmt>$domain{$xpath}</stmt>)
             let $domain-node :=  xdmp:value($stmt)
-            return domain:get-field-key($domain-node)
+            return domain:get-field-id($domain-node)
         else ()
     
     return $key
 };
-
+(:~
+ : Returns a controller based on the model name
+ : @param $application - name of the application
+ : @param $model-name  - name of the model
+~:)
 declare function domain:get-model-controller($application, $model-name) {
     let $domain := config:get-domain("application")
     return $domain/domain:controller[@model = $model-name]

@@ -294,6 +294,7 @@ declare function engine:transform-slot($node as node())
      else for $n in $slotcontent return (engine:transform($n), engine:consume($n))
   )  
 };
+
 declare function engine:template-uri($name)
 {
   fn:concat(config:application-directory(response:application()),"/templates/",$name,".html.xqy")
@@ -310,6 +311,7 @@ declare function engine:view-exists($view-uri as xs:string) as xs:boolean
 	else
 		xdmp:uri-is-file($view-uri)
 };
+
 declare function engine:view-uri($controller,$action)
 {
 
@@ -344,6 +346,7 @@ declare function engine:render-partial($response)
    engine:render-view()
 };
 
+(:Documentation:)
 declare function engine:render-view()
 {
     let $view-uri := engine:view-uri(fn:data(response:controller()),fn:data(response:view()))

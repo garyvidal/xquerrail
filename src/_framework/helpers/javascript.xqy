@@ -2,6 +2,9 @@
 
 module namespace js = "http://www.xquerrail-framework.com/helper/javascript";
 
+declare option xdmp:mapping "false";
+
+
 declare function js:null()
 {
    "null"
@@ -43,11 +46,16 @@ declare function js:number($value)
    else "isNaN"
 };
 
-declare function js:string($value as xs:string)
+declare function js:string(
+$value as xs:string?
+)
 {
+  if(fn:exists($value)) 
+  then
    fn:concat('"',
    js:stringify($value),
    '"')
+  else js:null()
 };
 declare function date($value as item())
 {
@@ -58,12 +66,12 @@ $value as item()*
 )
 {
    fn:concat(
-     "{",
+     "{&#xA;",
      if(fn:count($value) gt 1) 
-     then fn:string-join($value,",")
+     then fn:string-join($value,",&#xA;")
      else $value
      ,
-     "}"
+     "&#xA;}"
    )
 };
 
@@ -73,10 +81,20 @@ declare function js:named-object(
 ) as xs:string
 {
   fn:concat(
-      "{",
-      $name," : ",
-      $value,
+      '"', $name,""": {",
+      fn:string-join($value,","),
       "}"
+  )
+};
+declare function js:named-array(
+   $name as xs:string,
+   $value as item()*
+) as xs:string
+{
+  fn:concat(
+      '"',$name,""": [",
+      fn:string-join($value,",&#xA;"),
+      "]"
   )
 };
 
@@ -97,7 +115,7 @@ declare function js:pair(
    $key as xs:string, 
    $value as item()*) 
 {
-   fn:concat($key," : ",
+   fn:concat('"',$key,""": ",
    if(fn:count($value) gt 1) 
    then js:array($value)
    else if(isNumeric($value)) then js:number($value)
@@ -154,11 +172,16 @@ $value as item()*
 (:Named Object:)
 declare function js:no(
 $name as xs:string,
-$value as item()
+$value as item()*
 ){
    js:named-object($name,$value)
 };
-
+declare function js:na(
+$name as xs:string,
+$value as item()*
+){
+   js:named-array($name,$value)
+};
 (:Number shortcut:)
 declare function js:n($value as item())
 {

@@ -1,35 +1,47 @@
-(:@GENERATED@:)
 xquery version "1.0-ml";
+(:~
+ : Base Edit Template used for rendering output
+~:)
 declare default element namespace "http://www.w3.org/1999/xhtml";
+declare namespace domain = "http://www.xquerrail-framework.com/domain";
+
+import module namespace form = "http://www.xquerrail-framework.com/form-builder" at "/_framework/helpers/form-builder.xqy";
 import module namespace response = "http://www.xquerrail-framework.com/response" at "/_framework/response.xqy";
+
 declare option xdmp:output "indent-untyped=yes";
 declare variable $response as map:map external;
+
 let $init := response:initialize($response)
+let $domain-model := response:model()
+
+let $labels := 
+    if(response:body()/*:uuid) then      
+        ("Update","Save")
+    else 
+        ("New", "Create") 
 return
-<div id="form-wrapper">
-   <div class="inner-page-title">
-      <h2>Create New <span class="formLabel">Countries</span>
-      </h2>
-   </div>
-   <div class="content-box">
-      <form id="form_country" name="form_country" method="post"
-            action="/countries/save.html"
-            onsubmit="return validateSave('form_country','country_table');">
-         <ul class="editPanel">
-            <li>
-               <label class="desc">ISO Country Code:</label>
-               <input class="field text small" name="countryCode" type="text" value=""/>
-            </li>
-            <li>
-               <label class="desc">Country Name:</label>
-               <input class="field text small" name="countryDescription" type="text" value=""/>
-            </li>
-            <li class="buttons">
-               <a class="cnp-button" href="#"
-                  onclick="return validateSave('form_country','country_table');">Create</a>
-            </li>
-         </ul>
-      </form>
-   </div>
-   <div class="clearfix"/>
-</div>
+    <div>
+         <div class="content-box">
+            <form id="form_{response:controller()}" name="form_{response:controller()}" method="post"
+                  action="/{response:controller()}/post.json"
+                  onsubmit="return validateSave('form_{response:controller()}','{response:controller()}_table');">        
+                 <?template name="fields"?> 
+              <ul>
+                 <li class="buttons">
+                 <a class="ui-state-default ui-corner-all ui-button" href="#"
+                    onclick="return validateSave('form_{response:controller()}','{response:controller()}_table');">{$labels[2]}
+                 </a>
+                 {     
+                      (: If there is a UUID this will be an update form :)
+                      (: allow the user to remove the item from the DB :)
+                      if(response:body()/*:uuid) then      
+                      <a href="/{response:controller()}/remove.html?uuid={response:body()/*:uuid}" class="ui-state-default ui-corner-all ui-button"
+                                 onclick="return validateDelete(this,'{response:controller()}_table');">
+                       Remove</a>
+                      else ()
+                 }  
+                </li>
+             </ul>
+            </form>
+         </div> <!-- end content-box -->
+     </div>

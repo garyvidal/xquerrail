@@ -773,6 +773,7 @@ declare function p:_parse($node as node())
     case element() return element {fn:node-name($node)} {for $n in $node/node() return p:_parse($n)}
     default return $node
 };
+
 declare  function p:clean($string)
 {
   fn:replace(fn:replace($string,"^&quot;|^'",""),"&quot;$|'$","")

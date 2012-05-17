@@ -68,8 +68,8 @@ as xs:string?
     let $idfield := $domain-model/domain:element[@identity eq 'true']
     let $uuidfield := $domain-model/domain:element[@name eq 'uuid']
         
-    let $uuidKey := domain:get-field-key($uuidfield)
-    let $idKey := domain:get-field-key($idfield)
+    let $uuidKey := domain:get-field-id($uuidfield)
+    let $idKey := domain:get-field-id($idfield)
 
     let $id := map:get($params,$idKey)
     let $uuid := map:get($params, $uuidKey)
@@ -121,7 +121,7 @@ as element()?
   return
       (: Check if the document exists  first before trying to create it :)
       if ($current) then 
-          fn:error(xs:QName("DOCUMENT-EXISTS"),fn:concat("The document already exists. Duplicate ID: ", $id))
+          fn:error(xs:QName("DOCUMENT-EXISTS"),fn:concat("The document already exists. Duplicate ID: ", $id),$current)
       else 
         (: Validate the parameters before trying to build the document :)
         let $validation :=  () (: model:validate($domain-model,$params) :)
@@ -179,9 +179,10 @@ declare function model:get($domain-model as element(domain:model), $params as ma
     (: Retrieve document identity and namspace to help build query :)
     let $idfield := fn:data($domain-model/domain:element[@identity eq 'true']/@name)
     let $name := fn:data($domain-model/@name)
-    let $nameSpace :=  fn:data(model:get-namespaces($domain-model)/@namespace-uri)
-    let $stmt := fn:string(<stmt>
-            cts:search(
+    let $nameSpace := domain:get-field-namespace($domain-model)
+    let $stmt := fn:string(
+                <stmt>
+                cts:search(
                 {
                     (: Build a query to search within the give document :)
                     if ($domain-model/@persistence = 'document') then
@@ -197,19 +198,24 @@ declare function model:get($domain-model as element(domain:model), $params as ma
                             fn:concat('fn:doc("', $domain-model/domain:document/text() , '")', $xpath )
                     else 
                         (: otherwise for document persistance search against the proper root node :)
-                        fn:concat("/*:",$name, "[fn:namespace-uri(.) = '", $nameSpace, "']") 
+                        fn:concat("/    *:",$name, "[fn:namespace-uri(.) = '", $nameSpace, "']") 
                 },
                 cts:or-query(
-                       (cts:element-range-query(fn:QName($nameSpace,"uuid"),"=",$id),
-                        cts:element-value-query(fn:QName($nameSpace,"{$idfield}"),$id,"exact"))
+                       (cts:element-range-query(fn:QName("{$nameSpace}","uuid"),"=","{$id}"),
+                        cts:element-value-query(fn:QName("{$nameSpace}","{$idfield}"),"{$id}","exact"))
                 ), ("filtered"))
         </stmt>)
 
-    return 
+    return (
         (: Execute statement :)
-        xdmp:value($stmt)
+        xdmp:log($stmt),
+        xdmp:eval($stmt)
+        )
 };
 
+(:~
+ : Creates an update statement for a given model.
+~:)
 declare function model:update($domain-model as element(domain:model), $params as map:map)
 {
    let $current := model:get($domain-model,$params)
@@ -275,7 +281,7 @@ declare function model:recursive-build(
    $updates as map:map
 ) {
    let $type := fn:data($context/@type)
-   let $key  := domain:get-field-key($context)
+   let $key  := domain:get-field-id($context)
    let $current-value := domain:get-field-value($context,$key,$current)
    return    
    typeswitch($context)
@@ -285,7 +291,7 @@ declare function model:recursive-build(
             for $a in $context/domain:attribute 
             return 
                model:recursive-build($a, $mode,$current,$updates)
-        let $ns := ($context/@namespace)[1]
+        let $ns := domain:get-field-namespace($context)
         let $nses := model:get-namespaces($context)
         let $localname := fn:data($context/@name)
         let $default   := fn:data($context/@default)
@@ -294,7 +300,6 @@ declare function model:recursive-build(
                 for $nsi in $nses
                 return 
                   namespace {$nsi/@prefix}{$nsi/@namespace-uri},
-               
                 $attributes,
                 
                 for $n in $context/(domain:element|domain:container)
@@ -307,7 +312,7 @@ declare function model:recursive-build(
             for $a in $context/domain:attribute 
             return 
                 model:recursive-build($a, $mode, $current, $updates)
-        let $ns := ($context/@namespace,$context/ancestor::domain:model/@namespace)[1]
+        let $ns := domain:get-field-namespace($context)
         let $localname := fn:data($context/@name)
         let $default   := (fn:data($context/@default),"")[1]
         let $occurrence := ($context/@occurrence,"?")
@@ -334,7 +339,7 @@ declare function model:recursive-build(
                     
      (: Build out any domain Attributes :)              
      case element(domain:attribute) return
-        let $ns := ($context/@namespace,$context/ancestor::domain:model/@namespace)[1]
+        let $ns := ($context/@namespace-uri,$context/@namespace)[1] (:Attributes are only in namespace if they are declared:)
         let $localname := fn:data($context/@name)
         let $default   := (fn:data($context/@default),"")[1]
         let $occurrence := ($context/@occurrence,"?")
@@ -347,7 +352,7 @@ declare function model:recursive-build(
           
      (: Build out any domain Containers :)     
      case element(domain:container) return
-        let $ns := ($context/@namespace,$context/ancestor::domain:model/@namespace)[1]
+        let $ns := domain:get-field-namespace($context)
         let $localname := fn:data($context/@name)
         return 
           element {(fn:QName($ns,$localname))}{
@@ -460,7 +465,7 @@ as element(list)?
     let $end := if ($total > $last) then $last else $total
     
     return 
-     <list>
+     <list type="{$name}">
          <currentpage>{$page}</currentpage>
          <pagesize>{$pageSize}</pagesize>
          <totalpages>{fn:ceiling($total div $pageSize)}</totalpages>
@@ -602,7 +607,7 @@ declare function model:get-references($field as element(), $params as map:map) {
  declare function model:get-model-references($reference as element(domain:element), $params as map:map)
  as element()* 
  {
-    let $fieldKey := domain:get-field-key($reference)
+    let $fieldKey := domain:get-field-id($reference)
     let $name := fn:data($reference/@name)
     let $tokens := fn:tokenize($reference/@reference, ":")
     let $type := $tokens[2]
@@ -613,7 +618,7 @@ declare function model:get-references($field as element(), $params as map:map) {
         if(fn:function-available($tokens[3])) then
             let $domain-model := domain:get-domain-model($type)
             let $identity := $domain-model/domain:element[@identity eq 'true']
-            let $key := domain:get-field-key($identity)  
+            let $key := domain:get-field-id($identity)  
             return
                 for $id at $pos in map:get($params,$fieldKey)
                 let $newParams := map:map()
@@ -669,7 +674,7 @@ declare private function model:get-application-reference($field,$params){
       if($ref-parent eq "application" and $ref-type eq "model")
       then 
         let $domains := xdmp:value(fn:concat("domain:model-",$ref-action))
-        let $key := domain:get-field-key($field)
+        let $key := domain:get-field-id($field)
         return
             for $value in map:get($params, $key)
             let $domain := $domains[@name = $value] 
@@ -699,7 +704,7 @@ as element(validationError)*
 {
    for $element in $domain-model/(domain:attribute | domain:element)
    let $name := fn:data($element/@name)
-   let $key := domain:get-field-key($element)
+   let $key := domain:get-field-id($element)
    let $type := domain:resolve-datatype($element)
    let $value := model:build-value($element,"validate", map:get($params,$key),())
    let $occurence := $element/@occurence
@@ -839,7 +844,7 @@ declare function model:build-value(
         then fn:data($current) 
         else model:generate-uuid()
     case element(reference) return
-        let $fieldKey := domain:get-field-key($field)
+        let $fieldKey := domain:get-field-id($field)
         let $map := map:map()
         let $_ := map:put($map, $fieldKey, $value)
         return
@@ -871,90 +876,3 @@ declare function model:build-value(
     default return 
         fn:data($value) 
 };
-
-
-
-
-(:
-declare function model:log-update($update as item()*, $params as map:map) 
-as empty-sequence()
-{
-    let $reportUUID := util:generate-guid-element()
-    let $article := $update[1]/uuid/text()
-    let $modified := $update[1]/*:modified
-    let $user := $update[1]/*:modifiedBy 
-    let $reportDir := config:get-audit-dir()
-    
-    let $date :=  fn:substring-before(fn:string($modified),"T")
-    let $tokens := fn:tokenize($date,"-")
-    let $uri := fn:concat(fn:string-join(($reportDir,$tokens,$reportUUID/text()),"/"),".xml")
-    
-    let $report :=
-        <report>
-             { ($reportUUID, $modified, $user) }
-            <audit>{
-                for $key in map:keys($update[2])
-                let $value := map:get($update[2],$key)
-                let $nodeName := fn:string(fn:node-name($value))
-                return
-                    element { $nodeName } {
-                        attribute node { $key },
-                        $value/node()
-                    }
-            }</audit>
-        </report>    
-    
-    let $_ := xdmp:document-insert($uri,$report)
-    return ()
-};
-:)
-
-
-
-(:
-(\:~
-: Update Operation packageType
-: @param $domain-model the model of the document
-: @param $id the id of the doucment being retreived (Can be UUID or Model Identity)
-: @param $params the values to fill into the element
-:\) 
-declare function model:update-x($domain-model as element(domain:model), $params as map:map) 
-as element()?
-{
-    let $validation := model:validate($domain-model,$params)
-    return
-        if(fn:count($validation) > 0) then
-               fn:error(xs:QName("VALIDATION-ERROR"), fn:concat("The document trying to be updated contains validation errors"), $validation)    
-        else
-            let $name := $domain-model/@name
-            let $current := model:get($domain-model,$params)
-
-            (\: Expand out all references and replace the params map :\)
-            let $_ :=
-            for $ref in $domain-model/domain:element[fn:boolean(./@reference)]
-            let $refName := fn:data($ref/@name)
-            let $values := map:get($params, $refName)
-            return
-                map:put($params,$refName,model:get-references($ref,$params))
-            
-            (\: Create the update system information for tracking :\) 
-            let $_ :=
-            for $item in model:create-system-node($domain-model,$params)
-            let $itemName := fn:string(fn:node-name($item))
-            return
-                map:put($params, $itemName, $item/*)
-                
-            let $update := (\: updater:update($current,$params) :\) 
-                model:recursive-update($domain-model, (), $params)
-
-            return
-                (\: Execute the insert function :\)
-                ($update[1],
-                    if ($current) then
-                          (\:  let $log := model:log-update($update,$params)
-                            return
-                            :\)xdmp:node-replace($current,$update[1])
-                    else 
-                        fn:error(xs:QName("ERROR"), "Trying to update a document that does not exist.")
-                )
-};:)

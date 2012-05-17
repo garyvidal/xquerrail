@@ -40,3 +40,12 @@ declare function assert:error($actual as item()*, $expected-error-name as xs:str
   let $status := $actual-error-name = $expected-error-name
   return xray:test-response("error", $status, ($actual-error-name, $actual)[1], $expected-error-name)
 };
+
+declare function assert:error-code($actual as item()*, $expected-error-name as xs:string)
+{
+  let $actual-error-name := 
+    if ($actual instance of element(error:error)) then $actual/error:code/fn:string()
+    else ()
+  let $status := $actual-error-name = $expected-error-name
+  return xray:test-response("error-code", $status, ($actual-error-name, $actual)[1], $expected-error-name)
+};

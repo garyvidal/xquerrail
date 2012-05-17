@@ -1,15 +1,20 @@
 (:@GENERATED@:)
 xquery version "1.0-ml";
 declare default element namespace "http://www.w3.org/1999/xhtml";
+
 import module namespace response = "http://www.xquerrail-framework.com/response" at "/_framework/response.xqy";
 
 import module namespace domain = "http://www.xquerrail-framework.com/domain" at "/_framework/domain.xqy";
+
+import module namespace js = "http://www.xquerrail-framework.com/helper/javascript" at "/_framework/helpers/javascript.xqy";
+
 
 declare option xdmp:output "indent-untyped=yes";
 declare variable $response as map:map external;
 
 let $init := response:initialize($response)
 let $domain-model := response:model()
+let $model := $domain-model
 let $modelName := fn:data($domain-model/@name)
 let $modelLabel := (fn:data($domain-model/@label),$modelName)[1]
 let $gridCols :=
@@ -33,10 +38,20 @@ let $gridCols :=
             width:'{$colWidth}'
          </stmt>),"}")
      else ()
-let $editButtons := fn:string(<stmt>{{new:true,edit:true,show:true,delete:true,import:true,export:true}}</stmt>)
+(:let $editButtons := fn:string(<stmt>{{new:true,edit:true,show:true,delete:true,import:true,export:true}}</stmt>)
+:)
+let $editButtons := 
+     js:o((
+         js:p("new",($model/domain:navigation/@newable,"true")[1]),
+         js:p("edit",($model/domain:navigation/@editable,"true")[1]),
+         js:p("delete",($model/domain:navigation/@removable,"true")[1]),
+         js:p("show",($model/domain:navigation/@showable,"true")[1]),
+         js:p("import",($model/domain:navigation/@importable,"true")[1]),
+         js:p("export",($model/domain:navigation/@exportable,"true")[1])
+     ))
 let $uuidMap :=  fn:string(<stmt>{{ name:'uuid', label:'UUID', index:'uuid',hidden:true }}</stmt>)
 let $gridColsStr := fn:string-join(($uuidMap,$gridCols),",")
-let $uuidKey := domain:get-field-key($domain-model/domain:element[@name = "uuid"])
+let $uuidKey := domain:get-field-id($domain-model/domain:element[@name = "uuid"])
 
 return
 <div xmlns="http://www.w3.org/1999/xhtml" class="body-wrapper">
@@ -83,7 +98,7 @@ return
                 xmlReader : xmlListReaderSettings('{$modelName}s','{$modelName}'),
                 onSelectRow: function(id){{ 
                     if(id){{ 
-                       editForm('{fn:concat("/",response:controller(),"/edit.html?", $uuidKey, "=")}',id,true);
+                       editForm('{response:controller()}',id,true);
                     }} 
                     return true;
                 }}
@@ -92,8 +107,8 @@ return
             /*initialize your grid model*/
             $(document).ready(function(){{
                initListGrid("#{response:controller()}_table",gridModel)
-               //initToolbar(toolbarMode);
-               //initLayout();
+               initToolbar(toolbarMode);
+               initLayout();
             }});
             var controller = '{response:controller()}';
            </script>

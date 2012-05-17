@@ -3,15 +3,17 @@ xquery version "1.0-ml";
  : Model model Application framework model functions
 ~:)
 module namespace model = "http://www.xquerrail-framework.com/model";
-   
-declare namespace dc = "http://purl.org/dc/elements/1.1/";
-declare namespace dcterms = "http://purl.org/dc/terms/";
-declare namespace local = "urn:local";
-declare namespace rest = "http://marklogic.com/ps/restmvc";
+
+import module namespace js = "http://www.xquerrail-framework.com/helper/javascript" at "/_framework/helpers/javascript.xqy";
+import module namespace domain = "http://www.xquerrail-framework.com/domain" at "/_framework/domain.xqy";
 
 declare option xdmp:mapping "false";
 
-declare variable $NL as xs:string := fn:codepoints-to-string((13,10));
+declare variable $NL as xs:string := 
+    if(xdmp:platform() eq "winnt") 
+    then fn:codepoints-to-string((13,10))
+    else "&#xA;"
+;    
 (:~
  :  Does an update by iterating the element structure and looking for named element 
  :  by local-name and updating it with a new value
@@ -235,3 +237,60 @@ declare function model:eval-node-insert-child(
       </options>
     )
 };
+
+declare function model:build-json(
+  $field as element(),
+  $instance as element()
+){
+   typeswitch($field)
+     case element(domain:element) return
+        let $field-key := domain:get-field-id($field)
+        let $field-path := domain:get-field-xpath($field,$field-key)
+        let $field-value := domain:get-field-value($field,$field-key,$instance)
+        return       
+        if($field/domain:attribute) then 
+           js:no($field/@name,(
+               js:no("_attributes",
+                 for $field in $field/(domain:attribute)
+                 return 
+                   model:build-json($field,$instance)
+               ),
+               js:pair("_text",$field-value)
+           ))
+       else if($field/@occurrence = ("+","*")) then
+           let $field-key := domain:get-field-id($field)
+           let $field-path := domain:get-field-xpath($field,$field-key)
+           let $field-value := domain:get-field-value($field,$field-key,$instance)
+           return 
+               js:na($field/@name,$field-value)
+       else 
+           js:pair($field/@name,$field-value)
+     case element(domain:attribute) return
+         let $field-key := domain:get-field-id($field)
+         let $field-path := domain:get-field-xpath($field,$field-key)
+         let $field-value := domain:get-field-value($field,$field-key,$instance)
+         return        
+             js:pair(fn:concat("@",$field/@name),$field-value)
+     case element(domain:container) return 
+         js:no($field/@name, (
+            for $field in $field
+            return model:build-json($field,$instance)
+          ))
+     default return ()
+};
+
+declare function model:to-json(
+  $model as element(domain:model),
+  $instance as element()
+ ) {
+   if($model/@name eq $instance/fn:local-name(.)) then 
+   js:o((
+      for $field in $model/(domain:element|domain:attribute|domain:container)
+      return
+        model:build-json($field,$instance)
+   ))
+   else fn:error(xs:QName("MODEL-INSTANCE-MISMATCH"),
+      fn:string(
+        <msg>{$instance/fn:local-name(.)} does not have same signature model name:{fn:data($model/@name)}</msg>)
+      )
+ };

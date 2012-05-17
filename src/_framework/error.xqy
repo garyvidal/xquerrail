@@ -102,7 +102,7 @@ declare function local:render-response($request)
 )};
 xdmp:set-response-content-type("text/html"), 
 xdmp:set-response-code(500,<e>{map:get($ERROR,"error")}</e>//error:format-string),
-xdmp:log($ERROR),
+xdmp:log($ERROR,"debug"),
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>    
      <title>Application Error</title>

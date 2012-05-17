@@ -11,6 +11,7 @@ import module namespace request  = "http://www.xquerrail-framework.com/request"
 declare namespace routing = "http://www.xquerrail-framework.com/routing";   
 
 declare option xdmp:mapping "false";
+
 (:Make sure this points to a valid location in your modules path:)   
 declare variable $CONFIG                   := xdmp:invoke("/_config/config.xml");
 
@@ -112,10 +113,19 @@ declare function config:base-view-directory() {
 (:~
  : Gets the default anonymous user
  :)
-declare function config:anonymous-user($application-name)
+declare function config:anonymous-user()
 {
-   fn:data($CONFIG/config:anonymous-user/@value)
+   config:anonymous-user(config:default-application())
 };
+
+(:~
+ : Gets the default anonymous user
+ :)
+declare function config:anonymous-user($application-name)
+{(
+   fn:data($CONFIG/config:anonymous-user/@value),
+   "anonymous"
+)[1]};
 
 (:~
  :  Get the domain for a given asset
@@ -124,6 +134,7 @@ declare function config:get-domain($application-name)
 {
   let $app-path := config:application-directory($application-name)
   return 
+    
      xdmp:invoke(fn:concat($app-path,"/domains/application-domain.xml"))
 };
 

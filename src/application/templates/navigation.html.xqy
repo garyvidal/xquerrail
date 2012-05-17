@@ -121,8 +121,6 @@
     </ul>
     </li>
 <li><a href="">Controllers</a>
-  <ul>
      <?controller-list?>        
-  </ul>
 </li>
 </ul>

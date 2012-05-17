@@ -10,15 +10,19 @@
         <xs:sequence>
             <xs:sequence>
                 <xs:element name="name" type="xs:ID" minOccurs="1" maxOccurs="1"/>
-                <xs:element name="content-namespace" type="namespaceDeclarationType" minOccurs="1" maxOccurs="1"/>
-                <xs:element name="application-namespace" type="xs:anyURI" minOccurs="0"  maxOccurs="1"/>
+                <xs:element name="content-namespace" type="namespaceDeclarationType" minOccurs="1"
+                    maxOccurs="1"/>
+                <xs:element name="application-namespace" type="namespaceDeclarationType"
+                    minOccurs="0" maxOccurs="1"/>
                 <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1"/>
                 <xs:element name="author" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element name="version" type="xs:string" minOccurs="0" maxOccurs="1"/>
-                <xs:element name="declare-namespace" type="namespaceDeclarationType" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="declare-namespace" type="namespaceDeclarationType" minOccurs="0"
+                    maxOccurs="unbounded"/>
                 <xs:choice minOccurs="1" maxOccurs="unbounded">
-                    <xs:element name="model" type="modelType" minOccurs="0" maxOccurs="unbounded"></xs:element>
-                    <xs:element name="controller" type="controllerType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="model" type="modelType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="controller" type="controllerType" minOccurs="0"
+                        maxOccurs="unbounded"/>
                 </xs:choice>
                 <xs:choice minOccurs="0" maxOccurs="unbounded">
                     <xs:element name="hasMany">
@@ -30,46 +34,51 @@
             </xs:sequence>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="constraintType">
         <xs:attributeGroup ref="constraintAttributes"/>
     </xs:complexType>
-    
+
     <xs:complexType name="namespaceDeclarationType">
         <xs:attribute name="prefix"/>
         <xs:attribute name="namespace-uri"/>
     </xs:complexType>
 
     <xs:complexType name="controllerType">
-            <xs:attributeGroup ref="controllerBaseAttributes"> </xs:attributeGroup>
+        <xs:attributeGroup ref="controllerBaseAttributes"> </xs:attributeGroup>
     </xs:complexType>
 
     <xs:complexType name="modelType">
-            <xs:sequence>
-                <xs:group ref="contentModelTypeGroup"/>
-                <xs:element name="declare-namespace" type="namespaceDeclarationType" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element name="default-namespace" type="namespaceDeclarationType" minOccurs="0" maxOccurs="1"/>
-                <xs:element name="import-model" minOccurs="0" maxOccurs="unbounded">
-                    <xs:complexType>
-                        <xs:attributeGroup ref="importModelAttributes"/>
-                    </xs:complexType>
-                </xs:element>
-                <xs:choice minOccurs="1" maxOccurs="unbounded">
-                    <xs:element name="element" type="fieldType" minOccurs="0" maxOccurs="unbounded"></xs:element>
-                    <xs:element name="attribute" type="fieldType" minOccurs="0" maxOccurs="unbounded"/>
-                    <xs:element name="container" type="containerType" minOccurs="0" maxOccurs="unbounded"/>
-                    <xs:element name="optionlist" type="optionListType" minOccurs="0" maxOccurs="unbounded"/>
-                </xs:choice>
-                <xs:choice minOccurs="0" maxOccurs="unbounded">
-                   <xs:element name="collection" type="xs:string">
-                       
-                   </xs:element>
-                </xs:choice>  
-                <xs:element name="hasMany" type="relationType" minOccurs="0" maxOccurs="unbounded"/>                
-            </xs:sequence>
-            <xs:attributeGroup ref="modelBaseAttributes"/>
+        <xs:sequence>
+            <xs:group ref="contentModelTypeGroup"/>
+            <xs:element name="declare-namespace" type="namespaceDeclarationType" minOccurs="0"
+                maxOccurs="unbounded"/>
+            <xs:element name="import-model" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:attributeGroup ref="importModelAttributes"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="navigation" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:attributeGroup ref="modelNavigationAttributes"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:choice minOccurs="1" maxOccurs="unbounded">
+                <xs:element name="element" type="elementType" minOccurs="0" maxOccurs="unbounded"> </xs:element>
+                <xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="container" type="containerType" minOccurs="0"
+                    maxOccurs="unbounded"/>
+                <xs:element name="optionlist" type="optionListType" minOccurs="0"
+                    maxOccurs="unbounded"/>
+            </xs:choice>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="collection" type="xs:string"> </xs:element>
+            </xs:choice>
+            <xs:element name="hasMany" type="relationType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="modelBaseAttributes"/>
     </xs:complexType>
-    
+
     <xs:group name="contentModelTypeGroup">
         <xs:sequence>
             <xs:element name="directory" minOccurs="0" maxOccurs="1">
@@ -83,13 +92,12 @@
                 <xs:complexType>
                     <xs:simpleContent>
                         <xs:extension base="xs:string">
-                            <xs:attribute name="root" type="xs:QName">
-                            </xs:attribute>
+                            <xs:attribute name="root" type="xs:QName"> </xs:attribute>
                         </xs:extension>
                     </xs:simpleContent>
                 </xs:complexType>
             </xs:element>
-            
+
             <xs:element name="binaryDirectory" minOccurs="0" maxOccurs="1">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
@@ -99,20 +107,43 @@
             </xs:element>
         </xs:sequence>
     </xs:group>
-    <xs:complexType name="fieldType">
+
+    <xs:complexType name="elementType">
+        <xs:sequence minOccurs="0" maxOccurs="3">
+            <xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded">
+                
+            </xs:element>
+            <xs:element name="navigation" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:attributeGroup ref="fieldNavigationAttributes"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="constraint" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:attributeGroup ref="constraintAttributes"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:choice minOccurs="0" maxOccurs="1">
+                <xs:element name="ui" type="uiType" minOccurs="0" maxOccurs="1"/>
+            </xs:choice>
+        </xs:sequence>
+        <xs:attributeGroup ref="fieldAttributes"/>
+    </xs:complexType>
+    
+    <xs:complexType name="attributeType">
         <xs:sequence minOccurs="0" maxOccurs="3">
             <xs:element name="navigation" minOccurs="0" maxOccurs="1">
                 <xs:complexType>
-                    <xs:attributeGroup ref="navigationAttributes"/>
+                    <xs:attributeGroup ref="fieldNavigationAttributes"/>
                 </xs:complexType>
-            </xs:element> 
+            </xs:element>
             <xs:element name="constraint" minOccurs="0" maxOccurs="1">
-              <xs:complexType>
-                  <xs:attributeGroup ref="constraintAttributes"/>
-              </xs:complexType>
+                <xs:complexType>
+                    <xs:attributeGroup ref="constraintAttributes"/>
+                </xs:complexType>
             </xs:element>
             <xs:choice minOccurs="0" maxOccurs="1">
-                <xs:element name="ui" type="uiType"  minOccurs="0" maxOccurs="1" />
+                <xs:element name="ui" type="uiType" minOccurs="0" maxOccurs="1"/>
             </xs:choice>
         </xs:sequence>
         <xs:attributeGroup ref="fieldAttributes"/>
@@ -120,80 +151,78 @@
     <xs:complexType name="relationType">
         <xs:attributeGroup ref="relationshipAttributes"/>
     </xs:complexType>
-    
+
     <xs:complexType name="containerType">
         <xs:choice minOccurs="1" maxOccurs="unbounded">
             <xs:element name="element" type="fieldType"/>
-            <xs:element name="attribute" type="fieldType"/>
         </xs:choice>
         <xs:attributeGroup ref="containerAttributes"/>
     </xs:complexType>
-    
+
     <xs:complexType name="optionListType">
         <xs:sequence>
             <xs:element name="option" type="optionType" minOccurs="1" maxOccurs="unbounded">
             </xs:element>
         </xs:sequence>
-        <xs:attributeGroup ref="optionListAttributes"></xs:attributeGroup>
+        <xs:attributeGroup ref="optionListAttributes"/>
     </xs:complexType>
-    
-    
+
+
     <xs:complexType name="optionType">
         <xs:simpleContent>
             <xs:extension base="xs:string">
-                <xs:attribute name="label" type="xs:string">
-                </xs:attribute>
+                <xs:attribute name="label" type="xs:string"> </xs:attribute>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
-    
-    
+
+
     <xs:attributeGroup name="importModelAttributes">
         <xs:attribute name="name" type="xs:Name"/>
     </xs:attributeGroup>
-    
+
     <xs:attributeGroup name="importLibraryGroup">
         <xs:attribute name="name" type="xs:string"/>
         <xs:attribute name="reference" type="xs:string"/>
     </xs:attributeGroup>
-    
+
     <xs:attributeGroup name="optionListAttributes">
-        <xs:attribute name="name" type="xs:string" />
-        <xs:attribute name="child-element" type="xs:string" />
-        <xs:attribute name="type" type="dataType"/>         
+        <xs:attribute name="name" type="xs:string"/>
+        <xs:attribute name="child-element" type="xs:string"/>
+        <xs:attribute name="type" type="dataType"/>
     </xs:attributeGroup>
-    
+
     <xs:attributeGroup name="optionAttributes">
         <xs:attribute name="key" type="xs:string"/>
     </xs:attributeGroup>
-    
+
     <xs:attributeGroup name="controllerBaseAttributes">
         <xs:attribute name="name" type="xs:NCName"/>
         <xs:attribute name="model" type="xs:IDREF"/>
         <xs:attribute name="multi" type="xs:boolean"/>
-        <xs:attribute name="label" type="xs:string" />
+        <xs:attribute name="label" type="xs:string"/>
     </xs:attributeGroup>
-    
+
     <xs:attributeGroup name="modelBaseAttributes">
         <xs:attribute name="name" type="xs:ID"/>
         <xs:attribute name="namespace" type="xs:anyURI"/>
         <xs:attribute name="description" type="xs:string"/>
         <xs:attribute name="label" type="xs:string"/>
         <xs:attribute name="class" type="xs:string"/>
-        <xs:attribute name="key" type="xs:IDREF" />
-        <xs:attribute name="keyLabel" type="xs:IDREF" />
+        <xs:attribute name="key" type="xs:string"/>
+        <xs:attribute name="keyLabel" type="xs:string"/>
         <xs:attribute name="extends" type="xs:IDREF"/>
         <xs:attribute name="persistence">
             <xs:simpleType>
                 <xs:restriction base="xs:string">
                     <xs:enumeration value="document"/>
                     <xs:enumeration value="directory"/>
-                    <xs:enumeration value="abstract" />
+                    <xs:enumeration value="abstract"/>
                 </xs:restriction>
             </xs:simpleType>
         </xs:attribute>
     </xs:attributeGroup>
-    
+
     <xs:attributeGroup name="fieldAttributes">
         <xs:attribute name="name" type="xs:Name"/>
         <xs:attribute name="namespace" type="xs:anyURI"/>
@@ -214,7 +243,7 @@
         </xs:attribute>
     </xs:attributeGroup>
     <xs:attributeGroup name="containerAttributes">
-        <xs:attribute name="name" type="xs:QName"></xs:attribute>
+        <xs:attribute name="name" type="xs:QName"/>
         <xs:attribute name="namespace" type="xs:anyURI"/>
         <xs:attribute name="label" type="xs:string"/>
     </xs:attributeGroup>
@@ -243,7 +272,20 @@
         </xs:attribute>
     </xs:attributeGroup>
 
-    <xs:attributeGroup name="navigationAttributes">
+    <xs:attributeGroup name="modelNavigationAttributes">
+        <xs:attribute name="securable" type="xs:boolean"/>
+        <xs:attribute name="searchable" type="xs:boolean"/>
+        <xs:attribute name="sortable" type="xs:boolean"/>
+        <xs:attribute name="newable" type="xs:boolean"/>
+        <xs:attribute name="editable" type="xs:boolean"/>
+        <xs:attribute name="listable" type="xs:boolean"/>
+        <xs:attribute name="removable" type="xs:boolean"/>
+        <xs:attribute name="findable" type="xs:boolean"/>
+        <xs:attribute name="exportable" type="xs:boolean"/>
+        <xs:attribute name="importable" type="xs:boolean"/>
+    </xs:attributeGroup>
+
+    <xs:attributeGroup name="fieldNavigationAttributes">
         <xs:attribute name="securable" type="xs:boolean"/>
         <xs:attribute name="searchable" type="xs:boolean"/>
         <xs:attribute name="sortable" type="xs:boolean"/>
@@ -261,16 +303,12 @@
                     <xs:enumeration value="range"/>
                     <xs:enumeration value="value"/>
                     <xs:enumeration value="word"/>
+                    <xs:enumeration value="geo-element"/>
+                    <xs:enumeration value="geo-element-child"/>
+                    <xs:enumeration value="geo-element-pair"/>
+                    <xs:enumeration value="geo-attribute-pair"/>
                     <xs:enumeration value="none"/>
                 </xs:restriction>
-            </xs:simpleType>
-        </xs:attribute>
-        <xs:attribute name="editor">
-            <xs:simpleType>
-                 <xs:restriction base="xs:string">
-                     <xs:enumeration value="ckeditor"/>
-                     <xs:enumeration value="codemirror"/>
-                 </xs:restriction>
             </xs:simpleType>
         </xs:attribute>
     </xs:attributeGroup>
@@ -284,7 +322,7 @@
         <xs:attribute name="update" type="referenceIntegrity"/>
         <xs:attribute name="delete" type="referenceIntegrity"/>
     </xs:attributeGroup>
-    
+
     <xs:simpleType name="dataType">
         <xs:restriction base="xs:string">
             <!--Generic Types-->
@@ -318,7 +356,7 @@
             <xs:enumeration value="point"/>
         </xs:restriction>
     </xs:simpleType>
-    
+
     <xs:simpleType name="matcherType">
         <xs:restriction base="xs:string">
             <xs:enumeration value="email"/>
@@ -329,7 +367,7 @@
             <xs:enumeration value="custom"/>
         </xs:restriction>
     </xs:simpleType>
-    
+
     <xs:simpleType name="referenceIntegrity">
         <xs:restriction base="xs:string">
             <xs:enumeration value="cascade"/>
@@ -337,7 +375,7 @@
             <xs:enumeration value="none"/>
         </xs:restriction>
     </xs:simpleType>
-    
+
     <xs:simpleType name="identityType">
         <xs:restriction base="xs:string">
             <xs:enumeration value="guid"/>
@@ -345,8 +383,8 @@
             <xs:enumeration value="timestamp"/>
         </xs:restriction>
     </xs:simpleType>
-    
-    
+
+
     <!--UI Domain Experimental-->
     <xs:complexType name="uiType">
         <xs:choice minOccurs="0" maxOccurs="1">
@@ -355,11 +393,12 @@
         </xs:choice>
         <xs:attributeGroup ref="uiTypeAttributes"/>
     </xs:complexType>
-    
-    
+
+
     <xs:complexType name="gridColumnsType">
-        <xs:sequence >
-            <xs:element name="gridColumn" type="gridColumnType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:sequence>
+            <xs:element name="gridColumn" type="gridColumnType" minOccurs="0" maxOccurs="unbounded"
+            />
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="gridColumnType">
@@ -368,7 +407,7 @@
         </xs:sequence>
         <xs:attributeGroup ref="gridColumnAttributes"/>
     </xs:complexType>
-    
+
     <xs:attributeGroup name="uiTypeAttributes">
         <xs:attribute name="id" type="xs:Name"/>
         <xs:attribute name="type" type="uiFieldType"/>
@@ -377,7 +416,7 @@
         <xs:attribute name="repeatable" type="xs:boolean"/>
         <xs:attribute name="listable" type="xs:boolean"/>
     </xs:attributeGroup>
-    
+
     <xs:attributeGroup name="gridColumnAttributes">
         <xs:attribute name="name" type="xs:string"/>
         <xs:attribute name="index" type="xs:string"/>
@@ -391,7 +430,7 @@
             <xs:enumeration value="textbox"/>
             <xs:enumeration value="selectbox"/>
             <xs:enumeration value="checkbox"/>
-            <xs:enumeration value="fileupload"/>    
+            <xs:enumeration value="fileupload"/>
             <xs:enumeration value="grid"/>
             <xs:enumeration value="datepicker"/>
             <xs:enumeration value="datepager"/>
@@ -414,5 +453,5 @@
         <xs:restriction base="xs:Name">
             <xs:enumeration value="panel"/>
         </xs:restriction>
-    </xs:simpleType>    
+    </xs:simpleType>
 </xs:schema>

@@ -4,15 +4,16 @@ xquery version "1.0-ml";
 ~:)
 declare default element namespace "http://www.w3.org/1999/xhtml";
 
-import module namespace form = "http://www.xquerrail-framework.com/helper/form-builder" at "/_framework/helpers/form-builder.xqy";
+import module namespace form     = "http://www.xquerrail-framework.com/helper/form-builder" at "/_framework/helpers/form-builder.xqy";
 import module namespace response = "http://www.xquerrail-framework.com/response" at "/_framework/response.xqy";
+import module namespace domain   = "http://www.xquerrail-framework.com/domain" at "/_framework/domain.xqy";
 
 declare option xdmp:output "indent-untyped=yes";
 declare variable $response as map:map external;
 
 let $init := response:initialize($response)
 let $domain-model := response:model()
-
+let $id-field := fn:data(response:body()//*[fn:local-name(.) eq domain:get-model-id-field($domain-model)])
 let $labels := ("Update","Cancel")
 return
 <div class="body-wrapper">
@@ -23,6 +24,7 @@ return
        </ul>
     </div>
  </div>  
+ 
 <div class="content-box content-box-header ui-corner-all">
      <div class="content-box-wrapper">
          <h2><?title?></h2>  
@@ -33,17 +35,18 @@ return
              <li class="buttons">
                  <button type="submit" class="ui-state-default ui-corner-all ui-button" href="#">Save</button>
                  <a class="ui-state-default ui-corner-all ui-button" href="#" 
-                    onclick="return validateDelete('form_{response:controller()}','{response:controller()}_table');">
+                    onclick="return deleteForm('form_{response:controller()}','{response:controller()}_table');">
                     Delete
                  </a>
                  <a class="ui-state-default ui-corner-all ui-button" href="#" 
-                    onclick="return cancelUpdate()">Cancel</a>
+                    onclick="window.location.href='/{response:controller()}';">Cancel</a>
             </li>
          </ul>
         </form>
      </div> <!-- end content-box -->
-     <script type="text/javascript"> {
-        form:context($response)
-     }</script>
+     <script type="text/javascript">
+        var _id = "{$id-field}";
+        {form:context($response)}
+        </script>
  </div>
  </div>

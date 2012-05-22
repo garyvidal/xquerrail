@@ -33,17 +33,20 @@ function deleteForm() {
 };
 
 function showForm(){
-    $("#popup").dialog(function(){
-        $.ajax({
-             url: '/' + context.controller + '/show.html',
-             data: {
-                 id: _id, _partial: true
-             },
-             success: function (r) {
-                 $("#popup").empty().stop().html(r);
-             }
-         })
-     });    
+  var url = "/" + context.controller + "/show.html?_partial=true&" + context.model_id_field + "=" + _id;;
+  jQuery('#popup').html("<div class='loading'>...</div>");
+  jQuery.get(url, function (data) {
+        jQuery('#popup').html(data);
+  });
+  jQuery("#popup").dialog({ 
+     width: 800, 
+     height: 600, 
+     autoOpen: true,
+     resizable:false,
+     modal:true,
+     zIndex:999999,
+     title:'Show ' + _id   
+  });   
 }
 // Sends the partial form back to UI
 function importForm() {

@@ -3,8 +3,9 @@ xquery version "1.0-ml";
 
 declare default element namespace "http://www.w3.org/1999/xhtml";
 
-import module namespace form = "http://www.xquerrail-framework.com/formbuilder" at "/_framework/helpers/formbuilder.xqy";
+import module namespace form = "http://www.xquerrail-framework.com/helper/form-builder" at "/_framework/helpers/form-builder.xqy";
 import module namespace response = "http://www.xquerrail-framework.com/response" at "/_framework/response.xqy";
+import module namespace model = "http://www.xquerrail-framework.com/model" at "/_framework/model.xqy";
 
 declare option xdmp:output "indent-untyped=yes";
 declare variable $response as map:map external;
@@ -24,10 +25,10 @@ return
       <div style="width:400px">
          <pre>{xdmp:quote(response:body())}</pre>
       </div>
+      <h2>JSON Format</h2>
+      <div style="width:400px">
+         <pre>{model:to-json(response:model(),response:body())}</pre>
+      </div>
    </div>
-   <script type="text/javascript">
-      var controller  = '{response:controller()}';
-      var action  = '{response:action()}';
-   </script>
    <div class="clearfix"/>
 </div>

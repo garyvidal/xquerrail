@@ -36,8 +36,8 @@ declare function controller:index()
 
 declare function controller:login()
 {
- let $username   := request:param("username") 
- let $password := request:param("password")
+ let $username   := request:param("username")[1] 
+ let $password := request:param("password")[1]
  return 
     if($username ne "" or $password ne "") then 
        let $is-logged-in := xdmp:login($username,$password)

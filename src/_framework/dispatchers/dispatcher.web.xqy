@@ -101,7 +101,7 @@ declare function dispatcher:invoke-controller()
    let $application as xs:string? := (request:application(),config:default-application())[1]
    let $controller as xs:string   := (request:controller(),config:default-controller())[1]
    let $action as xs:string       := (request:action(),config:default-action())[1]
-   let $route  as xs:string?      := request:route()
+   let $route  as xs:string?      := request:route()[1]
    let $controller-location       := fn:concat(config:get-application($application)/@uri,'/controller/', $controller,'-controller.xqy')
    let $controller-uri            := fn:concat(config:get-application($application)/@namespace,'/controller/', $controller)
    let $results := 
@@ -120,7 +120,10 @@ declare function dispatcher:invoke-controller()
                <options xmlns="xdmp:eval">
                </options>
              )
-     else base:invoke($action)
+     else (
+          base:initialize(request:request()),
+          base:invoke($action)
+          )
     return     
           $results
 };
@@ -196,10 +199,10 @@ try {
        ))  
          
        else 
-         let $request := request:parse(())
+         let $request := request:parse($init)
          return
-             let $request  := interceptor:after-request()
-             let $log := xdmp:log(string-join(("dispatcher::after-request-xxx::[",request:redirect(),"]"),""))
+             let $request  := interceptor:after-request(request:request())
+             let $log := xdmp:log(string-join(("dispatcher::after-request-xxx::[",request:redirect(),"]"),""),"debug")
              return (
                if(fn:normalize-space(request:redirect()) ne ""  and fn:exists(request:redirect()))
                then xdmp:redirect-response(request:redirect())

@@ -30,9 +30,10 @@
         <script type="text/javascript" src="/resources/js/live_search.js"></script>
         <script type="text/javascript" src="/resources/js/tooltip.js"></script>
         <script type="text/javascript" src="/resources/js/cookie.js"></script>
-        
-        <script type="text/javascript" src="/resources/js/codemirror/theme/xquery/xquery.js">//</script>
-        <script type="text/javascript" src="/resources/js/codemirror.js"></script>
+
+        <script type="text/javascript" src="/resources/js/codemirror/lib/codemirror.js">//</script>
+        <script type="text/javascript" src="/resources/js/codemirror/mode/xquery/xquery.js">//</script>
+
         
         <script type="text/javascript" src="/resources/js/i18n/grid.locale-en.js">//</script>
         <script type="text/javascript" src="/resources/js/jquery.jqgrid.min.js">//</script>

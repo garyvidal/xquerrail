@@ -6,4 +6,9 @@ declare option xdmp:output "indent-untyped=yes";
 declare variable $response as map:map external;
 let $init := response:initialize($response)
 return
-<p>The item has been saved.</p>
+<div class="save">
+   <p>The item has been saved.</p>
+   <script type="text/javascript">
+   window.location.href="/{response:controller()}";
+   </script>
+</div>

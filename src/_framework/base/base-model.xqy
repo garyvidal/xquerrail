@@ -62,21 +62,17 @@ as node() {
 : @param - $params - parameters of content that pertain to the domain model
 : @return a identity or uuid value (repsective) for identifying the model instance
 :)
-declare function model:get-id-from-params($domain-model as element(domain:model), $params as map:map)  
-as xs:string?
+declare function model:get-id-from-params(
+   $domain-model as element(domain:model), 
+   $params as map:map)  
+as xs:string+
 {
-    let $idfield := $domain-model/domain:element[@identity eq 'true']
-    let $uuidfield := $domain-model/domain:element[@name eq 'uuid']
-        
-    let $uuidKey := domain:get-field-id($uuidfield)
-    let $idKey := domain:get-field-id($idfield)
-
-    let $id := map:get($params,$idKey)
-    let $uuid := map:get($params, $uuidKey)
-    
-    return ($uuid,$id)[1]
+   let $id-field := domain:get-model-id-field($domain-model)
+   let $id-key := 
+     $domain-model/(domain:element|domain:attribute)[@name eq $id-field]
+   return
+      (domain:get-field-id($id-key),fn:data($id-key/@name))
 };
-
 (:~
  : Gets only the params for a given model
  : @param - $domain-model - is the model for the given params
@@ -171,19 +167,20 @@ as element()?
 : @param $params the values to pull the id from
 : @return the document
 ~:) 
-declare function model:get($domain-model as element(domain:model), $params as map:map) as element()? {
-    
+declare function model:get(
+   $domain-model as element(domain:model), 
+   $params as map:map
+) as element()? {    
     (: Get document identifier from parameters :)
-    let $id := model:get-id-from-params($domain-model,$params)
-
     (: Retrieve document identity and namspace to help build query :)
-    let $idfield := fn:data($domain-model/domain:element[@identity eq 'true']/@name)
+    let $id-field   := domain:get-model-id-field($domain-model)
+    let $id-fields  := model:get-id-from-params($domain-model,$params)
+    let $id-value   := (for $k in $id-fields return map:get($params, $k))[1]
     let $name := fn:data($domain-model/@name)
     let $nameSpace := domain:get-field-namespace($domain-model)
-    let $stmt := fn:string(
-                <stmt>
-                cts:search(
-                {
+    let $stmt := 
+      fn:normalize-space(fn:string(
+      <stmt>cts:search({
                     (: Build a query to search within the give document :)
                     if ($domain-model/@persistence = 'document') then
                         let $rootNode := fn:data($domain-model/domain:document/@root)
@@ -198,18 +195,17 @@ declare function model:get($domain-model as element(domain:model), $params as ma
                             fn:concat('fn:doc("', $domain-model/domain:document/text() , '")', $xpath )
                     else 
                         (: otherwise for document persistance search against the proper root node :)
-                        fn:concat("/    *:",$name, "[fn:namespace-uri(.) = '", $nameSpace, "']") 
+                        fn:concat("/*:",$name, "[fn:namespace-uri(.) = '", $nameSpace, "']") 
                 },
                 cts:or-query(
-                       (cts:element-range-query(fn:QName("{$nameSpace}","uuid"),"=","{$id}"),
-                        cts:element-value-query(fn:QName("{$nameSpace}","{$idfield}"),"{$id}","exact"))
+                       (cts:element-range-query(fn:QName("{$nameSpace}","{$id-field}"),"=","{$id-value}"))  
                 ), ("filtered"))
-        </stmt>)
+        </stmt>))
 
     return (
         (: Execute statement :)
-        xdmp:log($stmt),
-        xdmp:eval($stmt)
+        xdmp:log(("model:get::",$stmt)),
+        xdmp:value($stmt)
         )
 };
 
@@ -219,6 +215,7 @@ declare function model:get($domain-model as element(domain:model), $params as ma
 declare function model:update($domain-model as element(domain:model), $params as map:map)
 {
    let $current := model:get($domain-model,$params)
+   let $_ := xdmp:log(("model:update::",$params))
    let $id := $domain-model//(domain:container|domain:element|domain:attribute)[@identity eq "true"]/@name
    return 
      if($current) then (
@@ -262,7 +259,7 @@ declare function model:recursive-create(
    $context as node(),
    $updates as map:map
 ){
-    model:recursive-build( $context, "create", (), $updates) 
+    model:recursive-build( $context, (), $updates) 
 };
 
 declare function model:recursive-update(   
@@ -271,12 +268,11 @@ declare function model:recursive-update(
    $updates as map:map
 ) 
 {
-    model:recursive-build( $context, "update", $current, $updates) 
+    model:recursive-build( $context, $current, $updates) 
 };
 
 declare function model:recursive-build(
    $context as node(),
-   $mode as xs:string,
    $current as node()?,
    $updates as map:map
 ) {
@@ -290,7 +286,7 @@ declare function model:recursive-build(
         let $attributes := 
             for $a in $context/domain:attribute 
             return 
-               model:recursive-build($a, $mode,$current,$updates)
+               model:recursive-build($a, $current,$updates)
         let $ns := domain:get-field-namespace($context)
         let $nses := model:get-namespaces($context)
         let $localname := fn:data($context/@name)
@@ -301,17 +297,16 @@ declare function model:recursive-build(
                 return 
                   namespace {$nsi/@prefix}{$nsi/@namespace-uri},
                 $attributes,
-                
                 for $n in $context/(domain:element|domain:container)
                 return 
-                    model:recursive-build($n, $mode,$current,$updates)             
+                    model:recursive-build($n,$current,$updates)             
             }
      (: Build out any domain Elements :)     
      case element(domain:element) return
         let $attributes := 
             for $a in $context/domain:attribute 
             return 
-                model:recursive-build($a, $mode, $current, $updates)
+                model:recursive-build($a,$current, $updates)
         let $ns := domain:get-field-namespace($context)
         let $localname := fn:data($context/@name)
         let $default   := (fn:data($context/@default),"")[1]
@@ -322,19 +317,19 @@ declare function model:recursive-build(
             then $map-values 
             else $default
         return 
-          if ($context/@reference) 
-          then model:build-value($context, $mode, $map-values, $current-value)
+          if ($context/@type eq "reference" and $context/@reference ne "") 
+          then model:build-value($context, $map-values, $current-value)
           else  
             if ($type = "schema-element") then
                element {(fn:QName($ns,$localname))}{
-                  model:build-value($context, $mode, $map-values, $current-value)
+                  model:build-value($context, $map-values, $current-value)
                }
             else
                 for $value in $map-values
                 return
                    element {(fn:QName($ns,$localname))}{
                       $attributes,
-                      model:build-value($context, $mode, $value, $current-value)
+                      model:build-value($context,  $value, $current-value)
                     }
                     
      (: Build out any domain Attributes :)              
@@ -347,7 +342,7 @@ declare function model:recursive-build(
         let $value := ($map-value,$default)[1]
         return 
           attribute {(fn:QName($ns,$localname))}{
-            model:build-value($context, $mode,$value,$current-value)
+            model:build-value($context, $value,$current-value)
           }
           
      (: Build out any domain Containers :)     
@@ -358,7 +353,7 @@ declare function model:recursive-build(
           element {(fn:QName($ns,$localname))}{
            for $n in $context/(domain:attribute|domain:element|domain:container)
            return 
-             model:recursive-build($n, $mode, $current ,$updates)
+             model:recursive-build($n,  $current ,$updates)
            }
            
      (: Return nothing if the type is not of Model, Element, Attribute or Container :)      
@@ -706,7 +701,7 @@ as element(validationError)*
    let $name := fn:data($element/@name)
    let $key := domain:get-field-id($element)
    let $type := domain:resolve-datatype($element)
-   let $value := model:build-value($element,"validate", map:get($params,$key),())
+   let $value := model:build-value($element, map:get($params,$key),())
    let $occurence := $element/@occurence
    return
         (
@@ -829,7 +824,6 @@ declare function model:build-params-map-from-json($domain-model as element(domai
 
 declare function model:build-value(
   $field as element(),
-  $mode as xs:string, 
   $value as item()*,
   $current as item()*)
 {
@@ -840,8 +834,8 @@ declare function model:build-value(
   return
     typeswitch($qtype)
     case element(identity) return 
-        if($mode eq "update") 
-        then fn:data($current) 
+        if(fn:data($current)) 
+        then fn:data($current)
         else model:generate-uuid()
     case element(reference) return
         let $fieldKey := domain:get-field-id($field)
@@ -860,11 +854,11 @@ declare function model:build-value(
     case element(update-user) return  
         xdmp:get-current-user()
     case element(create-timestamp) return 
-        if($mode eq "update") 
-        then fn:data($current) 
+        if(fn:data($current))
+        then fn:data($current)
         else fn:current-dateTime()
     case element(create-user) return 
-        if($mode eq "update")
+        if(fn:data($current))
         then fn:data($current)
         else xdmp:get-current-user()
     case element(file) return 
@@ -872,7 +866,7 @@ declare function model:build-value(
     case element(schema-element) return 
         $value
     case element(query) return 
-        $value 
+        $value
     default return 
         fn:data($value) 
 };

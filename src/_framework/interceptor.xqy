@@ -69,6 +69,7 @@ declare function interceptor:before-request (
 };
 
 declare function interceptor:after-request(
+$request as map:map
 ){(
    for $int in config:get-interceptors("after-request")
    let $_ := xdmp:log(("interceptor:ml-security::after-request",()))
@@ -80,7 +81,7 @@ declare function interceptor:after-request(
       else if($int/@dbresource) then
           fn:doc($int/@dbresource)
       else <config/>
-   let $invoke := xdmp:apply($function,$config)
+   let $invoke := xdmp:apply($function,$request,$config)
    return 
      if($invoke instance of map:map) 
      then request:initialize($invoke)

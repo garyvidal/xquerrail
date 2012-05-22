@@ -84,7 +84,11 @@ declare function local:render-request($request)
    for $k in map:keys($request)
    return
       <tr><td>{$k}</td>
-          <td>{map:get($request,$k)}
+          <td>{
+          if(map:get($request,$k) instance of binary())
+          then map:get($request,$k)
+          else "(binary)"
+          }
           </td>
       </tr>
  }</table>

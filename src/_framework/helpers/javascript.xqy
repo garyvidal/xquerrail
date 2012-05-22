@@ -147,7 +147,12 @@ declare function js:bind-event(
 { 
    ()
 };
-
+declare function js:variable(
+ $varname as xs:string,
+ $statement as xs:string 
+){
+  fn:concat("var ",$varname," = ", $statement, ";")
+};
 declare function js:function(
    $params as xs:string,
    $body)

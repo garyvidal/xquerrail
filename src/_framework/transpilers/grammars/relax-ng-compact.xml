@@ -1,0 +1,1114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This file was generated on Tue May 15, 2012 10:37 (UTC-04) by REx v5.15 which is Copyright (c) 1979-2012 by Gunther Rademacher <grd@gmx.net> -->
+<!-- REx command line: relax-ng-compact.ebnf -backtrack -xml -tree -trace -->
+<g:grammar xmlns:g="http://www.w3.org/2001/03/XPath/grammar">
+  <g:production name="topLevel">
+    <g:zeroOrMore>
+      <g:ref if="datatypes default namespace" queued="1" name="decl"/>
+    </g:zeroOrMore>
+    <g:ref queued="1" name="topLevelBody"/>
+  </g:production>
+  <g:production queued="1" name="decl">
+    <g:choice queued="1">
+      <g:sequence default="" queued="1">
+        <g:choice queued="1">
+          <g:sequence if="namespace" queued="1">
+            <g:string queued="1">namespace</g:string>
+            <g:ref name="namespacePrefix"/>
+          </g:sequence>
+          <g:sequence default="" queued="1">
+            <g:string queued="1">default</g:string>
+            <g:string>namespace</g:string>
+            <g:optional>
+              <g:ref ifnot="=" queued="1" name="namespacePrefix"/>
+            </g:optional>
+          </g:sequence>
+        </g:choice>
+        <g:string>=</g:string>
+        <g:ref name="namespaceURILiteral"/>
+      </g:sequence>
+      <g:sequence if="datatypes" queued="1">
+        <g:string queued="1">datatypes</g:string>
+        <g:ref name="datatypePrefix"/>
+        <g:string>=</g:string>
+        <g:ref name="literal"/>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="namespacePrefix">
+    <g:ref name="identifierOrKeyword"/>
+  </g:production>
+  <g:production name="datatypePrefix">
+    <g:ref name="identifierOrKeyword"/>
+  </g:production>
+  <g:production name="namespaceURILiteral">
+    <g:choice>
+      <g:ref if="literalSegment" queued="1" name="literal"/>
+      <g:string default="" queued="1">inherit</g:string>
+    </g:choice>
+  </g:production>
+  <g:production queued="1" name="topLevelBody">
+    <g:choice LL1-conflict="CName [ documentation identifier" LL2-conflict="[~CName [~] [~attribute [~datatypes [~default [~div [~element [~empty [~external [~grammar [~identifier [~include [~inherit [~list [~mixed [~namespace [~notAllowed [~parent [~start [~string [~text [~token documentation~[ documentation~documentation documentation~identifier" LL3-conflict="[~CName~= [~CName~[ [~]~identifier [~attribute~[ [~datatypes~[ [~default~[ [~div~[ [~element~[ [~empty~[ [~external~[ [~grammar~[ [~identifier~[ [~include~[ [~inherit~[ [~list~[ [~mixed~[ [~namespace~[ [~notAllowed~[ [~parent~[ [~start~[ [~string~[ [~text~[ [~token~[ documentation~[~CName documentation~[~] documentation~[~attribute documentation~[~datatypes documentation~[~default documentation~[~div documentation~[~element documentation~[~empty documentation~[~external documentation~[~grammar documentation~[~identifier documentation~[~include documentation~[~inherit documentation~[~list documentation~[~mixed documentation~[~namespace documentation~[~notAllowed documentation~[~parent documentation~[~start documentation~[~string documentation~[~text documentation~[~token documentation~documentation~[ documentation~documentation~documentation documentation~documentation~identifier" queued="1">
+      <g:ref default="" queued="1+" name="pattern"/>
+      <g:ref if="CName~[ END [~]~div [~]~include [~]~start div documentation~div documentation~documentation~div documentation~documentation~include documentation~documentation~start documentation~identifier~&amp;= documentation~identifier~= documentation~identifier~|= documentation~include documentation~start identifier~&amp;= identifier~= identifier~[ identifier~|= include start" queued="1+" name="grammar"/>
+    </g:choice>
+  </g:production>
+  <g:production name="grammar">
+    <g:zeroOrMore>
+      <g:ref ifnot="END }" queued="1" name="member"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production queued="1" name="member">
+    <g:choice LL1-conflict="identifier" queued="1">
+      <g:ref default="" queued="1+" name="annotatedComponent"/>
+      <g:ref if="CName identifier~[" queued="1+" name="annotationElementNotKeyword"/>
+    </g:choice>
+  </g:production>
+  <g:production queued="1+" name="annotatedComponent">
+    <g:ref queued="1+" name="annotations"/>
+    <g:ref name="component"/>
+  </g:production>
+  <g:production name="component">
+    <g:choice>
+      <g:ref if="start" queued="1" name="start"/>
+      <g:ref if="identifier" queued="1" name="define"/>
+      <g:ref if="include" queued="1" name="include"/>
+      <g:ref default="" queued="1" name="div"/>
+    </g:choice>
+  </g:production>
+  <g:production queued="1" name="start">
+    <g:string queued="1">start</g:string>
+    <g:ref name="assignOp"/>
+    <g:ref name="pattern"/>
+  </g:production>
+  <g:production queued="1" name="define">
+    <g:ref queued="1" name="identifier"/>
+    <g:ref name="assignOp"/>
+    <g:ref name="pattern"/>
+  </g:production>
+  <g:production name="assignOp">
+    <g:choice>
+      <g:string if="=" queued="1">=</g:string>
+      <g:string if="|=" queued="1">|=</g:string>
+      <g:string default="" queued="1">&amp;=</g:string>
+    </g:choice>
+  </g:production>
+  <g:production queued="1" name="include">
+    <g:string queued="1">include</g:string>
+    <g:ref name="anyURILiteral"/>
+    <g:ref name="optInherit"/>
+    <g:ref name="optIncludeBody"/>
+  </g:production>
+  <g:production name="anyURILiteral">
+    <g:ref name="literal"/>
+  </g:production>
+  <g:production name="optInherit">
+    <g:optional>
+      <g:string if="inherit" queued="1">inherit</g:string>
+      <g:string>=</g:string>
+      <g:ref name="identifierOrKeyword"/>
+    </g:optional>
+  </g:production>
+  <g:production name="optIncludeBody">
+    <g:optional>
+      <g:string if="{" queued="1">{</g:string>
+      <g:ref name="includeBody"/>
+      <g:string>}</g:string>
+    </g:optional>
+  </g:production>
+  <g:production name="includeBody">
+    <g:zeroOrMore>
+      <g:ref ifnot="}" queued="1" name="includeMember"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production queued="1" name="includeMember">
+    <g:choice LL1-conflict="identifier" queued="1">
+      <g:ref default="" queued="1+" name="annotatedIncludeComponent"/>
+      <g:ref if="CName identifier~[" queued="1+" name="annotationElementNotKeyword"/>
+    </g:choice>
+  </g:production>
+  <g:production queued="1+" name="annotatedIncludeComponent">
+    <g:ref queued="1+" name="annotations"/>
+    <g:ref name="includeComponent"/>
+  </g:production>
+  <g:production name="includeComponent">
+    <g:choice>
+      <g:ref if="start" queued="1" name="start"/>
+      <g:ref if="identifier" queued="1" name="define"/>
+      <g:ref default="" queued="1" name="includeDiv"/>
+    </g:choice>
+  </g:production>
+  <g:production queued="1" name="div">
+    <g:string queued="1">div</g:string>
+    <g:string>{</g:string>
+    <g:ref name="grammar"/>
+    <g:string>}</g:string>
+  </g:production>
+  <g:production queued="1" name="includeDiv">
+    <g:string queued="1">div</g:string>
+    <g:string>{</g:string>
+    <g:ref name="includeBody"/>
+    <g:string>}</g:string>
+  </g:production>
+  <g:production name="pattern">
+    <g:ref name="innerPattern"/>
+  </g:production>
+  <g:production name="innerPattern">
+    <g:choice LL1-conflict="CName [ documentation string token" LL2-conflict="CName~{ [~CName [~] [~attribute [~datatypes [~default [~div [~element [~empty [~external [~grammar [~identifier [~include [~inherit [~list [~mixed [~namespace [~notAllowed [~parent [~start [~string [~text [~token documentation~CName documentation~[ documentation~documentation documentation~string documentation~token string~{ token~{" LL3-conflict="CName~{~[ CName~{~attribute CName~{~datatypes CName~{~default CName~{~div CName~{~documentation CName~{~element CName~{~empty CName~{~external CName~{~grammar CName~{~identifier CName~{~include CName~{~inherit CName~{~list CName~{~mixed CName~{~namespace CName~{~notAllowed CName~{~parent CName~{~start CName~{~string CName~{~text CName~{~token CName~{~} [~CName~= [~CName~[ [~]~CName [~]~string [~]~token [~attribute~[ [~datatypes~[ [~default~[ [~div~[ [~element~[ [~empty~[ [~external~[ [~grammar~[ [~identifier~[ [~include~[ [~inherit~[ [~list~[ [~mixed~[ [~namespace~[ [~notAllowed~[ [~parent~[ [~start~[ [~string~[ [~text~[ [~token~[ documentation~CName~{ documentation~[~CName documentation~[~] documentation~[~attribute documentation~[~datatypes documentation~[~default documentation~[~div documentation~[~element documentation~[~empty documentation~[~external documentation~[~grammar documentation~[~identifier documentation~[~include documentation~[~inherit documentation~[~list documentation~[~mixed documentation~[~namespace documentation~[~notAllowed documentation~[~parent documentation~[~start documentation~[~string documentation~[~text documentation~[~token documentation~documentation~CName documentation~documentation~[ documentation~documentation~documentation documentation~documentation~string documentation~documentation~token documentation~string~{ documentation~token~{ string~{~[ string~{~attribute string~{~datatypes string~{~default string~{~div string~{~documentation string~{~element string~{~empty string~{~external string~{~grammar string~{~identifier string~{~include string~{~inherit string~{~list string~{~mixed string~{~namespace string~{~notAllowed string~{~parent string~{~start string~{~string string~{~text string~{~token string~{~} token~{~[ token~{~attribute token~{~datatypes token~{~default token~{~div token~{~documentation token~{~element token~{~empty token~{~external token~{~grammar token~{~identifier token~{~include token~{~inherit token~{~list token~{~mixed token~{~namespace token~{~notAllowed token~{~parent token~{~start token~{~string token~{~text token~{~token token~{~}">
+      <g:ref if="CName~- documentation~CName~- documentation~string~- documentation~token~- string~- token~-" queued="1+" name="annotatedDataExcept"/>
+      <g:sequence default="" queued="1+">
+        <g:ref queued="1+" name="innerParticle"/>
+        <g:zeroOrMore>
+          <g:choice if="&amp; , |" queued="1">
+            <g:string if="|" queued="1">|</g:string>
+            <g:string if="," queued="1">,</g:string>
+            <g:string default="" queued="1">&amp;</g:string>
+          </g:choice>
+          <g:ref name="innerParticle"/>
+        </g:zeroOrMore>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="innerParticle">
+    <g:ref name="annotatedPrimary"/>
+    <g:optional>
+      <g:choice if="* + ?" queued="1">
+        <g:string if="*" queued="1">*</g:string>
+        <g:string if="+" queued="1">+</g:string>
+        <g:string default="" queued="1">?</g:string>
+      </g:choice>
+      <g:ref name="followAnnotations"/>
+    </g:optional>
+  </g:production>
+  <g:production name="annotatedPrimary">
+    <g:ref name="leadAnnotatedPrimary"/>
+    <g:ref name="followAnnotations"/>
+  </g:production>
+  <g:production queued="1+" name="annotatedDataExcept">
+    <g:ref queued="1+" name="leadAnnotatedDataExcept"/>
+    <g:ref name="followAnnotations"/>
+  </g:production>
+  <g:production name="leadAnnotatedDataExcept">
+    <g:ref name="annotations"/>
+    <g:ref name="dataExcept"/>
+  </g:production>
+  <g:production name="leadAnnotatedPrimary">
+    <g:ref name="annotations"/>
+    <g:choice>
+      <g:ref default="" queued="1" name="primary"/>
+      <g:sequence if="(" queued="1">
+        <g:string queued="1">(</g:string>
+        <g:ref name="innerPattern"/>
+        <g:string>)</g:string>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production queued="1" name="primary">
+    <g:choice queued="1">
+      <g:sequence default="" queued="1">
+        <g:choice queued="1">
+          <g:sequence default="" queued="1">
+            <g:choice queued="1">
+              <g:sequence default="" queued="1">
+                <g:choice queued="1">
+                  <g:string if="element" queued="1">element</g:string>
+                  <g:string default="" queued="1">attribute</g:string>
+                </g:choice>
+                <g:ref name="nameClass"/>
+              </g:sequence>
+              <g:string if="mixed" queued="1">mixed</g:string>
+              <g:string if="list" queued="1">list</g:string>
+            </g:choice>
+            <g:string>{</g:string>
+            <g:ref name="pattern"/>
+          </g:sequence>
+          <g:sequence if="grammar" queued="1">
+            <g:string queued="1">grammar</g:string>
+            <g:string>{</g:string>
+            <g:ref name="grammar"/>
+          </g:sequence>
+        </g:choice>
+        <g:string>}</g:string>
+      </g:sequence>
+      <g:sequence if="CName string token" queued="1">
+        <g:ref queued="1" name="datatypeName"/>
+        <g:choice>
+          <g:ref default="" queued="1" name="optParams"/>
+          <g:ref if="literalSegment" queued="1" name="datatypeValue"/>
+        </g:choice>
+      </g:sequence>
+      <g:ref if="literalSegment" queued="1" name="datatypeValue"/>
+      <g:string if="empty" queued="1">empty</g:string>
+      <g:string if="notAllowed" queued="1">notAllowed</g:string>
+      <g:string if="text" queued="1">text</g:string>
+      <g:sequence if="identifier parent" queued="1">
+        <g:optional queued="1">
+          <g:string if="parent" queued="1">parent</g:string>
+        </g:optional>
+        <g:ref name="ref"/>
+      </g:sequence>
+      <g:sequence if="external" queued="1">
+        <g:string queued="1">external</g:string>
+        <g:ref name="anyURILiteral"/>
+        <g:ref name="optInherit"/>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="dataExcept">
+    <g:ref name="datatypeName"/>
+    <g:ref name="optParams"/>
+    <g:string>-</g:string>
+    <g:ref name="leadAnnotatedPrimary"/>
+  </g:production>
+  <g:production name="ref">
+    <g:ref name="identifier"/>
+  </g:production>
+  <g:production name="datatypeName">
+    <g:choice>
+      <g:ref if="CName" queued="1" name="CName"/>
+      <g:string if="string" queued="1">string</g:string>
+      <g:string default="" queued="1">token</g:string>
+    </g:choice>
+  </g:production>
+  <g:production queued="1" name="datatypeValue">
+    <g:ref queued="1" name="literal"/>
+  </g:production>
+  <g:production name="optParams">
+    <g:optional>
+      <g:string if="{" queued="1">{</g:string>
+      <g:zeroOrMore>
+        <g:ref ifnot="}" queued="1" name="param"/>
+      </g:zeroOrMore>
+      <g:string queued="1">}</g:string>
+    </g:optional>
+  </g:production>
+  <g:production queued="1" name="param">
+    <g:ref queued="1" name="annotations"/>
+    <g:ref name="identifierOrKeyword"/>
+    <g:string>=</g:string>
+    <g:ref name="literal"/>
+  </g:production>
+  <g:production name="nameClass">
+    <g:ref name="innerNameClass"/>
+  </g:production>
+  <g:production name="innerNameClass">
+    <g:choice LL1-conflict="* [ documentation nsName" LL2-conflict="[~CName [~] [~attribute [~datatypes [~default [~div [~element [~empty [~external [~grammar [~identifier [~include [~inherit [~list [~mixed [~namespace [~notAllowed [~parent [~start [~string [~text [~token documentation~* documentation~[ documentation~documentation documentation~nsName" LL3-conflict="[~CName~= [~CName~[ [~]~* [~]~nsName [~attribute~[ [~datatypes~[ [~default~[ [~div~[ [~element~[ [~empty~[ [~external~[ [~grammar~[ [~identifier~[ [~include~[ [~inherit~[ [~list~[ [~mixed~[ [~namespace~[ [~notAllowed~[ [~parent~[ [~start~[ [~string~[ [~text~[ [~token~[ documentation~[~CName documentation~[~] documentation~[~attribute documentation~[~datatypes documentation~[~default documentation~[~div documentation~[~element documentation~[~empty documentation~[~external documentation~[~grammar documentation~[~identifier documentation~[~include documentation~[~inherit documentation~[~list documentation~[~mixed documentation~[~namespace documentation~[~notAllowed documentation~[~parent documentation~[~start documentation~[~string documentation~[~text documentation~[~token documentation~documentation~* documentation~documentation~[ documentation~documentation~documentation documentation~documentation~nsName">
+      <g:sequence default="" queued="1+">
+        <g:ref queued="1+" name="annotatedSimpleNameClass"/>
+        <g:zeroOrMore>
+          <g:string if="|" queued="1">|</g:string>
+          <g:ref name="annotatedSimpleNameClass"/>
+        </g:zeroOrMore>
+      </g:sequence>
+      <g:ref if="*~- documentation~*~- documentation~nsName~- nsName~-" queued="1+" name="annotatedExceptNameClass"/>
+    </g:choice>
+  </g:production>
+  <g:production queued="1+" name="annotatedExceptNameClass">
+    <g:ref queued="1+" name="leadAnnotatedExceptNameClass"/>
+    <g:ref name="followAnnotations"/>
+  </g:production>
+  <g:production name="leadAnnotatedExceptNameClass">
+    <g:ref name="annotations"/>
+    <g:ref name="exceptNameClass"/>
+  </g:production>
+  <g:production name="annotatedSimpleNameClass">
+    <g:ref name="leadAnnotatedSimpleNameClass"/>
+    <g:ref name="followAnnotations"/>
+  </g:production>
+  <g:production name="leadAnnotatedSimpleNameClass">
+    <g:ref name="annotations"/>
+    <g:choice>
+      <g:ref default="" queued="1" name="simpleNameClass"/>
+      <g:sequence if="(" queued="1">
+        <g:string queued="1">(</g:string>
+        <g:ref name="innerNameClass"/>
+        <g:string>)</g:string>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="exceptNameClass">
+    <g:choice>
+      <g:ref if="nsName" queued="1" name="nsName"/>
+      <g:string default="" queued="1">*</g:string>
+    </g:choice>
+    <g:string>-</g:string>
+    <g:ref name="leadAnnotatedSimpleNameClass"/>
+  </g:production>
+  <g:production queued="1" name="simpleNameClass">
+    <g:choice queued="1">
+      <g:ref default="" queued="1" name="identifierOrKeyword"/>
+      <g:ref if="CName" queued="1" name="CName"/>
+      <g:ref if="nsName" queued="1" name="nsName"/>
+      <g:string if="*" queued="1">*</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="followAnnotations">
+    <g:zeroOrMore>
+      <g:string if="&gt;&gt;" queued="1">&gt;&gt;</g:string>
+      <g:ref name="annotationElement"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="annotations">
+    <g:ref name="documentations"/>
+    <g:optional>
+      <g:string if="[" queued="1">[</g:string>
+      <g:zeroOrMore LL1-conflict="CName">
+        <g:ref if="CName~=" queued="1+" name="foreignAttributeName"/>
+        <g:string>=</g:string>
+        <g:ref name="literal"/>
+      </g:zeroOrMore>
+      <g:zeroOrMore>
+        <g:ref ifnot="]" queued="1" name="annotationElement"/>
+      </g:zeroOrMore>
+      <g:string queued="1">]</g:string>
+    </g:optional>
+  </g:production>
+  <g:production queued="1+" name="foreignAttributeName">
+    <g:ref queued="1+" name="prefixedName"/>
+  </g:production>
+  <g:production name="annotationElement">
+    <g:ref name="foreignElementName"/>
+    <g:ref name="annotationAttributesContent"/>
+  </g:production>
+  <g:production name="foreignElementName">
+    <g:choice>
+      <g:ref default="" queued="1" name="identifierOrKeyword"/>
+      <g:ref if="CName" queued="1" name="prefixedName"/>
+    </g:choice>
+  </g:production>
+  <g:production queued="1+" name="annotationElementNotKeyword">
+    <g:ref queued="1+" name="foreignElementNameNotKeyword"/>
+    <g:ref name="annotationAttributesContent"/>
+  </g:production>
+  <g:production name="foreignElementNameNotKeyword">
+    <g:choice>
+      <g:ref if="identifier" queued="1" name="identifier"/>
+      <g:ref default="" queued="1" name="prefixedName"/>
+    </g:choice>
+  </g:production>
+  <g:production name="annotationAttributesContent">
+    <g:string>[</g:string>
+    <g:zeroOrMore LL1-conflict="CName attribute datatypes default div element empty external grammar identifier include inherit list mixed namespace notAllowed parent start string text token">
+      <g:ref if="CName~= attribute~= datatypes~= default~= div~= element~= empty~= external~= grammar~= identifier~= include~= inherit~= list~= mixed~= namespace~= notAllowed~= parent~= start~= string~= text~= token~=" queued="1+" name="anyAttributeName"/>
+      <g:string>=</g:string>
+      <g:ref name="literal"/>
+    </g:zeroOrMore>
+    <g:zeroOrMore>
+      <g:choice ifnot="]" queued="1">
+        <g:ref default="" queued="1" name="nestedAnnotationElement"/>
+        <g:ref if="literalSegment" queued="1" name="literal"/>
+      </g:choice>
+    </g:zeroOrMore>
+    <g:string queued="1">]</g:string>
+  </g:production>
+  <g:production queued="1+" name="anyAttributeName">
+    <g:choice queued="1+">
+      <g:ref default="" queued="1" name="identifierOrKeyword"/>
+      <g:ref if="CName" queued="1" name="prefixedName"/>
+    </g:choice>
+  </g:production>
+  <g:production queued="1" name="nestedAnnotationElement">
+    <g:ref queued="1" name="anyElementName"/>
+    <g:ref name="annotationAttributesContent"/>
+  </g:production>
+  <g:production name="anyElementName">
+    <g:choice>
+      <g:ref default="" queued="1" name="identifierOrKeyword"/>
+      <g:ref if="CName" queued="1" name="prefixedName"/>
+    </g:choice>
+  </g:production>
+  <g:production name="prefixedName">
+    <g:ref name="CName"/>
+  </g:production>
+  <g:production name="documentations">
+    <g:zeroOrMore>
+      <g:ref if="documentation" queued="1" name="documentation"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="identifierOrKeyword">
+    <g:choice>
+      <g:ref if="identifier" queued="1" name="identifier"/>
+      <g:string if="attribute" queued="1">attribute</g:string>
+      <g:string if="default" queued="1">default</g:string>
+      <g:string if="datatypes" queued="1">datatypes</g:string>
+      <g:string if="div" queued="1">div</g:string>
+      <g:string if="element" queued="1">element</g:string>
+      <g:string if="empty" queued="1">empty</g:string>
+      <g:string if="external" queued="1">external</g:string>
+      <g:string if="grammar" queued="1">grammar</g:string>
+      <g:string if="include" queued="1">include</g:string>
+      <g:string if="inherit" queued="1">inherit</g:string>
+      <g:string if="list" queued="1">list</g:string>
+      <g:string if="mixed" queued="1">mixed</g:string>
+      <g:string if="namespace" queued="1">namespace</g:string>
+      <g:string if="notAllowed" queued="1">notAllowed</g:string>
+      <g:string if="parent" queued="1">parent</g:string>
+      <g:string if="start" queued="1">start</g:string>
+      <g:string if="string" queued="1">string</g:string>
+      <g:string if="text" queued="1">text</g:string>
+      <g:string default="" queued="1">token</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="literal">
+    <g:ref name="literalSegment"/>
+    <g:zeroOrMore>
+      <g:string if="~" queued="1">~</g:string>
+      <g:ref name="literalSegment"/>
+    </g:zeroOrMore>
+  </g:production>
+  <?TOKENS?>
+  <g:production name="keyword">
+    <g:choice>
+      <g:string>attribute</g:string>
+      <g:string>default</g:string>
+      <g:string>datatypes</g:string>
+      <g:string>div</g:string>
+      <g:string>element</g:string>
+      <g:string>empty</g:string>
+      <g:string>external</g:string>
+      <g:string>grammar</g:string>
+      <g:string>include</g:string>
+      <g:string>inherit</g:string>
+      <g:string>list</g:string>
+      <g:string>mixed</g:string>
+      <g:string>namespace</g:string>
+      <g:string>notAllowed</g:string>
+      <g:string>parent</g:string>
+      <g:string>start</g:string>
+      <g:string>string</g:string>
+      <g:string>text</g:string>
+      <g:string>token</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="identifier">
+    <g:choice>
+      <g:subtract>
+        <g:ref name="NCName"/>
+        <g:ref name="keyword"/>
+      </g:subtract>
+      <g:sequence>
+        <g:string>\</g:string>
+        <g:ref name="NCName"/>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="NCName">
+    <g:ref name="NCNameStartChar"/>
+    <g:zeroOrMore>
+      <g:ref name="NCNameChar"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="NCNameChar">
+    <g:subtract>
+      <g:ref name="NameChar"/>
+      <g:string>:</g:string>
+    </g:subtract>
+  </g:production>
+  <g:production name="NCNameStartChar">
+    <g:choice>
+      <g:ref name="Letter"/>
+      <g:string>_</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="Letter">
+    <g:choice>
+      <g:ref name="BaseChar"/>
+      <g:ref name="Ideographic"/>
+    </g:choice>
+  </g:production>
+  <g:production name="BaseChar">
+    <g:charClass>
+      <g:charCodeRange minValue="41" maxValue="5A"/>
+      <g:charCodeRange minValue="61" maxValue="7A"/>
+      <g:charCodeRange minValue="C0" maxValue="D6"/>
+      <g:charCodeRange minValue="D8" maxValue="F6"/>
+      <g:charCodeRange minValue="F8" maxValue="FF"/>
+      <g:charCodeRange minValue="100" maxValue="131"/>
+      <g:charCodeRange minValue="134" maxValue="13E"/>
+      <g:charCodeRange minValue="141" maxValue="148"/>
+      <g:charCodeRange minValue="14A" maxValue="17E"/>
+      <g:charCodeRange minValue="180" maxValue="1C3"/>
+      <g:charCodeRange minValue="1CD" maxValue="1F0"/>
+      <g:charCodeRange minValue="1F4" maxValue="1F5"/>
+      <g:charCodeRange minValue="1FA" maxValue="217"/>
+      <g:charCodeRange minValue="250" maxValue="2A8"/>
+      <g:charCodeRange minValue="2BB" maxValue="2C1"/>
+      <g:charCode value="386"/>
+      <g:charCodeRange minValue="388" maxValue="38A"/>
+      <g:charCode value="38C"/>
+      <g:charCodeRange minValue="38E" maxValue="3A1"/>
+      <g:charCodeRange minValue="3A3" maxValue="3CE"/>
+      <g:charCodeRange minValue="3D0" maxValue="3D6"/>
+      <g:charCode value="3DA"/>
+      <g:charCode value="3DC"/>
+      <g:charCode value="3DE"/>
+      <g:charCode value="3E0"/>
+      <g:charCodeRange minValue="3E2" maxValue="3F3"/>
+      <g:charCodeRange minValue="401" maxValue="40C"/>
+      <g:charCodeRange minValue="40E" maxValue="44F"/>
+      <g:charCodeRange minValue="451" maxValue="45C"/>
+      <g:charCodeRange minValue="45E" maxValue="481"/>
+      <g:charCodeRange minValue="490" maxValue="4C4"/>
+      <g:charCodeRange minValue="4C7" maxValue="4C8"/>
+      <g:charCodeRange minValue="4CB" maxValue="4CC"/>
+      <g:charCodeRange minValue="4D0" maxValue="4EB"/>
+      <g:charCodeRange minValue="4EE" maxValue="4F5"/>
+      <g:charCodeRange minValue="4F8" maxValue="4F9"/>
+      <g:charCodeRange minValue="531" maxValue="556"/>
+      <g:charCode value="559"/>
+      <g:charCodeRange minValue="561" maxValue="586"/>
+      <g:charCodeRange minValue="5D0" maxValue="5EA"/>
+      <g:charCodeRange minValue="5F0" maxValue="5F2"/>
+      <g:charCodeRange minValue="621" maxValue="63A"/>
+      <g:charCodeRange minValue="641" maxValue="64A"/>
+      <g:charCodeRange minValue="671" maxValue="6B7"/>
+      <g:charCodeRange minValue="6BA" maxValue="6BE"/>
+      <g:charCodeRange minValue="6C0" maxValue="6CE"/>
+      <g:charCodeRange minValue="6D0" maxValue="6D3"/>
+      <g:charCode value="6D5"/>
+      <g:charCodeRange minValue="6E5" maxValue="6E6"/>
+      <g:charCodeRange minValue="905" maxValue="939"/>
+      <g:charCode value="93D"/>
+      <g:charCodeRange minValue="958" maxValue="961"/>
+      <g:charCodeRange minValue="985" maxValue="98C"/>
+      <g:charCodeRange minValue="98F" maxValue="990"/>
+      <g:charCodeRange minValue="993" maxValue="9A8"/>
+      <g:charCodeRange minValue="9AA" maxValue="9B0"/>
+      <g:charCode value="9B2"/>
+      <g:charCodeRange minValue="9B6" maxValue="9B9"/>
+      <g:charCodeRange minValue="9DC" maxValue="9DD"/>
+      <g:charCodeRange minValue="9DF" maxValue="9E1"/>
+      <g:charCodeRange minValue="9F0" maxValue="9F1"/>
+      <g:charCodeRange minValue="A05" maxValue="A0A"/>
+      <g:charCodeRange minValue="A0F" maxValue="A10"/>
+      <g:charCodeRange minValue="A13" maxValue="A28"/>
+      <g:charCodeRange minValue="A2A" maxValue="A30"/>
+      <g:charCodeRange minValue="A32" maxValue="A33"/>
+      <g:charCodeRange minValue="A35" maxValue="A36"/>
+      <g:charCodeRange minValue="A38" maxValue="A39"/>
+      <g:charCodeRange minValue="A59" maxValue="A5C"/>
+      <g:charCode value="A5E"/>
+      <g:charCodeRange minValue="A72" maxValue="A74"/>
+      <g:charCodeRange minValue="A85" maxValue="A8B"/>
+      <g:charCode value="A8D"/>
+      <g:charCodeRange minValue="A8F" maxValue="A91"/>
+      <g:charCodeRange minValue="A93" maxValue="AA8"/>
+      <g:charCodeRange minValue="AAA" maxValue="AB0"/>
+      <g:charCodeRange minValue="AB2" maxValue="AB3"/>
+      <g:charCodeRange minValue="AB5" maxValue="AB9"/>
+      <g:charCode value="ABD"/>
+      <g:charCode value="AE0"/>
+      <g:charCodeRange minValue="B05" maxValue="B0C"/>
+      <g:charCodeRange minValue="B0F" maxValue="B10"/>
+      <g:charCodeRange minValue="B13" maxValue="B28"/>
+      <g:charCodeRange minValue="B2A" maxValue="B30"/>
+      <g:charCodeRange minValue="B32" maxValue="B33"/>
+      <g:charCodeRange minValue="B36" maxValue="B39"/>
+      <g:charCode value="B3D"/>
+      <g:charCodeRange minValue="B5C" maxValue="B5D"/>
+      <g:charCodeRange minValue="B5F" maxValue="B61"/>
+      <g:charCodeRange minValue="B85" maxValue="B8A"/>
+      <g:charCodeRange minValue="B8E" maxValue="B90"/>
+      <g:charCodeRange minValue="B92" maxValue="B95"/>
+      <g:charCodeRange minValue="B99" maxValue="B9A"/>
+      <g:charCode value="B9C"/>
+      <g:charCodeRange minValue="B9E" maxValue="B9F"/>
+      <g:charCodeRange minValue="BA3" maxValue="BA4"/>
+      <g:charCodeRange minValue="BA8" maxValue="BAA"/>
+      <g:charCodeRange minValue="BAE" maxValue="BB5"/>
+      <g:charCodeRange minValue="BB7" maxValue="BB9"/>
+      <g:charCodeRange minValue="C05" maxValue="C0C"/>
+      <g:charCodeRange minValue="C0E" maxValue="C10"/>
+      <g:charCodeRange minValue="C12" maxValue="C28"/>
+      <g:charCodeRange minValue="C2A" maxValue="C33"/>
+      <g:charCodeRange minValue="C35" maxValue="C39"/>
+      <g:charCodeRange minValue="C60" maxValue="C61"/>
+      <g:charCodeRange minValue="C85" maxValue="C8C"/>
+      <g:charCodeRange minValue="C8E" maxValue="C90"/>
+      <g:charCodeRange minValue="C92" maxValue="CA8"/>
+      <g:charCodeRange minValue="CAA" maxValue="CB3"/>
+      <g:charCodeRange minValue="CB5" maxValue="CB9"/>
+      <g:charCode value="CDE"/>
+      <g:charCodeRange minValue="CE0" maxValue="CE1"/>
+      <g:charCodeRange minValue="D05" maxValue="D0C"/>
+      <g:charCodeRange minValue="D0E" maxValue="D10"/>
+      <g:charCodeRange minValue="D12" maxValue="D28"/>
+      <g:charCodeRange minValue="D2A" maxValue="D39"/>
+      <g:charCodeRange minValue="D60" maxValue="D61"/>
+      <g:charCodeRange minValue="E01" maxValue="E2E"/>
+      <g:charCode value="E30"/>
+      <g:charCodeRange minValue="E32" maxValue="E33"/>
+      <g:charCodeRange minValue="E40" maxValue="E45"/>
+      <g:charCodeRange minValue="E81" maxValue="E82"/>
+      <g:charCode value="E84"/>
+      <g:charCodeRange minValue="E87" maxValue="E88"/>
+      <g:charCode value="E8A"/>
+      <g:charCode value="E8D"/>
+      <g:charCodeRange minValue="E94" maxValue="E97"/>
+      <g:charCodeRange minValue="E99" maxValue="E9F"/>
+      <g:charCodeRange minValue="EA1" maxValue="EA3"/>
+      <g:charCode value="EA5"/>
+      <g:charCode value="EA7"/>
+      <g:charCodeRange minValue="EAA" maxValue="EAB"/>
+      <g:charCodeRange minValue="EAD" maxValue="EAE"/>
+      <g:charCode value="EB0"/>
+      <g:charCodeRange minValue="EB2" maxValue="EB3"/>
+      <g:charCode value="EBD"/>
+      <g:charCodeRange minValue="EC0" maxValue="EC4"/>
+      <g:charCodeRange minValue="F40" maxValue="F47"/>
+      <g:charCodeRange minValue="F49" maxValue="F69"/>
+      <g:charCodeRange minValue="10A0" maxValue="10C5"/>
+      <g:charCodeRange minValue="10D0" maxValue="10F6"/>
+      <g:charCode value="1100"/>
+      <g:charCodeRange minValue="1102" maxValue="1103"/>
+      <g:charCodeRange minValue="1105" maxValue="1107"/>
+      <g:charCode value="1109"/>
+      <g:charCodeRange minValue="110B" maxValue="110C"/>
+      <g:charCodeRange minValue="110E" maxValue="1112"/>
+      <g:charCode value="113C"/>
+      <g:charCode value="113E"/>
+      <g:charCode value="1140"/>
+      <g:charCode value="114C"/>
+      <g:charCode value="114E"/>
+      <g:charCode value="1150"/>
+      <g:charCodeRange minValue="1154" maxValue="1155"/>
+      <g:charCode value="1159"/>
+      <g:charCodeRange minValue="115F" maxValue="1161"/>
+      <g:charCode value="1163"/>
+      <g:charCode value="1165"/>
+      <g:charCode value="1167"/>
+      <g:charCode value="1169"/>
+      <g:charCodeRange minValue="116D" maxValue="116E"/>
+      <g:charCodeRange minValue="1172" maxValue="1173"/>
+      <g:charCode value="1175"/>
+      <g:charCode value="119E"/>
+      <g:charCode value="11A8"/>
+      <g:charCode value="11AB"/>
+      <g:charCodeRange minValue="11AE" maxValue="11AF"/>
+      <g:charCodeRange minValue="11B7" maxValue="11B8"/>
+      <g:charCode value="11BA"/>
+      <g:charCodeRange minValue="11BC" maxValue="11C2"/>
+      <g:charCode value="11EB"/>
+      <g:charCode value="11F0"/>
+      <g:charCode value="11F9"/>
+      <g:charCodeRange minValue="1E00" maxValue="1E9B"/>
+      <g:charCodeRange minValue="1EA0" maxValue="1EF9"/>
+      <g:charCodeRange minValue="1F00" maxValue="1F15"/>
+      <g:charCodeRange minValue="1F18" maxValue="1F1D"/>
+      <g:charCodeRange minValue="1F20" maxValue="1F45"/>
+      <g:charCodeRange minValue="1F48" maxValue="1F4D"/>
+      <g:charCodeRange minValue="1F50" maxValue="1F57"/>
+      <g:charCode value="1F59"/>
+      <g:charCode value="1F5B"/>
+      <g:charCode value="1F5D"/>
+      <g:charCodeRange minValue="1F5F" maxValue="1F7D"/>
+      <g:charCodeRange minValue="1F80" maxValue="1FB4"/>
+      <g:charCodeRange minValue="1FB6" maxValue="1FBC"/>
+      <g:charCode value="1FBE"/>
+      <g:charCodeRange minValue="1FC2" maxValue="1FC4"/>
+      <g:charCodeRange minValue="1FC6" maxValue="1FCC"/>
+      <g:charCodeRange minValue="1FD0" maxValue="1FD3"/>
+      <g:charCodeRange minValue="1FD6" maxValue="1FDB"/>
+      <g:charCodeRange minValue="1FE0" maxValue="1FEC"/>
+      <g:charCodeRange minValue="1FF2" maxValue="1FF4"/>
+      <g:charCodeRange minValue="1FF6" maxValue="1FFC"/>
+      <g:charCode value="2126"/>
+      <g:charCodeRange minValue="212A" maxValue="212B"/>
+      <g:charCode value="212E"/>
+      <g:charCodeRange minValue="2180" maxValue="2182"/>
+      <g:charCodeRange minValue="3041" maxValue="3094"/>
+      <g:charCodeRange minValue="30A1" maxValue="30FA"/>
+      <g:charCodeRange minValue="3105" maxValue="312C"/>
+      <g:charCodeRange minValue="AC00" maxValue="D7A3"/>
+    </g:charClass>
+  </g:production>
+  <g:production name="Ideographic">
+    <g:charClass>
+      <g:charCode value="3007"/>
+      <g:charCodeRange minValue="3021" maxValue="3029"/>
+      <g:charCodeRange minValue="4E00" maxValue="9FA5"/>
+    </g:charClass>
+  </g:production>
+  <g:production name="CombiningChar">
+    <g:charClass>
+      <g:charCodeRange minValue="300" maxValue="345"/>
+      <g:charCodeRange minValue="360" maxValue="361"/>
+      <g:charCodeRange minValue="483" maxValue="486"/>
+      <g:charCodeRange minValue="591" maxValue="5A1"/>
+      <g:charCodeRange minValue="5A3" maxValue="5B9"/>
+      <g:charCodeRange minValue="5BB" maxValue="5BD"/>
+      <g:charCode value="5BF"/>
+      <g:charCodeRange minValue="5C1" maxValue="5C2"/>
+      <g:charCode value="5C4"/>
+      <g:charCodeRange minValue="64B" maxValue="652"/>
+      <g:charCode value="670"/>
+      <g:charCodeRange minValue="6D6" maxValue="6DC"/>
+      <g:charCodeRange minValue="6DD" maxValue="6DF"/>
+      <g:charCodeRange minValue="6E0" maxValue="6E4"/>
+      <g:charCodeRange minValue="6E7" maxValue="6E8"/>
+      <g:charCodeRange minValue="6EA" maxValue="6ED"/>
+      <g:charCodeRange minValue="901" maxValue="903"/>
+      <g:charCode value="93C"/>
+      <g:charCodeRange minValue="93E" maxValue="94C"/>
+      <g:charCode value="94D"/>
+      <g:charCodeRange minValue="951" maxValue="954"/>
+      <g:charCodeRange minValue="962" maxValue="963"/>
+      <g:charCodeRange minValue="981" maxValue="983"/>
+      <g:charCode value="9BC"/>
+      <g:charCode value="9BE"/>
+      <g:charCode value="9BF"/>
+      <g:charCodeRange minValue="9C0" maxValue="9C4"/>
+      <g:charCodeRange minValue="9C7" maxValue="9C8"/>
+      <g:charCodeRange minValue="9CB" maxValue="9CD"/>
+      <g:charCode value="9D7"/>
+      <g:charCodeRange minValue="9E2" maxValue="9E3"/>
+      <g:charCode value="A02"/>
+      <g:charCode value="A3C"/>
+      <g:charCode value="A3E"/>
+      <g:charCode value="A3F"/>
+      <g:charCodeRange minValue="A40" maxValue="A42"/>
+      <g:charCodeRange minValue="A47" maxValue="A48"/>
+      <g:charCodeRange minValue="A4B" maxValue="A4D"/>
+      <g:charCodeRange minValue="A70" maxValue="A71"/>
+      <g:charCodeRange minValue="A81" maxValue="A83"/>
+      <g:charCode value="ABC"/>
+      <g:charCodeRange minValue="ABE" maxValue="AC5"/>
+      <g:charCodeRange minValue="AC7" maxValue="AC9"/>
+      <g:charCodeRange minValue="ACB" maxValue="ACD"/>
+      <g:charCodeRange minValue="B01" maxValue="B03"/>
+      <g:charCode value="B3C"/>
+      <g:charCodeRange minValue="B3E" maxValue="B43"/>
+      <g:charCodeRange minValue="B47" maxValue="B48"/>
+      <g:charCodeRange minValue="B4B" maxValue="B4D"/>
+      <g:charCodeRange minValue="B56" maxValue="B57"/>
+      <g:charCodeRange minValue="B82" maxValue="B83"/>
+      <g:charCodeRange minValue="BBE" maxValue="BC2"/>
+      <g:charCodeRange minValue="BC6" maxValue="BC8"/>
+      <g:charCodeRange minValue="BCA" maxValue="BCD"/>
+      <g:charCode value="BD7"/>
+      <g:charCodeRange minValue="C01" maxValue="C03"/>
+      <g:charCodeRange minValue="C3E" maxValue="C44"/>
+      <g:charCodeRange minValue="C46" maxValue="C48"/>
+      <g:charCodeRange minValue="C4A" maxValue="C4D"/>
+      <g:charCodeRange minValue="C55" maxValue="C56"/>
+      <g:charCodeRange minValue="C82" maxValue="C83"/>
+      <g:charCodeRange minValue="CBE" maxValue="CC4"/>
+      <g:charCodeRange minValue="CC6" maxValue="CC8"/>
+      <g:charCodeRange minValue="CCA" maxValue="CCD"/>
+      <g:charCodeRange minValue="CD5" maxValue="CD6"/>
+      <g:charCodeRange minValue="D02" maxValue="D03"/>
+      <g:charCodeRange minValue="D3E" maxValue="D43"/>
+      <g:charCodeRange minValue="D46" maxValue="D48"/>
+      <g:charCodeRange minValue="D4A" maxValue="D4D"/>
+      <g:charCode value="D57"/>
+      <g:charCode value="E31"/>
+      <g:charCodeRange minValue="E34" maxValue="E3A"/>
+      <g:charCodeRange minValue="E47" maxValue="E4E"/>
+      <g:charCode value="EB1"/>
+      <g:charCodeRange minValue="EB4" maxValue="EB9"/>
+      <g:charCodeRange minValue="EBB" maxValue="EBC"/>
+      <g:charCodeRange minValue="EC8" maxValue="ECD"/>
+      <g:charCodeRange minValue="F18" maxValue="F19"/>
+      <g:charCode value="F35"/>
+      <g:charCode value="F37"/>
+      <g:charCode value="F39"/>
+      <g:charCode value="F3E"/>
+      <g:charCode value="F3F"/>
+      <g:charCodeRange minValue="F71" maxValue="F84"/>
+      <g:charCodeRange minValue="F86" maxValue="F8B"/>
+      <g:charCodeRange minValue="F90" maxValue="F95"/>
+      <g:charCode value="F97"/>
+      <g:charCodeRange minValue="F99" maxValue="FAD"/>
+      <g:charCodeRange minValue="FB1" maxValue="FB7"/>
+      <g:charCode value="FB9"/>
+      <g:charCodeRange minValue="20D0" maxValue="20DC"/>
+      <g:charCode value="20E1"/>
+      <g:charCodeRange minValue="302A" maxValue="302F"/>
+      <g:charCode value="3099"/>
+      <g:charCode value="309A"/>
+    </g:charClass>
+  </g:production>
+  <g:production name="Digit">
+    <g:charClass>
+      <g:charCodeRange minValue="30" maxValue="39"/>
+      <g:charCodeRange minValue="660" maxValue="669"/>
+      <g:charCodeRange minValue="6F0" maxValue="6F9"/>
+      <g:charCodeRange minValue="966" maxValue="96F"/>
+      <g:charCodeRange minValue="9E6" maxValue="9EF"/>
+      <g:charCodeRange minValue="A66" maxValue="A6F"/>
+      <g:charCodeRange minValue="AE6" maxValue="AEF"/>
+      <g:charCodeRange minValue="B66" maxValue="B6F"/>
+      <g:charCodeRange minValue="BE7" maxValue="BEF"/>
+      <g:charCodeRange minValue="C66" maxValue="C6F"/>
+      <g:charCodeRange minValue="CE6" maxValue="CEF"/>
+      <g:charCodeRange minValue="D66" maxValue="D6F"/>
+      <g:charCodeRange minValue="E50" maxValue="E59"/>
+      <g:charCodeRange minValue="ED0" maxValue="ED9"/>
+      <g:charCodeRange minValue="F20" maxValue="F29"/>
+    </g:charClass>
+  </g:production>
+  <g:production name="Extender">
+    <g:charClass>
+      <g:charCode value="B7"/>
+      <g:charCode value="2D0"/>
+      <g:charCode value="2D1"/>
+      <g:charCode value="387"/>
+      <g:charCode value="640"/>
+      <g:charCode value="E46"/>
+      <g:charCode value="EC6"/>
+      <g:charCode value="3005"/>
+      <g:charCodeRange minValue="3031" maxValue="3035"/>
+      <g:charCodeRange minValue="309D" maxValue="309E"/>
+      <g:charCodeRange minValue="30FC" maxValue="30FE"/>
+    </g:charClass>
+  </g:production>
+  <g:production name="Char">
+    <g:charClass>
+      <g:charCode value="9"/>
+      <g:charCode value="A"/>
+      <g:charCode value="D"/>
+      <g:charCodeRange minValue="20" maxValue="D7FF"/>
+      <g:charCodeRange minValue="E000" maxValue="FFFD"/>
+      <g:charCodeRange minValue="10000" maxValue="10FFFF"/>
+    </g:charClass>
+  </g:production>
+  <g:production name="NameChar">
+    <g:choice>
+      <g:ref name="Letter"/>
+      <g:ref name="Digit"/>
+      <g:string>.</g:string>
+      <g:string>-</g:string>
+      <g:string>_</g:string>
+      <g:string>:</g:string>
+      <g:ref name="CombiningChar"/>
+      <g:ref name="Extender"/>
+    </g:choice>
+  </g:production>
+  <g:production name="CName">
+    <g:ref name="NCName"/>
+    <g:string>:</g:string>
+    <g:ref name="NCName"/>
+  </g:production>
+  <g:production name="nsName">
+    <g:ref name="NCName"/>
+    <g:string>:*</g:string>
+  </g:production>
+  <g:production name="documentation">
+    <g:string>##</g:string>
+    <g:zeroOrMore>
+      <g:complement>
+        <g:charClass>
+          <g:charCode value="A"/>
+        </g:charClass>
+      </g:complement>
+    </g:zeroOrMore>
+    <g:zeroOrMore>
+      <g:ref name="newline"/>
+      <g:ref name="indent"/>
+      <g:string>##</g:string>
+      <g:zeroOrMore>
+        <g:complement>
+          <g:charClass>
+            <g:charCode value="A"/>
+          </g:charClass>
+        </g:complement>
+      </g:zeroOrMore>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="indent">
+    <g:zeroOrMore>
+      <g:charClass>
+        <g:charCode value="9"/>
+        <g:charCode value="20"/>
+      </g:charClass>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="literalSegment">
+    <g:choice>
+      <g:sequence>
+        <g:string>&quot;</g:string>
+        <g:zeroOrMore>
+          <g:subtract>
+            <g:ref name="Char"/>
+            <g:choice>
+              <g:string>&quot;</g:string>
+              <g:ref name="newline"/>
+            </g:choice>
+          </g:subtract>
+        </g:zeroOrMore>
+        <g:string>&quot;</g:string>
+      </g:sequence>
+      <g:sequence>
+        <g:string>'</g:string>
+        <g:zeroOrMore>
+          <g:subtract>
+            <g:ref name="Char"/>
+            <g:choice>
+              <g:string>'</g:string>
+              <g:ref name="newline"/>
+            </g:choice>
+          </g:subtract>
+        </g:zeroOrMore>
+        <g:string>'</g:string>
+      </g:sequence>
+      <g:sequence>
+        <g:string>&quot;&quot;&quot;</g:string>
+        <g:zeroOrMore>
+          <g:charClass>
+            <g:char>&quot;</g:char>
+            <g:char>'</g:char>
+          </g:charClass>
+          <g:charClass>
+            <g:char>&quot;</g:char>
+            <g:char>'</g:char>
+          </g:charClass>
+          <g:subtract>
+            <g:ref name="Char"/>
+            <g:string>&quot;</g:string>
+          </g:subtract>
+        </g:zeroOrMore>
+        <g:string>&quot;&quot;&quot;</g:string>
+      </g:sequence>
+      <g:sequence>
+        <g:string>'''</g:string>
+        <g:zeroOrMore>
+          <g:charClass>
+            <g:char>&quot;</g:char>
+            <g:char>'</g:char>
+          </g:charClass>
+          <g:charClass>
+            <g:char>&quot;</g:char>
+            <g:char>'</g:char>
+          </g:charClass>
+          <g:subtract>
+            <g:ref name="Char"/>
+            <g:string>'</g:string>
+          </g:subtract>
+        </g:zeroOrMore>
+        <g:string>'''</g:string>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="newline">
+    <g:charCode value="A"/>
+  </g:production>
+  <g:production name="separator" whitespace-spec="definition">
+    <g:choice>
+      <g:oneOrMore>
+        <g:charClass>
+          <g:charCode value="9"/>
+          <g:charCode value="A"/>
+          <g:charCode value="D"/>
+          <g:charCode value="20"/>
+        </g:charClass>
+      </g:oneOrMore>
+      <g:sequence>
+        <g:string>#</g:string>
+        <g:optional>
+          <g:complement>
+            <g:charClass>
+              <g:charCode value="A"/>
+              <g:charCode value="23"/>
+            </g:charClass>
+          </g:complement>
+          <g:zeroOrMore>
+            <g:complement>
+              <g:charClass>
+                <g:charCode value="A"/>
+              </g:charClass>
+            </g:complement>
+          </g:zeroOrMore>
+        </g:optional>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="NonNCNameChar">
+    <g:choice>
+      <g:endOfFile/>
+      <g:subtract>
+        <g:ref name="Char"/>
+        <g:ref name="NCNameChar"/>
+      </g:subtract>
+    </g:choice>
+  </g:production>
+  <g:delimiter>
+    <g:ref name="NonNCNameChar"/>
+    <g:ref name="identifier"/>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NonNCNameChar"/>
+    <g:string>attribute</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NonNCNameChar"/>
+    <g:string>default</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NonNCNameChar"/>
+    <g:string>datatypes</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NonNCNameChar"/>
+    <g:string>div</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NonNCNameChar"/>
+    <g:string>element</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NonNCNameChar"/>
+    <g:string>empty</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NonNCNameChar"/>
+    <g:string>external</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NonNCNameChar"/>
+    <g:string>grammar</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NonNCNameChar"/>
+    <g:string>include</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NonNCNameChar"/>
+    <g:string>inherit</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NonNCNameChar"/>
+    <g:string>list</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NonNCNameChar"/>
+    <g:string>mixed</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NonNCNameChar"/>
+    <g:string>namespace</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NonNCNameChar"/>
+    <g:string>notAllowed</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NonNCNameChar"/>
+    <g:string>parent</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NonNCNameChar"/>
+    <g:string>start</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NonNCNameChar"/>
+    <g:string>string</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NonNCNameChar"/>
+    <g:string>text</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NonNCNameChar"/>
+    <g:string>token</g:string>
+  </g:delimiter>
+</g:grammar>

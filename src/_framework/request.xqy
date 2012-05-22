@@ -12,6 +12,7 @@ import module namespace config = "http://www.xquerrail-framework.com/config"
 
 declare option xdmp:mapping "false";
 
+declare variable $REQUEST-ID        := "request:request";
 declare variable $BODY              := "request:body";
 declare variable $BODY-XML          := "request:body-xml";
 declare variable $BODY-TEXT         := "request:body-text";
@@ -32,15 +33,21 @@ declare variable $FORMAT            := "request:format";
 declare variable $ROUTE             := "request:route";
 declare variable $VIEW              := "request:view";
 declare variable $PARTIAL           := "request:partial";
-declare variable $HEADER-PREFIX     := "request:header::";
-declare variable $PARAM-PREFIX      := "request:field::";
 declare variable $REDIRECT          := "request:redirect";
 
+declare variable $HEADER-PREFIX     := "request:header::";
+declare variable $PARAM-PREFIX      := "request:field::";
 declare variable $PARAM-CONTENT-TYPE-PREFIX := "request:field-content-type::";
 declare variable $PARAM-FILENAME-PREFIX   := "request:field-filename::";
+declare variable $SYS-PARAMS := ("_application","_controller","_action","_view","_context","_format","_url","_route","_partial");
 
 (:~Global Request Variable ~:)
-declare private variable $request as map:map := map:map();
+declare private variable $request as map:map := 
+ let $init := map:map()
+ return (
+    map:put($init,"type", $REQUEST-ID),
+    $init
+ );
 
 (:~
  : Decodes a binary request into s string
@@ -49,6 +56,9 @@ declare function request:hex-decode($hexBin as xs:hexBinary) as xs:string {
     request:hex-decode($hexBin, fn:floor(fn:string-length(fn:string($hexBin)) div 2))
 };
 
+(:~
+ : Binary Decoder used for 4.1x before xdmp:binary-decode()
+~:)
 declare function request:hex-decode($hexBin as xs:hexBinary, $length as xs:integer) as xs:string {
     let $string := fn:substring(fn:string($hexBin),1,$length * 2)
     let $bytes as xs:integer* :=
@@ -70,6 +80,10 @@ declare function request:request()
 {
   $request
 };
+
+(:~
+ : Joins a request map with another request-map
+~:)
 declare function request:join($params as map:map)
 {
    let $_ := xdmp:set($request, $request + ($request - $params) )
@@ -85,7 +99,7 @@ declare function request:join($params as map:map)
  :      request:body
 ~:)
 declare function request:initialize($_request as map:map) {
-  xdmp:set($request:request, $request:request + $_request)
+  xdmp:set($request:request, $_request + $request:request)
 };
 
 (:~
@@ -119,7 +133,7 @@ declare function request:parse($parameters) as map:map {
         map:put($request, $USERID,     xdmp:get-request-user())
       )
    let $fields := 
-         for $i in xdmp:get-request-field-names()[fn:not(. = ("_controller","_action","_view","_context","_format","_url","_route","_partial"))]
+         for $i in xdmp:get-request-field-names()[fn:not(. = $SYS-PARAMS)]
          let $fieldname := fn:concat($PARAM-PREFIX,$i)
          let $filename := xdmp:get-request-field-filename($i)
          let $content-type := xdmp:get-request-field-content-type($i)
@@ -153,12 +167,11 @@ declare function request:parse($parameters) as map:map {
  
         let $_content-type := fn:normalize-space(fn:tokenize(xdmp:get-request-header("Content-Type"), ";")[1])
         let $accept-types := xdmp:uri-format($_content-type)
-        let $_ := xdmp:log($_content-type)
+        let $_ := xdmp:log($_content-type,"debug")
         let $_ := 
              if ($_content-type = "application/json" or fn:contains($_content-type,"application/json"))  
              then map:put($request, $BODY, json:parse( xdmp:quote(xdmp:get-request-body()/node()) ))
              else  map:put($request, $BODY, xdmp:get-request-body($accept-types))
-        let $_ := map:put($request,"foo","foo")
    return $request
 };
 
@@ -204,6 +217,9 @@ declare function request:view() {
    map:get($request,$VIEW)
 };
 
+declare function request:url() {
+   map:get($request,$URL)
+};
 (:~
  : Returns the method for a given request
  : the method returns the http verb such as POST,GET,DELETE
@@ -295,7 +311,17 @@ declare function request:param($name as xs:string) {
    return 
     map:get($request,$key-name)
 };
-
+declare function request:params-to-querystring(){
+ fn:string-join(
+   let $params := request:params()
+   for $k in map:keys($params)
+   order by $k
+   return
+   for $v in map:get($params,$k)
+   return 
+      fn:concat($k,"=",fn:string($v))
+  ,"&amp;")
+};
 (:~
  : Retrieves a field if it is available and returns.
  : If field does not exist returns default.
@@ -572,4 +598,17 @@ declare function request:set-redirect($uri)
 declare function request:redirect()  as xs:string?
 {
   map:get($request,$REDIRECT)
+};
+declare function request:add-param(
+  $name,
+  $value as item()*
+) {
+     map:put($request,fn:concat($PARAM-PREFIX,$name),$value)
+};
+declare function request:add-params(
+  $params as map:map
+) as empty-sequence() {
+   for $k in map:keys($params)
+   return
+     map:put($request,fn:concat($PARAM-PREFIX,$k),map:get($params,$k))
 };

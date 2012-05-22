@@ -34,6 +34,7 @@ declare variable $collation := "http://marklogic.com/collation/codepoint";
 
 declare function controller:initialize($request)
 {(
+   xdmp:log(("initialize::",$request),"debug"),
    request:initialize($request),
    response:initialize(map:map(),$request),
    response:set-partial(request:partial())
@@ -53,7 +54,7 @@ declare function controller:invoke($action)
 {
  response:set-model(controller:model()),
  (
-   if($action eq "create")      then controller:list()
+   if($action eq "create")      then controller:create()
    else if($action eq "update") then controller:update()
    else if($action eq "get")    then controller:get()
    else if($action eq "delete") then controller:delete()
@@ -70,6 +71,8 @@ declare function controller:invoke($action)
    else if($action eq "show")   then controller:show()
    else if($action eq "lookup") then controller:lookup()
    else if($action eq "fields") then controller:fields()
+   else if($action eq "export") then controller:export()
+   else if($action eq "import") then controller:import()
    else controller:main()   
  )
 };
@@ -137,9 +140,10 @@ declare function controller:main()
 (:~
  : Create contentType
 ~:) 
-declare function controller:create() {
+declare function controller:create() {(
+  xdmp:log(("controller:create::",request:params()),"debug"),
   model:create(controller:model(),request:params())
-};
+)};
 
 (:~
  :  Retrieves a contentType
@@ -244,10 +248,11 @@ declare function controller:new()
 ~:)
 declare function controller:save()
 {
-   let $uuid := request:param("uuid")
+   let $identity-field := model:get-id-from-params(controller:model(),request:params())
+   let $identity-value := for $fi in $identity-field return map:get(request:params(),$fi)[1]
    let $update := 
        try {
-         if ($uuid and $uuid ne "") 
+         if (fn:not($identity-value  = "")) 
          then controller:update()
          else controller:create()
    } catch($exception) {
@@ -270,7 +275,8 @@ declare function controller:save()
 declare function controller:edit()
 {(
     response:set-body(controller:get()),
-    response:set-template("edit"),
+    response:set-title(fn:concat("Edit ",(response:model()/@label, response:model()/@name)[1])),
+    response:set-template("main"),
     response:set-view("edit"), 
     response:flush()
 )};
@@ -335,3 +341,15 @@ declare function controller:fields()
     response:set-view("fields"), 
     response:flush()
 )};
+
+declare function controller:import() {
+    response:set-template("main"),
+    response:set-view("import"),  
+    response:flush()
+};
+
+declare function controller:export() {
+    response:set-template("main"),
+    response:set-view("export"),  
+    response:flush()
+};

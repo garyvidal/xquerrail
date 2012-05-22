@@ -66,6 +66,7 @@ declare function get-route($url as xs:string)
             let $parts      := fn:tokenize(fn:normalize-space($controller),":")
             let $add-params := 
               ( map:put($params-map,"_route",fn:data($matching-route/@id)),
+                map:put($params-map,"_url",$url),
                 for $p in $matching-route/routing:param
                 return
                   if(fn:matches($p,"\$\d")) 
@@ -90,11 +91,11 @@ declare function get-route($url as xs:string)
                        then map:put($params-map,"_format",fn:replace($path,$matching-route/@pattern,$value)) 
                        else map:put($params-map,"_format",($value,config:default-format())[1])
                    else ()
-       let $url := fn:concat(config:get-dispatcher(),"?",map-to-params($params-map),if($params ne "") then fn:concat("&amp;",$params) else ())
+       let $new-url := fn:concat(config:get-dispatcher(),"?",map-to-params($params-map),if($params ne "") then fn:concat("&amp;",$params) else ())
        return
          (
-            xdmp:log(("rewriter url:",$url),"debug"),
-            if(fn:normalize-space($url) eq "") then config:error-handler() else $url
+            xdmp:log(("rewriter url:",$new-url),"debug"),
+            if(fn:normalize-space($new-url) eq "") then config:error-handler() else $new-url
          )
      else (xdmp:log(("Not Routing Right",$url)),config:error-handler())
   return (xdmp:log(("route:",$route),"debug"),$route)

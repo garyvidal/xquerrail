@@ -61,7 +61,6 @@ jQuery(document).ready(function() {
 	// Sidebar close/open (with cookies)
 
 	function close_sidebar() {
-		
 		jQuery("#sidebar").addClass('closed-sidebar');
 		jQuery("#page_wrapper #page-content #page-content-wrapper").addClass("no-bg-image wrapper-full");
 		jQuery("#open_sidebar").show();

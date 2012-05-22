@@ -2,21 +2,35 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.xquerrail-framework.com/domain file:../../_framework/schemas/domain.xsd">
     <name>application</name>
-    <content-namespace prefix="application" namespace-uri="http://www.xquerrail-framework.com/application"/>
-    <application-namespace prefix="application" namespace-uri="http://www.xquerrail-framework.com/application"/>
-    <description>XQuerrail Demo Application</description>
+    <content-namespace prefix="test" namespace-uri="http://www.xquerrail-framework.com/test"/>
+    <application-namespace prefix="application" namespace-uri="http://www.xquerrail-framework.com/test"/>
+    <description>XQuerRail Test Application</description>
     <author>Gary Vidal</author>
     <version>1.0</version>
-    <model name="base" description="Base Extension Class" persistence="abstract">
+    <model name="test" description="testing-all-model-features" persistence="document" key="uuid" label="name">
         <element name="uuid" type="identity" identity="true" label="Globally Unique Identifier">
             <navigation  searchable="true" sortable="true" facetable="true" />
             <constraint required="true"  />
-            <ui type="hidden" gridWidth="0"/>
+            <ui type="hidden"/>
+        </element>
+        <element name="name" type="string"></element>
+        <element name="intValue" type="integer"></element>
+        <element name="booleanValue" type="boolean" default="false"></element>
+        <element name="elementWithAttributes" type="integer">
+            <attribute name="boolAttribute" type="boolean"/>
+            <attribute name="intAttribute" type="integer"/>
+        </element>
+    </model>
+    <model name="base" description="Base Extension Class" persistence="abstract">
+        <element name="uuid" type="identity" identity="true" label="Globally Unique Identifier">
+            <navigation listable="false"  searchable="true" sortable="true" facetable="true" />
+            <constraint required="true" />
+            <ui type="hidden"/>
         </element>
     </model>
     <!-- Georgraphic Related Models -->
-    <model name="countryCode" label="Country Code" description="Country Code Controlled Vocabulary" 
-        persistence="document" key="id" keyLabel="name" extends="base">
+    <model name="countryCode" description="Country Code Controlled Vocabulary" 
+        persistence="document" key="id" keyLabel="name" extends="base" class="authority">
         <document root="countryCodes">/codetables/countryCodes.xml</document>
         <element name="id" type="string" label="ISO Country Code">
             <navigation  searchable="true" sortable="true" facetable="true" />
@@ -29,40 +43,38 @@
         <element name="ISO3" type="string" label="ISO 3">
             <navigation  searchable="true" sortable="true" />
             <constraint required="true" />
+            <attribute name="Checked" type="boolean"/>
         </element>       
         <element name="isOnWatchList" type="boolean" label="Is On Watch List">
             <navigation  searchable="true" sortable="true"  />
             <constraint required="true" />
-        </element>
-        <element name="foo" type="boolean" label="Foo">
-            <navigation   searchable="true" sortable="true"  />
-            <constraint required="true"  />
-        </element>        
+        </element>          
     </model>
     
     <!-- Georgraphic Related Models -->
     <model name="company" description="Companies" 
         persistence="document" key="id" keyLabel="name" extends="base">
         <document root="companies">/codetables/companies.xml</document>
-        <element name="companyID" type="string" label="Company ID">
+        <element name="CompanyID" type="string" label="Company ID">
             <navigation  searchable="true" sortable="true" facetable="true"  />
             <constraint required="true"  />
         </element>
-        <element name="companyName" type="string" label="Company Name" >
+        <element name="CompanyName" type="string" label="Company Name" >
             <navigation searchable="true" sortable="true"  />
             <constraint required="true" />
         </element>
-        <element name="countryCode" type="reference" reference="model:countryCode:reference" label="Country">
+        <element name="CountryCode" type="reference" reference="model:countryCode:reference" label="Country">
             <navigation  searchable="true" sortable="true" />
             <constraint required="true" />
         </element>               
-        <element name="isLoser" type="boolean" label="Is a Loser?">
+        <element name="IsLoser" type="boolean" label="Is a Loser?">
             <navigation  searchable="true" sortable="true" />
             <constraint required="true" />
         </element>          
     </model>
     
-    <model name="timezone" description="Timezones Configuration" persistence="document" key="id" keyLabel="name">
+    <model name="timezone" class="authority"
+            description="Timezones Configuration" persistence="document" key="id" keyLabel="name" >
         <document root="timezones">/codetables/timezones.xml</document>
         <element name="id" type="string" identity="true" label="ID">
             <navigation searchable="true" sortable="true" facetable="true"/>
@@ -134,42 +146,7 @@
             <navigation searchable="true" sortable="true"/>
             <constraint  required="true"/>            
         </element>
-    </model> 
-    
-    <model name="blog" label="Blog" description="A blog" 
-        persistence="directory" key="id" keyLabel="name" extends="base">
-        <directory>/blogs/</directory>
-        <element name="id" type="string" label="ID of the blog">
-            <navigation  searchable="true" sortable="true" facetable="true" />
-            <constraint required="true"  />
-        </element>
-        <element name="title" type="string" label="Title" >
-            <navigation searchable="true" sortable="true"  />
-            <constraint required="true" />
-        </element>
-        <element name="url" type="anyURI" label="Url" >
-            <navigation searchable="true" sortable="true"  />
-            <constraint required="true" />
-        </element>
-    </model>
-    
-    <model name="posting" label="Blog Post" description="A posting in the blog" 
-        persistence="directory" key="id" keyLabel="name" extends="base">
-        <directory>/postings/</directory>
-        <element name="id" type="string" label="ID of the posting">
-            <navigation  searchable="true" sortable="true" facetable="true" />
-            <constraint required="true"  />
-        </element>
-        <element name="blogId" type="integer" label="Blog to which the posting belongs">
-            <navigation  searchable="true" sortable="true"  />
-            <constraint required="true" />
-        </element>          
-        <element name="comment" type="string" label="Comment" >
-            <navigation searchable="true" sortable="true"  />
-            <constraint required="true" />
-        </element>
-    </model>
-    
+    </model>  
     
     <!-- Geographic Related Controllers -->
     <controller name="countryCodes" model="countryCode" label="Country Codes"/>
@@ -178,7 +155,5 @@
     <controller name="users" model="user" label="Users"/>
     <controller name="roles" model="role" label="Roles"/>
     <controller name="companies" model="company" label="Companies"/>
-    
-    <controller name="blog" model="blog" label="Blog"/>
-    <controller name="posting" model="posting" label="Posting"/>
+
 </domain>

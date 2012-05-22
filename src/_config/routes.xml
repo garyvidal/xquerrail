@@ -19,7 +19,6 @@
       <default key="_controller">application:default:index:html</default>
    </route>
 
-
    <route id="_listxml" pattern="^/(\i\c*)/list.xml$">
       <default key="_controller">application:$1:list:xml</default>
    </route>  
@@ -41,10 +40,6 @@
       <default key="_controller">application:$1:edit:xml</default>
       <param key="id">$2</param>
    </route>
-   <route id="default_article" pattern="^/articles/(.*)/?$">
-      <default key="_controller">application:article:show:html</default> 
-      <param key="title">$1</param>      
-   </route>
    <!--Default Routes-->
    <route id="default_index" pattern="^/(\i\c*)/?$">
       <default key="_controller">application:$1:index:html</default>      
@@ -63,7 +58,6 @@
    <route id="_default_delete" pattern="^/(\i\c*)/(\i\c*[^/])\.(json|html)$" method="delete">
       <default key="_controller">application:$1:delete:$3</default>
    </route> 
-   
    <route id="_default_create" pattern="^/(.*[^/])/(\i\c*[^/])\.(json|html)$" method="put">
       <default key="_controller">application:$1:create:$3</default>
    </route> 

@@ -12,7 +12,10 @@ declare variable $DOMAIN-NODE-FIELDS :=
    for  $fld in ("domain:container","domain:element","domain:attribute") 
    return  xs:QName($fld);
 
-
+declare function domain:get-model-id-field($model as element(domain:model)) {
+  $model/(domain:element|domain:attribute)
+  [fn:node-name(.) = $DOMAIN-NODE-FIELDS][./@identity eq "true" or ./@type eq "identity"]/fn:string(@name)
+};
 declare function domain:resolve-datatype($field)
 {
    let $data-type := element{$field/@type}{$field}
@@ -57,7 +60,6 @@ declare function domain:get-controller(
     return 
         $domain/domain:controller[@name eq $controller-name]  
 };
-
 declare function domain:get-controller-model(
     $application-name as xs:string, 
     $controller-name as xs:string
@@ -135,6 +137,7 @@ $application-name as xs:string
 {
   ()   
 };
+
 declare function domain:get-namespaces($application-name as xs:string) {
     let $application := config:get-domain($application-name)
     return 
@@ -149,6 +152,12 @@ declare function domain:model-selector(
    let $domain := config:get-domain($application-name)
    return
        $domain/domain:model[@class eq $class]
+};
+declare function domain:model-selector( 
+   $class as xs:string
+) as element(domain:model)*
+{ 
+  domain:model-selector(config:default-application(),$class)
 };
 
 declare function domain:get-node-key($node as node()) {
@@ -307,4 +316,16 @@ as xs:string?
 declare function domain:get-model-controller($application, $model-name) {
     let $domain := config:get-domain("application")
     return $domain/domain:controller[@model = $model-name]
+};
+
+declare function domain:get-model(
+$application-name as xs:string,
+$model-name as xs:string*
+) as element(domain:model)* {
+   domain:get-domain-model($application-name,$model-name)
+};
+declare function domain:get-model(
+  $model-name as xs:string*
+) {
+   domain:get-domain-model($model-name)
 };

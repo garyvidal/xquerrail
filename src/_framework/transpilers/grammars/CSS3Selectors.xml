@@ -1,0 +1,631 @@
+<g:grammar xmlns:g="http://www.w3.org/2001/03/XPath/grammar">
+  <g:production name="selectors_group">
+    <g:ref name="selector"/>
+    <g:zeroOrMore>
+      <g:ref if="COMMA" queued="1" name="COMMA"/>
+      <g:zeroOrMore>
+        <g:ref if="S" queued="1" name="S"/>
+      </g:zeroOrMore>
+      <g:ref queued="1" name="selector"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="selector">
+    <g:ref name="simple_selector_sequence"/>
+    <g:zeroOrMore>
+      <g:ref ifnot="COMMA END" queued="1" name="combinator"/>
+      <g:ref name="simple_selector_sequence"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production queued="1" name="combinator">
+    <g:choice queued="1">
+      <g:sequence if="PLUS" queued="1">
+        <g:ref queued="1" name="PLUS"/>
+        <g:zeroOrMore>
+          <g:ref if="S" queued="1" name="S"/>
+        </g:zeroOrMore>
+      </g:sequence>
+      <g:sequence if="GREATER" queued="1">
+        <g:ref queued="1" name="GREATER"/>
+        <g:zeroOrMore>
+          <g:ref if="S" queued="1" name="S"/>
+        </g:zeroOrMore>
+      </g:sequence>
+      <g:sequence if="TILDE" queued="1">
+        <g:ref queued="1" name="TILDE"/>
+        <g:zeroOrMore>
+          <g:ref if="S" queued="1" name="S"/>
+        </g:zeroOrMore>
+      </g:sequence>
+      <g:oneOrMore default="">
+        <g:ref if="S" queued="1" name="S"/>
+      </g:oneOrMore>
+    </g:choice>
+  </g:production>
+  <g:production name="simple_selector_sequence">
+    <g:choice>
+      <g:sequence if="* IDENT |" queued="1">
+        <g:choice LL1-conflict="* IDENT |" LL2-conflict="*~| IDENT~|" queued="1">
+          <g:ref if="*~|~IDENT IDENT~. IDENT~: IDENT~COMMA IDENT~END IDENT~GREATER IDENT~HASH IDENT~NOT IDENT~PLUS IDENT~S IDENT~TILDE IDENT~[ IDENT~|~IDENT |~IDENT" queued="1+" name="type_selector"/>
+          <g:ref default="" queued="1+" name="universal"/>
+        </g:choice>
+        <g:zeroOrMore>
+          <g:choice if=". : HASH NOT [" queued="1">
+            <g:ref if="HASH" queued="1" name="HASH"/>
+            <g:ref if="." queued="1" name="class"/>
+            <g:ref if="[" queued="1" name="attrib"/>
+            <g:ref if=":" queued="1" name="pseudo"/>
+            <g:ref default="" queued="1" name="negation"/>
+          </g:choice>
+        </g:zeroOrMore>
+      </g:sequence>
+      <g:oneOrMore default="">
+        <g:choice if=". : HASH NOT [" queued="1">
+          <g:ref if="HASH" queued="1" name="HASH"/>
+          <g:ref if="." queued="1" name="class"/>
+          <g:ref if="[" queued="1" name="attrib"/>
+          <g:ref if=":" queued="1" name="pseudo"/>
+          <g:ref default="" queued="1" name="negation"/>
+        </g:choice>
+      </g:oneOrMore>
+    </g:choice>
+  </g:production>
+  <g:production queued="1+" name="type_selector">
+    <g:optional LL1-conflict="IDENT" queued="1+">
+      <g:ref if="* IDENT~| |" queued="1+" name="namespace_prefix"/>
+    </g:optional>
+    <g:ref name="element_name"/>
+  </g:production>
+  <g:production queued="1+" name="namespace_prefix">
+    <g:optional queued="1+">
+      <g:choice ifnot="|" queued="1">
+        <g:ref if="IDENT" queued="1" name="IDENT"/>
+        <g:string default="" queued="1">*</g:string>
+      </g:choice>
+    </g:optional>
+    <g:string>|</g:string>
+  </g:production>
+  <g:production name="element_name">
+    <g:ref name="IDENT"/>
+  </g:production>
+  <g:production queued="1+" name="universal">
+    <g:optional LL1-conflict="*" queued="1+">
+      <g:ref if="*~| IDENT |" queued="1+" name="namespace_prefix"/>
+    </g:optional>
+    <g:string>*</g:string>
+  </g:production>
+  <g:production queued="1+" name="class">
+    <g:string queued="1+">.</g:string>
+    <g:ref name="IDENT"/>
+  </g:production>
+  <g:production queued="1+" name="attrib">
+    <g:string queued="1+">[</g:string>
+    <g:zeroOrMore>
+      <g:ref if="S" queued="1" name="S"/>
+    </g:zeroOrMore>
+    <g:optional LL1-conflict="IDENT" queued="1">
+      <g:ref if="* IDENT~| |" queued="1+" name="namespace_prefix"/>
+    </g:optional>
+    <g:ref name="IDENT"/>
+    <g:zeroOrMore>
+      <g:ref if="S" queued="1" name="S"/>
+    </g:zeroOrMore>
+    <g:optional queued="1">
+      <g:choice ifnot="]" queued="1">
+        <g:ref if="PREFIXMATCH" queued="1" name="PREFIXMATCH"/>
+        <g:ref if="SUFFIXMATCH" queued="1" name="SUFFIXMATCH"/>
+        <g:ref if="SUBSTRINGMATCH" queued="1" name="SUBSTRINGMATCH"/>
+        <g:string if="=" queued="1">=</g:string>
+        <g:ref if="INCLUDES" queued="1" name="INCLUDES"/>
+        <g:ref default="" queued="1" name="DASHMATCH"/>
+      </g:choice>
+      <g:zeroOrMore>
+        <g:ref if="S" queued="1" name="S"/>
+      </g:zeroOrMore>
+      <g:choice queued="1">
+        <g:ref if="IDENT" queued="1" name="IDENT"/>
+        <g:ref default="" queued="1" name="STRING"/>
+      </g:choice>
+      <g:zeroOrMore>
+        <g:ref if="S" queued="1" name="S"/>
+      </g:zeroOrMore>
+    </g:optional>
+    <g:string>]</g:string>
+  </g:production>
+  <g:production queued="1+" name="pseudo">
+    <g:string queued="1+">:</g:string>
+    <g:optional>
+      <g:string if=":" queued="1">:</g:string>
+    </g:optional>
+    <g:choice>
+      <g:ref if="IDENT" queued="1" name="IDENT"/>
+      <g:ref default="" queued="1" name="functional_pseudo"/>
+    </g:choice>
+  </g:production>
+  <g:production queued="1" name="functional_pseudo">
+    <g:ref queued="1" name="FUNCTION"/>
+    <g:zeroOrMore>
+      <g:ref if="S" queued="1" name="S"/>
+    </g:zeroOrMore>
+    <g:ref queued="1" name="expression"/>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production queued="1" name="expression">
+    <g:oneOrMore queued="1">
+      <g:choice ifnot=")" queued="1">
+        <g:ref if="PLUS" queued="1" name="PLUS"/>
+        <g:string if="-" queued="1">-</g:string>
+        <g:ref if="DIMENSION" queued="1" name="DIMENSION"/>
+        <g:ref if="NUMBER" queued="1" name="NUMBER"/>
+        <g:ref if="STRING" queued="1" name="STRING"/>
+        <g:ref default="" queued="1" name="IDENT"/>
+      </g:choice>
+      <g:zeroOrMore>
+        <g:ref if="S" queued="1" name="S"/>
+      </g:zeroOrMore>
+    </g:oneOrMore>
+  </g:production>
+  <g:production queued="1" name="negation">
+    <g:ref queued="1" name="NOT"/>
+    <g:zeroOrMore>
+      <g:ref if="S" queued="1" name="S"/>
+    </g:zeroOrMore>
+    <g:ref queued="1" name="negation_arg"/>
+    <g:zeroOrMore>
+      <g:ref if="S" queued="1" name="S"/>
+    </g:zeroOrMore>
+    <g:string queued="1">)</g:string>
+  </g:production>
+  <g:production queued="1" name="negation_arg">
+    <g:choice LL1-conflict="* IDENT |" LL2-conflict="*~| IDENT~|" queued="1">
+      <g:ref if="*~|~IDENT IDENT~) IDENT~S IDENT~|~IDENT |~IDENT" queued="1+" name="type_selector"/>
+      <g:ref default="" queued="1+" name="universal"/>
+      <g:ref if="HASH" queued="1+" name="HASH"/>
+      <g:ref if="." queued="1+" name="class"/>
+      <g:ref if="[" queued="1+" name="attrib"/>
+      <g:ref if=":" queued="1+" name="pseudo"/>
+    </g:choice>
+  </g:production>
+  <?TOKENS?>
+  <g:production name="ident">
+    <g:optional>
+      <g:charClass>
+        <g:char>-</g:char>
+      </g:charClass>
+    </g:optional>
+    <g:ref name="nmstart"/>
+    <g:zeroOrMore>
+      <g:ref name="nmchar"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="name">
+    <g:oneOrMore>
+      <g:ref name="nmchar"/>
+    </g:oneOrMore>
+  </g:production>
+  <g:production name="nmstart">
+    <g:choice>
+      <g:charClass>
+        <g:char>_</g:char>
+        <g:charRange minChar="a" maxChar="z"/>
+      </g:charClass>
+      <g:ref name="nonascii"/>
+      <g:ref name="escape"/>
+    </g:choice>
+  </g:production>
+  <g:production name="nonascii">
+    <g:complement>
+      <g:charClass>
+        <g:charCodeRange minValue="0" maxValue="7F"/>
+      </g:charClass>
+    </g:complement>
+  </g:production>
+  <g:production name="unicode">
+    <g:string>\</g:string>
+    <g:ref name="one-to-six-hex-digits"/>
+    <g:optional>
+      <g:choice>
+        <g:sequence>
+          <g:charCode value="D"/>
+          <g:charCode value="A"/>
+        </g:sequence>
+        <g:charClass>
+          <g:char> </g:char>
+          <g:charCode value="A"/>
+          <g:charCode value="D"/>
+          <g:charCode value="9"/>
+          <g:charCode value="C"/>
+        </g:charClass>
+      </g:choice>
+    </g:optional>
+  </g:production>
+  <g:production name="escape">
+    <g:choice>
+      <g:ref name="unicode"/>
+      <g:sequence>
+        <g:string>\</g:string>
+        <g:complement>
+          <g:charClass>
+            <g:charRange minChar="0" maxChar="9"/>
+            <g:charRange minChar="a" maxChar="f"/>
+            <g:charCode value="A"/>
+            <g:charCode value="D"/>
+            <g:charCode value="C"/>
+          </g:charClass>
+        </g:complement>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="nmchar">
+    <g:choice>
+      <g:charClass>
+        <g:char>_</g:char>
+        <g:charRange minChar="a" maxChar="z"/>
+        <g:charRange minChar="0" maxChar="9"/>
+        <g:charCode value="2D"/>
+      </g:charClass>
+      <g:ref name="nonascii"/>
+      <g:ref name="escape"/>
+    </g:choice>
+  </g:production>
+  <g:production name="num">
+    <g:choice>
+      <g:oneOrMore>
+        <g:charClass>
+          <g:charRange minChar="0" maxChar="9"/>
+        </g:charClass>
+      </g:oneOrMore>
+      <g:sequence>
+        <g:zeroOrMore>
+          <g:charClass>
+            <g:charRange minChar="0" maxChar="9"/>
+          </g:charClass>
+        </g:zeroOrMore>
+        <g:string>.</g:string>
+        <g:oneOrMore>
+          <g:charClass>
+            <g:charRange minChar="0" maxChar="9"/>
+          </g:charClass>
+        </g:oneOrMore>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="string">
+    <g:choice>
+      <g:ref name="string1"/>
+      <g:ref name="string2"/>
+    </g:choice>
+  </g:production>
+  <g:production name="string1">
+    <g:string>&quot;</g:string>
+    <g:zeroOrMore>
+      <g:choice>
+        <g:complement>
+          <g:charClass>
+            <g:charCode value="A"/>
+            <g:charCode value="D"/>
+            <g:charCode value="C"/>
+            <g:char>\</g:char>
+            <g:char>&quot;</g:char>
+          </g:charClass>
+        </g:complement>
+        <g:sequence>
+          <g:string>\</g:string>
+          <g:ref name="nl"/>
+        </g:sequence>
+        <g:ref name="nonascii"/>
+        <g:ref name="escape"/>
+      </g:choice>
+    </g:zeroOrMore>
+    <g:string>&quot;</g:string>
+  </g:production>
+  <g:production name="string2">
+    <g:string>'</g:string>
+    <g:zeroOrMore>
+      <g:choice>
+        <g:complement>
+          <g:charClass>
+            <g:charCode value="A"/>
+            <g:charCode value="D"/>
+            <g:charCode value="C"/>
+            <g:char>\</g:char>
+            <g:char>'</g:char>
+          </g:charClass>
+        </g:complement>
+        <g:sequence>
+          <g:string>\</g:string>
+          <g:ref name="nl"/>
+        </g:sequence>
+        <g:ref name="nonascii"/>
+        <g:ref name="escape"/>
+      </g:choice>
+    </g:zeroOrMore>
+    <g:string>'</g:string>
+  </g:production>
+  <g:production name="nl">
+    <g:choice>
+      <g:charCode value="A"/>
+      <g:sequence>
+        <g:charCode value="D"/>
+        <g:charCode value="A"/>
+      </g:sequence>
+      <g:charCode value="D"/>
+      <g:charCode value="C"/>
+    </g:choice>
+  </g:production>
+  <g:production name="w">
+    <g:zeroOrMore>
+      <g:charClass>
+        <g:char> </g:char>
+        <g:charCode value="9"/>
+        <g:charCode value="D"/>
+        <g:charCode value="A"/>
+        <g:charCode value="C"/>
+      </g:charClass>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="N">
+    <g:choice>
+      <g:string>n</g:string>
+      <g:sequence>
+        <g:string>\</g:string>
+        <g:ref name="zero-to-four-zeroes"/>
+        <g:choice>
+          <g:string>4e</g:string>
+          <g:string>6e</g:string>
+        </g:choice>
+        <g:optional>
+          <g:choice>
+            <g:sequence>
+              <g:charCode value="D"/>
+              <g:charCode value="A"/>
+            </g:sequence>
+            <g:charClass>
+              <g:char> </g:char>
+              <g:charCode value="9"/>
+              <g:charCode value="D"/>
+              <g:charCode value="A"/>
+              <g:charCode value="C"/>
+            </g:charClass>
+          </g:choice>
+        </g:optional>
+      </g:sequence>
+      <g:string>\n</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="O">
+    <g:choice>
+      <g:string>o</g:string>
+      <g:sequence>
+        <g:string>\</g:string>
+        <g:ref name="zero-to-four-zeroes"/>
+        <g:choice>
+          <g:string>4f</g:string>
+          <g:string>6f</g:string>
+        </g:choice>
+        <g:optional>
+          <g:choice>
+            <g:sequence>
+              <g:charCode value="D"/>
+              <g:charCode value="A"/>
+            </g:sequence>
+            <g:charClass>
+              <g:char> </g:char>
+              <g:charCode value="9"/>
+              <g:charCode value="D"/>
+              <g:charCode value="A"/>
+              <g:charCode value="C"/>
+            </g:charClass>
+          </g:choice>
+        </g:optional>
+      </g:sequence>
+      <g:string>\o</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="T">
+    <g:choice>
+      <g:string>t</g:string>
+      <g:sequence>
+        <g:string>\</g:string>
+        <g:ref name="zero-to-four-zeroes"/>
+        <g:choice>
+          <g:string>54</g:string>
+          <g:string>74</g:string>
+        </g:choice>
+        <g:optional>
+          <g:choice>
+            <g:sequence>
+              <g:charCode value="D"/>
+              <g:charCode value="A"/>
+            </g:sequence>
+            <g:charClass>
+              <g:char> </g:char>
+              <g:charCode value="9"/>
+              <g:charCode value="D"/>
+              <g:charCode value="A"/>
+              <g:charCode value="C"/>
+            </g:charClass>
+          </g:choice>
+        </g:optional>
+      </g:sequence>
+      <g:string>\t</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="S">
+    <g:oneOrMore>
+      <g:charClass>
+        <g:char> </g:char>
+        <g:charCode value="9"/>
+        <g:charCode value="D"/>
+        <g:charCode value="A"/>
+        <g:charCode value="C"/>
+      </g:charClass>
+    </g:oneOrMore>
+  </g:production>
+  <g:production name="INCLUDES">
+    <g:string>~=</g:string>
+  </g:production>
+  <g:production name="DASHMATCH">
+    <g:string>|=</g:string>
+  </g:production>
+  <g:production name="PREFIXMATCH">
+    <g:string>^=</g:string>
+  </g:production>
+  <g:production name="SUFFIXMATCH">
+    <g:string>$=</g:string>
+  </g:production>
+  <g:production name="SUBSTRINGMATCH">
+    <g:string>*=</g:string>
+  </g:production>
+  <g:production name="IDENT">
+    <g:ref name="ident"/>
+  </g:production>
+  <g:production name="STRING">
+    <g:ref name="string"/>
+  </g:production>
+  <g:production name="FUNCTION">
+    <g:ref name="ident"/>
+    <g:string>(</g:string>
+  </g:production>
+  <g:production name="NUMBER">
+    <g:ref name="num"/>
+  </g:production>
+  <g:production name="HASH">
+    <g:string>#</g:string>
+    <g:ref name="name"/>
+  </g:production>
+  <g:production name="PLUS">
+    <g:ref name="w"/>
+    <g:string>+</g:string>
+  </g:production>
+  <g:production name="GREATER">
+    <g:ref name="w"/>
+    <g:string>&gt;</g:string>
+  </g:production>
+  <g:production name="COMMA">
+    <g:ref name="w"/>
+    <g:string>,</g:string>
+  </g:production>
+  <g:production name="TILDE">
+    <g:ref name="w"/>
+    <g:string>~</g:string>
+  </g:production>
+  <g:production name="NOT">
+    <g:string>:</g:string>
+    <g:ref name="N"/>
+    <g:ref name="O"/>
+    <g:ref name="T"/>
+    <g:string>(</g:string>
+  </g:production>
+  <g:production name="DIMENSION">
+    <g:ref name="num"/>
+    <g:ref name="ident"/>
+  </g:production>
+  <g:production name="one-to-six-hex-digits">
+    <g:choice>
+      <g:charClass>
+        <g:charRange minChar="0" maxChar="9"/>
+        <g:charRange minChar="a" maxChar="f"/>
+      </g:charClass>
+      <g:sequence>
+        <g:charClass>
+          <g:charRange minChar="0" maxChar="9"/>
+          <g:charRange minChar="a" maxChar="f"/>
+        </g:charClass>
+        <g:charClass>
+          <g:charRange minChar="0" maxChar="9"/>
+          <g:charRange minChar="a" maxChar="f"/>
+        </g:charClass>
+      </g:sequence>
+      <g:sequence>
+        <g:charClass>
+          <g:charRange minChar="0" maxChar="9"/>
+          <g:charRange minChar="a" maxChar="f"/>
+        </g:charClass>
+        <g:charClass>
+          <g:charRange minChar="0" maxChar="9"/>
+          <g:charRange minChar="a" maxChar="f"/>
+        </g:charClass>
+        <g:charClass>
+          <g:charRange minChar="0" maxChar="9"/>
+          <g:charRange minChar="a" maxChar="f"/>
+        </g:charClass>
+      </g:sequence>
+      <g:sequence>
+        <g:charClass>
+          <g:charRange minChar="0" maxChar="9"/>
+          <g:charRange minChar="a" maxChar="f"/>
+        </g:charClass>
+        <g:charClass>
+          <g:charRange minChar="0" maxChar="9"/>
+          <g:charRange minChar="a" maxChar="f"/>
+        </g:charClass>
+        <g:charClass>
+          <g:charRange minChar="0" maxChar="9"/>
+          <g:charRange minChar="a" maxChar="f"/>
+        </g:charClass>
+        <g:charClass>
+          <g:charRange minChar="0" maxChar="9"/>
+          <g:charRange minChar="a" maxChar="f"/>
+        </g:charClass>
+      </g:sequence>
+      <g:sequence>
+        <g:charClass>
+          <g:charRange minChar="0" maxChar="9"/>
+          <g:charRange minChar="a" maxChar="f"/>
+        </g:charClass>
+        <g:charClass>
+          <g:charRange minChar="0" maxChar="9"/>
+          <g:charRange minChar="a" maxChar="f"/>
+        </g:charClass>
+        <g:charClass>
+          <g:charRange minChar="0" maxChar="9"/>
+          <g:charRange minChar="a" maxChar="f"/>
+        </g:charClass>
+        <g:charClass>
+          <g:charRange minChar="0" maxChar="9"/>
+          <g:charRange minChar="a" maxChar="f"/>
+        </g:charClass>
+        <g:charClass>
+          <g:charRange minChar="0" maxChar="9"/>
+          <g:charRange minChar="a" maxChar="f"/>
+        </g:charClass>
+      </g:sequence>
+      <g:sequence>
+        <g:charClass>
+          <g:charRange minChar="0" maxChar="9"/>
+          <g:charRange minChar="a" maxChar="f"/>
+        </g:charClass>
+        <g:charClass>
+          <g:charRange minChar="0" maxChar="9"/>
+          <g:charRange minChar="a" maxChar="f"/>
+        </g:charClass>
+        <g:charClass>
+          <g:charRange minChar="0" maxChar="9"/>
+          <g:charRange minChar="a" maxChar="f"/>
+        </g:charClass>
+        <g:charClass>
+          <g:charRange minChar="0" maxChar="9"/>
+          <g:charRange minChar="a" maxChar="f"/>
+        </g:charClass>
+        <g:charClass>
+          <g:charRange minChar="0" maxChar="9"/>
+          <g:charRange minChar="a" maxChar="f"/>
+        </g:charClass>
+        <g:charClass>
+          <g:charRange minChar="0" maxChar="9"/>
+          <g:charRange minChar="a" maxChar="f"/>
+        </g:charClass>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="zero-to-four-zeroes">
+    <g:choice>
+      <g:sequence>
+      </g:sequence>
+      <g:string>0</g:string>
+      <g:string>00</g:string>
+      <g:string>000</g:string>
+      <g:string>0000</g:string>
+    </g:choice>
+  </g:production>
+</g:grammar>

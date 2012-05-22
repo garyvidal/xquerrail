@@ -33,20 +33,26 @@ declare function ml-security:implements() as xs:QName*
 };
 
 declare function ml-security:after-request(
+   $request as map:map,
    $configuration as element()
 )
 {
+     request:initialize($request),
      let $context := interceptor:get-context()
      let $scope   := interceptor:get-matching-scopes($configuration)[1]
      let $roles   := ml-security:get-roles()
-     return
-       if($scope//config:allow-role = $roles or
-          fn:not($scope//config:deny-role  = $roles))
+     return 
+       if($scope//config:allow-role = $roles or fn:not($scope//config:deny-role  = $roles))
        then ( 
-          xdmp:log(("Not-Redirecting::",xdmp:get-current-user(), $context,$scope))
+          if(request:param("returnUrl")) then 
+             request:set-redirect(request:param("returnUrl"))
+          else (),
+          xdmp:log(("Not-Redirecting::",xdmp:get-current-user(), $context,$scope),"debug")
        )
        else (
-          request:set-redirect($configuration/config:login-url/@url),
-          xdmp:log(("Redirecting::",request:redirect(),$context,$scope))
+          if(request:param("returnUrl")) then request:set-redirect($configuration/config:login-url/@url)
+          else 
+          request:set-redirect(fn:concat($configuration/config:login-url/@url,"?",request:params-to-querystring())),
+          xdmp:log(("Redirecting::",request:redirect(),$context,$scope),"debug")
        )
 };

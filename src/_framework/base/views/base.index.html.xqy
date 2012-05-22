@@ -7,10 +7,16 @@ import module namespace response = "http://www.xquerrail-framework.com/response"
 import module namespace domain = "http://www.xquerrail-framework.com/domain" at "/_framework/domain.xqy";
 
 import module namespace js = "http://www.xquerrail-framework.com/helper/javascript" at "/_framework/helpers/javascript.xqy";
+import module namespace form = "http://www.xquerrail-framework.com/helper/form-builder" at "/_framework/helpers/form-builder.xqy";
 
 
 declare option xdmp:output "indent-untyped=yes";
 declare variable $response as map:map external;
+
+declare variable $default-col-width := 40;
+declare variable $default-resizable := fn:true();
+declare variable $default-sortable  := fn:false();
+declare variable $default-pagesize  := 100;
 
 let $init := response:initialize($response)
 let $domain-model := response:model()
@@ -19,27 +25,7 @@ let $modelName := fn:data($domain-model/@name)
 let $modelLabel := (fn:data($domain-model/@label),$modelName)[1]
 let $gridCols :=
     for $item in $domain-model/(domain:element|domain:attribute)
-    let $name := fn:data($item/@name)
-    let $label := fn:data($item/@label)
-    let $dataType := fn:data($item/@type)
-    let $listable := $item/domain:navigation/@listable
-    let $colWidth := (fn:data($item/domain:ui/@gridWidth),"40")[1]
-    return
-    if(fn:not($listable = 'false')) then
-        fn:concat("{",fn:string(<stmt>
-            name:'{$name}', 
-            label:'{$label}', 
-            index:'{$name}', 
-            xmlmap:'{$name}', 
-            jsonmap:'{$name}', 
-            dataType:'{$dataType}', 
-            resizable: true, 
-            sortable: true,  
-            width:'{$colWidth}'
-         </stmt>),"}")
-     else ()
-(:let $editButtons := fn:string(<stmt>{{new:true,edit:true,show:true,delete:true,import:true,export:true}}</stmt>)
-:)
+    return form:field-grid-column($item)
 let $editButtons := 
      js:o((
          js:p("new",($model/domain:navigation/@newable,"true")[1]),
@@ -68,20 +54,24 @@ return
             <div id="{response:controller()}_table_pager"/>
         </div>
     </div>
+    <!--
     <div class="column-content-box ui-layout-east">
         <div id="form-content" class="form-box-wrapper">
         <h3>Please select {$modelLabel} or New</h3>
         </div>
-    </div>    
+    </div>   --> 
     <script type="text/javascript">
+            {form:context($response)}
+            var _id = null;
             var toolbarMode = {$editButtons}
             var gridModel = {{
                 url: '/{response:controller()}/list.xml',
                 pager: jQuery('#{response:controller()}_table_pager'),
+                id : "{domain:get-model-id-field(response:model())}",
                 datatype: "xml",
                 colModel: [{$gridColsStr}],
                 loadonce:false,
-                rowNum:9999999,
+                rowNum:20,
                 pgbuttons: false,
                 sortname: '{$domain-model/element[@identity eq 'true']/@name}',
                 sortorder: 'desc',   
@@ -96,11 +86,13 @@ return
                 height: '500',
                 multiselect: false,
                 xmlReader : xmlListReaderSettings('{$modelName}s','{$modelName}'),
-                onSelectRow: function(id){{ 
-                    if(id){{ 
-                       editForm('{response:controller()}',id,true);
-                    }} 
-                    return true;
+                onSelectRow   : function(rowid,e) {{
+                   _id = rowid;
+                   return 
+                      true;
+                }},
+                ondblClickRow : function(rowid) {{
+                    window.location.href = "/{response:controller()}/edit.html?" + context.model_id_field +  '=' + rowid;
                 }}
             }};
             
@@ -108,8 +100,8 @@ return
             $(document).ready(function(){{
                initListGrid("#{response:controller()}_table",gridModel)
                initToolbar(toolbarMode);
-               initLayout();
             }});
-            var controller = '{response:controller()}';
+             
            </script>
+           
 </div>

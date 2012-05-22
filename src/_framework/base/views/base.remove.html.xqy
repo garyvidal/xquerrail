@@ -6,4 +6,9 @@ declare option xdmp:output "indent-untyped=yes";
 declare variable $response as map:map external;
 let $init := response:initialize($response)
 return
+<div>
 <p>The item has been removed</p>
+  <script type="text/javascript">
+    window.location.href = '/{response:controller()}';
+  </script>
+</div>

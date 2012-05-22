@@ -119,7 +119,10 @@ declare function response:user()
 {
    map:get($response,$USER)
 };
-declare function response:has-flash(){
+declare function response:has-flash() {
+   fn:exists(map:get($response,$FLASH))  
+};
+declare function response:has-flash($id){
    fn:exists(map:get($response,$FLASH))
 };
 (:~

@@ -1,6 +1,5 @@
 var indexGrid = null;
 var codeMirrors = [];
-
 function xmlListReaderSettings(rootField, rowField) {
     var settings = {
         root: 'list',
@@ -14,72 +13,50 @@ function xmlListReaderSettings(rootField, rowField) {
     return settings;
 }
 
-
-//new Form
-function newForm() {
-   window.location.href = "/" + context.controller + "/new.html";
-}
-
-// Sends the partial form back to UI
-function editForm() {
-    window.location.href = "/" + context.controller + "/edit.html?" + context.model_id_field + "=" + _id;
-}
-
-function deleteForm() {
-   var c = confirm("Delete Record?");
-   if(c) {
-          window.location.href = "/" + context.controller + "/remove.html?" + context.model_id_field + "=" + _id;
-   }
-};
-
-function showForm(){
-    $("#popup").dialog(function(){
+function showForm(controller, idfield, id) {
+    $("#dialog").dialog(function(
         $.ajax({
-             url: '/' + context.controller + '/show.html',
+             url: '/' + controller + '/show.html',
              data: {
-                 id: _id, _partial: true
+                 id: id, _partial: true
              },
              success: function (r) {
-                 $("#popup").empty().stop().html(r);
+                 $("#dialog").empty().stop().html(r);
              }
          })
-     });    
+     });
+     
+}
+//new Form
+function newForm(controller) {
+    var url = "/" + controller + "/new.html?_partial=true";
+    jQuery.get(url, function (data) {
+        jQuery('#form-content').html(data); 
+    }).error(function(data){
+        jQuery('#form-content').html(data);
+    });
 }
 // Sends the partial form back to UI
-function importForm() {
- var url = "/" + context.controller + "/import.html?_partial=true";
- jQuery('#popup').html("<div class='loading'>...</div>");
-  jQuery.get(url, function (data) {
-        jQuery('#popup').html(data);
-  });
-  jQuery("#popup").dialog({ 
-     width: 800, 
-     height: 600, 
-     autoOpen: true,
-     resizable:false,
-     modal:true,
-     zIndex:999999,
-     title:'Import Options'     
-  });
+function editForm(controller, id) {
+    var url = "/" + controller + "/edit.html?_partial=true&uuid=" + id;
+    jQuery.get(url, function (data) {
+        jQuery('#form-content').html(data); 
+    }).error(function(data){
+        jQuery('#form-content').html(data);
+    });
+}
+// Sends the partial form back to UI
+function importForm(controller, id) {
+    var url = "/" + controller + "/export.html?_partial=true&uuid=" + id;
+    alert(url)
 }
 
-//Popup Dialog Form
-function exportForm() {
-  var url = "/" + context.controller + "/export.html?_partial=true";
-  jQuery('#popup').html("<div class='loading'>...</div>");
-  jQuery.get(url, function (data) {
-        jQuery('#popup').html(data);
-  });
-  jQuery("#popup").dialog({ 
-     width: 840, 
-     height: 500, 
-     autoOpen: true ,
-     modal:true ,
-     title:'Export Options'     
-  });
+// Sends the partial form back to UI
+function exportForm(controller, id) {
+    var url = "/" + controller + "/export.html?_partial=true&uuid=" + id;
 }
 // Convert a form to a map of name:value sets for each field
-function convertFormSerializationArray(formname) {
+function convertFormSerilizationArray(formname) {
     var serializedArray = jQuery('#' + formname).serializeArray();
     var map = {
     };
@@ -96,7 +73,7 @@ function convertFormSerializationArray(formname) {
     return map;
 }
 
-/*function validateSave(formName, gridId) {
+function validateSave(formName, gridId) {
 
     var c = confirm("Are you sure you want to save these changes?");
     if (c) {
@@ -125,43 +102,40 @@ function convertFormSerializationArray(formname) {
        jQuery.ajax({
            type: "POST",
            url: action,
-           contentType: "",
-           data: params,
+           dataType: "json",
+           contentType: "application/json",
+           data: JSON.stringify(params,null,2),
            success: function(html){
-               window.location.href = "/" + _context.controller;
+               jQuery('#form-content').html(html);
+               // Reload the Grid
+               jQuery("#" + gridId).trigger("reloadGrid");
            }
         });
     
     } else return false;
-}*/
-function toggleToolbarState() {
-  
 }
+
 function initToolbar(props) {
   var id = jQuery(indexGrid).jqGrid('getGridParam', 'selrow');
   if(props.new == true){
-     jQuery("#toolbar").append("<a id='new-button' class='ui-state-default ui-corner-all ui-button'>New</a>");
-     jQuery("#new-button").click(function() {newForm();});
+     jQuery("#toolbar").append("<a id='new-button' class='ui-state-default ui-corner-all ui-button'>New </a>");
+     jQuery("#new-button").click(function() {newForm(controller);});
   }
   if(props.edit == true) {
      jQuery("#toolbar").append("<a id='edit-button' class='ui-state-default ui-corner-all ui-button'>Edit</a>");
-     jQuery("#edit-button").click(function() {editForm();});
+     jQuery("#new-button").click(function() {editForm(controller,id);});
   }
   if(props.delete == true) {
      jQuery("#toolbar").append("<a id='delete-button' class='ui-state-default ui-corner-all ui-button'>Delete</a>");
-     jQuery("#delete-button").click(function() {deleteForm();});
-  }
-    if(props.show == true){
-     jQuery("#toolbar").append("<a id='show-button' class='ui-state-default ui-corner-all ui-button'>Show</a>");
-     jQuery("#show-button").click(function() {showForm();});
+     jQuery("#delete-button").click(function() {editForm(controller,id);});
   }
   if(props.export == true) {
      jQuery("#toolbar").append("<a id='export-button' class='ui-state-default ui-corner-all ui-button'>Export</a>");
-     jQuery("#export-button").click(function() {exportForm();});
+     jQuery("#export-button").click(function() {exportForm(controller);});
   }  
   if(props.import == true) {
      jQuery("#toolbar").append("<a id='import-button' class='ui-state-default ui-corner-all ui-button'>Import</a>");
-     jQuery("#import-button").click(function() {importForm();});
+     jQuery("#import-button").click(function() {importForm(controller);});
   } 
   jQuery("#toolbar").buttonset();  
 }
@@ -197,25 +171,24 @@ function populateRelatedOptions(name, values, occurence) {
     }
 }
 
+function initListGrid(gridId, gridParams) {
+    indexGrid = gridId;
+    jQuery(gridId).jqGrid(gridParams)
+    .navGrid(gridId + '_pager', {
+        edit: false, add: false, del: false, search: true, reload: true
+    })
+    .trigger("reloadGrid");   
+    resizeGrid();    
+}
 function resizeGrid() {
     jQuery(indexGrid).setGridWidth(jQuery("#list-wrapper").innerWidth());
-    jQuery(indexGrid).setGridHeight(jQuery("#list-wrapper").innerHeight() - 40);
+    jQuery(indexGrid).setGridHeight(jQuery("#list-wrapper").innerHeight() -48);
 }
 
 
 function resizeLayout() {
   outerLayout.resizeAll();
   resizeGrid();
-}
-
-function initListGrid(gridId, gridParams) {
-    indexGrid = gridId;
-    jQuery(gridId).jqGrid(gridParams)
-    .navGrid(gridId + '_pager', {
-        edit: false, add: false, del: false, search: true, reload: true,
-    },{},{},{multipleSearch:true})
-    .trigger("reloadGrid");   
-    resizeGrid();    
 }
 
 function initLayout() {
@@ -228,7 +201,4 @@ function initLayout() {
        east__size:600,
        east__closed:true
    }); 
-   if(jQuery("#popup") != null) {
-     jQuery(body).append("<div id='popup'></div>");
-   }
 }

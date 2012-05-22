@@ -22,7 +22,8 @@ import module namespace response = "http://www.xquerrail-framework.com/response"
    at "/_framework/response.xqy";
 declare function tag:apply($node,$response)
 {
-   let $data := fn:data($node)
+   let $data := fn:normalize-space(fn:data($node))
+   let $_ := xdmp:log(fn:data($node))
    return
      xdmp:eval($data)
 };

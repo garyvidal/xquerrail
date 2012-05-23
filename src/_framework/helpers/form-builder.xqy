@@ -98,6 +98,7 @@ declare function form:render-control($field,$value)
 
      (: Complex Element :)
       case element(schema-element) return form:render-complex($field,$value)
+      case element(html-editor) return form:render-complex($field,$value)
       case element(reference) return form:render-reference($field,$value)
       case element(grid) return form:build-child-grid($field,$value)
 
@@ -163,7 +164,10 @@ declare function form:get-value-from-response($field as element()) {
     (: Verify you only pull the approprite node just incase the body is a sequence :)
     let $node := response:body()//*[fn:local-name(.) = $name]
     let $_ := xdmp:log(("field:node::",$node))
-    let $value := fn:data($node)
+    let $value := 
+        if($field/@type eq "reference") 
+        then $node
+        else fn:data($node)
     return 
         $value
 };
@@ -186,17 +190,36 @@ declare function form:render-before($field)
 
 declare function form:render-after($field)
 {
-    ()
+    let $type := ($field/domain:ui/@type,$field/@type)[1]
+    let $id   := domain:get-field-id($field)
+    let $qtype := element {$type} {$type}
+    return
+      typeswitch($qtype)
+        case element(html-editor) return 
+            <script type="text/javascript">
+               jQuery(function(){{
+                  $("#{$id}").elrte({js:o((
+                     js:p("height",200),
+                     js:p("toolbar","compact")
+                  ))});
+               }});
+            </script>
+         case element(code-editor) return 
+            <script type="text/javascript">
+              
+            </script>       
+       default return ()
 };
 
 declare function form:render-attributes($field)
 {(
-    if($field/domain:constraint/@required  eq "true") 
+  (:  if($field/domain:constraint/@required  eq "true") 
     then attribute required{fn:boolean($field/domain:constraint/@required)} 
     else (),
     if($field/domain:constraint/@maxlength) 
     then attribute maxlength {fn:data($field/domain:constraint/@maxlength)} 
-    else (),  
+    else (), 
+:)    
     if($field/@editable = 'false') 
     then attribute readonly { 'readonly' } 
     else (),
@@ -205,6 +228,8 @@ declare function form:render-attributes($field)
     else (),
     if($field/@type eq "boolean")
     then attribute class {"field"}
+    else if($field/@type eq "schema-element")
+         then  attribute class {("field", "textarea","small", "ckeditor")}
     else attribute class {("field","medium",$field/@type)}
 )};
 
@@ -246,7 +271,7 @@ declare function form:render-text($field,$value)
   (
        form:render-before($field), 
        if($field/domain:constraint/@inList) then
-       <select name="{form:get-field-name($field)}">
+       <select id="{form:get-field-name($field)}" name="{form:get-field-name($field)}">
        {form:render-attributes($field)}
        {form:render-values($field,$value)}
        </select>
@@ -274,7 +299,7 @@ declare function form:render-checkbox($field,$value)
 {
   (
        form:render-before($field), 
-       <input name="{form:get-field-name($field)}" type="radio" value="true">
+       <input id="{form:get-field-name($field)}" name="{form:get-field-name($field)}" type="radio" value="true">
        {form:render-attributes($field)}
        {if($value castable as xs:boolean) 
         then if($value cast as xs:boolean  = fn:true()) then attribute checked{"checked"} else ()
@@ -297,7 +322,7 @@ declare function form:render-checkbox($field,$value)
 declare function form:render-money($field,$value)
 {(
            form:render-before($field), 
-           <input name="{form:get-field-name($field)}" type="text">
+           <input id="{form:get-field-name($field)}" name="{form:get-field-name($field)}" type="text">
            {form:render-attributes($field)}
            {form:render-values($field,$value)}
            </input>,
@@ -308,7 +333,7 @@ declare function form:render-number($field,$value)
 {
 (
    form:render-before($field), 
-   <input name="{form:get-field-name($field)}" type="text">
+   <input id="{form:get-field-name($field)}" name="{form:get-field-name($field)}" type="text">
    {form:render-attributes($field)}
    {form:render-values($field,$value)}
    </input>,
@@ -318,7 +343,7 @@ declare function form:render-number($field,$value)
 declare function form:render-password($field,$value)
 {(
    form:render-before($field), 
-   <input name="{form:get-field-name($field)}" type="password">
+   <input id="{form:get-field-name($field)}" name="{form:get-field-name($field)}" type="password">
    {form:render-attributes($field)}
    {form:render-values($field,$value)}
    </input>,
@@ -328,7 +353,7 @@ declare function form:render-password($field,$value)
 declare function form:render-email($field,$value)
 {(
    form:render-before($field), 
-   <input name="{form:get-field-name($field)}" type="text">
+   <input id="{form:get-field-name($field)}" name="{form:get-field-name($field)}" type="text">
    {form:render-attributes($field)}
    {form:render-values($field,$value)}
    </input>,
@@ -338,7 +363,7 @@ declare function form:render-email($field,$value)
 declare function form:render-search($field,$value)
 {(
        form:render-before($field), 
-       <input name="{form:get-field-name($field)}" type="text">
+       <input id="{form:get-field-name($field)}" name="{form:get-field-name($field)}" type="text">
        {form:render-attributes($field)}
        {form:render-values($field,$value)}
        </input>,
@@ -348,7 +373,7 @@ declare function form:render-search($field,$value)
 declare function form:render-url($field,$value)
 {(
        form:render-before($field), 
-       <input name="{form:get-field-name($field)}" type="text">
+       <input id="{form:get-field-name($field)}" name="{form:get-field-name($field)}" type="text">
        {form:render-attributes($field)}
        {form:render-values($field,$value)}
        </input>,
@@ -358,7 +383,7 @@ declare function form:render-url($field,$value)
 declare function form:render-choice($field,$value)
 {(
        form:render-before($field), 
-       <select name="{form:get-field-name($field)}">
+       <select id="{form:get-field-name($field)}" name="{form:get-field-name($field)}">
        {form:render-attributes($field)}
        {form:render-values($field,$value)}
        </select>,
@@ -368,7 +393,7 @@ declare function form:render-choice($field,$value)
 declare function form:render-entity($field,$value)
 {(
        form:render-before($field), 
-       <select name="{form:get-field-name($field)}">
+       <select id="{form:get-field-name($field)}" name="{form:get-field-name($field)}">
        {form:render-attributes($field)}
        {form:render-values($field,$value)}
        </select>,
@@ -378,7 +403,7 @@ declare function form:render-entity($field,$value)
 declare function form:render-country($field,$value)
 {(
        form:render-before($field), 
-       <select name="{form:get-field-name($field)}">
+       <select id="{form:get-field-name($field)}" name="{form:get-field-name($field)}">
        {form:render-attributes($field)}
        {form:render-values($field,$value)}
        </select>,
@@ -388,7 +413,7 @@ declare function form:render-country($field,$value)
 declare function form:render-locale($field,$value)
 {(
     form:render-before($field), 
-    <select name="{form:get-field-name($field)}">
+    <select id="{form:get-field-name($field)}" name="{form:get-field-name($field)}">
     {form:render-attributes($field)}
     {form:render-values($field,$value)}
     </select>,
@@ -398,7 +423,7 @@ declare function form:render-locale($field,$value)
 declare function form:render-timezone($field,$value)
 {(
    form:render-before($field), 
-   <select name="{form:get-field-name($field)}">
+   <select id="{form:get-field-name($field)}" name="{form:get-field-name($field)}">
    {form:render-attributes($field)}
    {form:render-values($field,$value)}
    </select>,
@@ -408,7 +433,7 @@ declare function form:render-timezone($field,$value)
 declare function form:render-date($field,$value)
 {(
    form:render-before($field), 
-   <input name="{form:get-field-name($field)}" type="text" class="date">
+   <input id="{form:get-field-name($field)}" name="{form:get-field-name($field)}" type="text" class="date">
    {form:render-attributes($field)}
    {form:render-values($field,$value)}
    </input>,
@@ -418,7 +443,7 @@ declare function form:render-date($field,$value)
 declare function form:render-dateTime($field,$value)
 {(
    form:render-before($field), 
-   <input name="{form:get-field-name($field)}" type="text" class="date">
+   <input id="{form:get-field-name($field)}" name="{form:get-field-name($field)}" type="text" class="date">
    {form:render-attributes($field)}
    {form:render-values($field,$value)}
    </input>,
@@ -428,7 +453,7 @@ declare function form:render-dateTime($field,$value)
 declare function form:render-birthday($field,$value)
 {(  
    form:render-before($field), 
-   <input name="{form:get-field-name($field)}" type="text">
+   <input id="{form:get-field-name($field)}" name="{form:get-field-name($field)}" type="text">
    {form:render-attributes($field)}
    {form:render-values($field,$value)}
    </input>,
@@ -438,7 +463,7 @@ declare function form:render-birthday($field,$value)
 declare function form:render-collection($field,$value)
 {(
    form:render-before($field), 
-   <input name="{form:get-field-name($field)}" type="text">
+   <input id="{form:get-field-name($field)}" name="{form:get-field-name($field)}" type="text">
    {form:render-attributes($field)}
    {form:render-values($field,$value)}
    </input>,
@@ -448,7 +473,7 @@ declare function form:render-collection($field,$value)
 declare function form:render-repeated($field,$value)
 {(
    form:render-before($field), 
-   <input name="{form:get-field-name($field)}" type="text">
+   <input id="{form:get-field-name($field)}" name="{form:get-field-name($field)}" type="text">
    {form:render-attributes($field)}
    {form:render-values($field,$value)}
    </input>,
@@ -458,7 +483,7 @@ declare function form:render-repeated($field,$value)
 declare function form:render-hidden($field,$value)
 {(
    form:render-before($field), 
-   <input name="{form:get-field-name($field)}" type="hidden">
+   <input id="{form:get-field-name($field)}" name="{form:get-field-name($field)}" type="hidden">
    {form:render-attributes($field)}
    {form:render-values($field,$value)}
    </input>,
@@ -498,7 +523,7 @@ declare function form:render-clear($field,$value)
 declare function form:render-file($field,$value)
 {(
    form:render-before($field), 
-   <input name="{form:get-field-name($field)}" type="file">
+   <input id="{form:get-field-name($field)}" name="{form:get-field-name($field)}" type="file">
    {form:render-attributes($field)}
    {form:render-values($field,$value)}
    </input>,
@@ -508,7 +533,7 @@ declare function form:render-file($field,$value)
 declare function form:render-csrf($field,$value)
 {(
    form:render-before($field), 
-   <input name="{form:get-field-name($field)}" id="CSRFToken" type="hidden">
+   <input id="{form:get-field-name($field)}" name="{form:get-field-name($field)}" id="CSRFToken" type="hidden">
    {form:render-attributes($field)}
    {form:render-values($field,$value)}
    </input>,
@@ -516,14 +541,12 @@ declare function form:render-csrf($field,$value)
 )};
 
 declare function form:render-complex($field,$value) 
-{
-(
+{(
   form:render-before($field), 
   <div class="complextextarea">
-    <textarea name="{form:get-field-name($field)}" id="{fn:data($field/@name)}">
-        { if ($field/domain:navigation/@editor = 'ckeditor') then attribute class {"ckeditor"} else () }
+    <textarea name="{form:get-field-name($field)}" id="{domain:get-field-id($field)}">
         { form:render-attributes($field) }
-        { $value/node() }
+        { $value }
      </textarea>
    </div>,
    form:render-after($field)
@@ -597,32 +620,34 @@ declare function form:render-reference($field,$value) {
     <div class="referenceSelect">
            { form:render-before($field) }
            
-           <select id="{fn:data($field/@name)}SelectBox" name="{form:get-field-name($field)}">
-            {
-                if($field/domain:constraint/@required = 'true')
-                then attribute required { "true" }
-                else ()
-            }
+           <select id="{fn:data($field/@name)}" name="{form:get-field-name($field)}" >
             { 
-               if($field/@occurence = "*") then
-                   (attribute multiple { "multiple" },
-                   attribute class { "multiselect" })
-                else ()
+               if($field/@occurence = "*") 
+               then (
+                   attribute multiple { "multiple" },
+                   attribute class {("field", "select", "medium", "multiselect" )}
+                   )
+                else (
+                    attribute class {("field", "select","medium" )},
+                    <option value="">Please select {fn:data($field/@label)}</option>
+                )
+                    
             }
-            <option value="">Please select {fn:data($field/@label)}</option> 
+            
             {
                 (: Build Model Refrences using the lookup feature in the base model :)
                 if($refParent = 'model') then
                      let $lookups := base:lookup(domain:get-domain-model($modelName),map:map())
                      for $lookup in $lookups/*:lookup
-                     let $key := $lookup/*:key/text()
+                     let $key := fn:string($lookup/*:key)
                      let $label := $lookup/*:label/text()
+                     let $_ := xdmp:log(("form:reference::",$value/@ref-id,"form::key",$key))
                      return 
                        element option {
                             attribute value {$key},
-                            if(fn:data($value[@ref = $refType]/@ref-id) = $key) 
+                            if($value/@ref-id = $key) 
                             then attribute selected { "selected" } 
-                            else (),               
+                            else (),
                             $label
                        }
                 (: Build Abstract Model References using the base model functions :)       
@@ -650,7 +675,7 @@ declare function form:render-reference($field,$value) {
             (: Allow the multi select javascript pane if it is a multiple occurence :)
             if($field/@occurence = "*") then 
                <script type="text/javascript">
-                   jQuery("#{fn:data($field/@name)}SelectBox").multiselect();
+                   jQuery("#{form:get-field-name($field)}").multiselect();
                </script>
             else ()
            }
@@ -683,6 +708,22 @@ declare function form:field-grid-column(
              js:p("hidden",$field/domain:ui/@type eq "hidden") 
          ))
      else ()
+};
+declare function form:build-validation($model) {
+  js:o((
+    js:no("rules",(
+        for $f in $model//(domain:element|domain:attribute|domain:container)
+        let $constraint := $f/domain:constraint
+        return
+          if($constraint) 
+          then js:no(form:get-field-name($f), (
+            if($constraint/@required) then js:p("required",$constraint/@required eq "true") else (),
+            if($constraint/@minLength) then js:p("minlength",xs:integer($constraint/@minLength)) else (),
+            if($constraint/@maxLength) then js:p("maxlength",xs:integer($constraint/@maxLength)) else ()
+          ))
+          else ()
+    ))
+  ))
 };
 declare function form:grid-column-type($field) {
   ()

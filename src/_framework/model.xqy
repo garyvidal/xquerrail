@@ -243,6 +243,11 @@ declare function model:build-json(
   $instance as element()
 ){
    typeswitch($field)
+     case element(domain:model) return 
+       js:o((
+         for $f in $field/(domain:container|domain:attribute|domain:element)
+         return model:build-json($f,$instance)
+       ))
      case element(domain:element) return
         let $field-key := domain:get-field-id($field)
         let $field-path := domain:get-field-xpath($field,$field-key)
@@ -283,12 +288,8 @@ declare function model:to-json(
   $model as element(domain:model),
   $instance as element()
  ) {
-   if($model/@name eq $instance/fn:local-name(.)) then 
-   js:o((
-      for $field in $model/(domain:element|domain:attribute|domain:container)
-      return
-        model:build-json($field,$instance)
-   ))
+   if($model/@name eq fn:local-name($instance)) 
+   then model:build-json($model,$instance)
    else fn:error(xs:QName("MODEL-INSTANCE-MISMATCH"),
       fn:string(
         <msg>{$instance/fn:local-name(.)} does not have same signature model name:{fn:data($model/@name)}</msg>)

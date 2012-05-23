@@ -26,27 +26,36 @@ function editForm() {
 }
 
 function deleteForm() {
-   var c = confirm("Delete Record?");
-   if(c) {
-          window.location.href = "/" + context.controller + "/remove.html?" + context.model_id_field + "=" + _id;
+  
+   if(_id != null) {
+      var c = confirm("Delete Record " + _id +"?");
+      if(c) {
+        window.location.href = "/" + context.controller + "/remove.html?" + context.model_id_field + "=" + _id;
+      }
+   } else if(_id == null ){
+     alert("Please select a record");
    }
 };
 
 function showForm(){
-  var url = "/" + context.controller + "/show.html?_partial=true&" + context.model_id_field + "=" + _id;;
-  jQuery('#popup').html("<div class='loading'>...</div>");
-  jQuery.get(url, function (data) {
-        jQuery('#popup').html(data);
-  });
-  jQuery("#popup").dialog({ 
-     width: 800, 
-     height: 600, 
-     autoOpen: true,
-     resizable:false,
-     modal:true,
-     zIndex:999999,
-     title:'Show ' + _id   
-  });   
+  if(_id != null) {
+   var url = "/" + context.controller + "/show.html?_partial=true&" + context.model_id_field + "=" + _id;;
+   jQuery('#popup').html("<div class='loading'>...</div>");
+   jQuery.get(url, function (data) {
+         jQuery('#popup').html(data);
+   });
+   jQuery("#popup").dialog({ 
+      width: 800, 
+      height: 600, 
+      autoOpen: true,
+      resizable:false,
+      modal:true,
+      zIndex:999999,
+      title:'Show ' + _id   
+   }); 
+  } else {
+    alert("Please select a record");
+  }  
 }
 // Sends the partial form back to UI
 function importForm() {

@@ -10,13 +10,13 @@
     <model name="base" description="Base Extension Class" persistence="abstract">
         <element name="uuid" type="identity" identity="true" label="Globally Unique Identifier">
             <navigation  searchable="true" sortable="true" facetable="true" />
-            <constraint required="true"  />
+            <constraint />
             <ui type="hidden" gridWidth="0"/>
         </element>
     </model>
     <!-- Georgraphic Related Models -->
     <model name="countryCode" label="Country Code" description="Country Code Controlled Vocabulary" 
-        persistence="document" key="id" keyLabel="name" extends="base">
+        persistence="document" key="uuid" keyLabel="name" extends="base">
         <document root="countryCodes">/codetables/countryCodes.xml</document>
         <element name="id" type="string" label="ISO Country Code">
             <navigation  searchable="true" sortable="true" facetable="true" />
@@ -28,7 +28,7 @@
         </element>
         <element name="ISO3" type="string" label="ISO 3">
             <navigation  searchable="true" sortable="true" />
-            <constraint required="true" />
+            <constraint required="true"  maxLength="3" minLength="3" />
         </element>       
         <element name="isOnWatchList" type="boolean" label="Is On Watch List">
             <navigation  searchable="true" sortable="true"  />
@@ -42,7 +42,7 @@
     
     <!-- Georgraphic Related Models -->
     <model name="company" description="Companies" 
-        persistence="document" key="id" keyLabel="name" extends="base">
+        persistence="document" key="uuid" keyLabel="name" extends="base">
         <document root="companies">/codetables/companies.xml</document>
         <element name="companyID" type="string" label="Company ID">
             <navigation  searchable="true" sortable="true" facetable="true"  />
@@ -62,9 +62,9 @@
         </element>          
     </model>
     
-    <model name="timezone" description="Timezones Configuration" persistence="document" key="id" keyLabel="name">
+    <model name="timezone" description="Timezones Configuration" persistence="document" key="uuid" keyLabel="name">
         <document root="timezones">/codetables/timezones.xml</document>
-        <element name="id" type="string" identity="true" label="ID">
+        <element name="id" type="string" label="ID">
             <navigation searchable="true" sortable="true" facetable="true"/>
             <constraint required="true"/>
         </element>
@@ -78,7 +78,7 @@
         </element>
     </model>
 
-    <model name="locale" description="Locales" persistence="document">
+    <model name="locale" description="Locales" persistence="document" key="id" keyLabel="name">
         <document root="locales">/codetables/locales.xml</document>
         <element name="id" type="string" identity="true" label="ID">
             <navigation searchable="true" sortable="true" facetable="true"/>
@@ -90,7 +90,7 @@
         </element>
     </model>
 
-    <model name="user" description="User" persistence="document">
+    <model name="user" description="User" persistence="document" key="userId" keyLabel="userName">
         <document root="users">/users/</document>
         <declare-namespace prefix="cndam" namespace-uri="http://www.condenast.com/dam/2.0"/> 
         <element name="userId" type="string" identity="true" label="UserId">
@@ -115,7 +115,7 @@
         </element>
     </model>  
 
-    <model name="role" description="Roles" persistence="directory" label="Roles">
+    <model name="role" description="Roles" persistence="directory" label="Roles" key="roleId" keyLabel="roleName" >
         <directory>/roles/</directory>
         <import-model name="user"/> 
         <element name="roleId" type="string" identity="true" label="Role ID" >
@@ -137,7 +137,7 @@
     </model> 
     
     <model name="blog" label="Blog" description="A blog" 
-        persistence="directory" key="id" keyLabel="name" extends="base">
+        persistence="directory" key="uuid" keyLabel="id" extends="base">
         <directory>/blogs/</directory>
         <element name="id" type="string" label="ID of the blog">
             <navigation  searchable="true" sortable="true" facetable="true" />
@@ -154,19 +154,21 @@
     </model>
     
     <model name="posting" label="Blog Post" description="A posting in the blog" 
-        persistence="directory" key="id" keyLabel="name" extends="base">
+        persistence="directory" key="uuid" keyLabel="id" extends="base">
         <directory>/postings/</directory>
         <element name="id" type="string" label="ID of the posting">
             <navigation  searchable="true" sortable="true" facetable="true" />
             <constraint required="true"  />
         </element>
-        <element name="blogId" type="integer" label="Blog to which the posting belongs">
+        <element name="blogId" type="reference" reference="model:blog:reference" label="Blog to which the posting belongs">
             <navigation  searchable="true" sortable="true"  />
             <constraint required="true" />
         </element>          
-        <element name="comment" type="string" label="Comment" >
+        <element name="comment" type="schema-element" label="Comment" >
             <navigation searchable="true" sortable="true"  />
             <constraint required="true" />
+            <ui type="html-editor">
+            </ui>
         </element>
     </model>
     
@@ -180,5 +182,5 @@
     <controller name="companies" model="company" label="Companies"/>
     
     <controller name="blog" model="blog" label="Blog"/>
-    <controller name="posting" model="posting" label="Posting"/>
+    <controller name="posting" model="posting" label="Blog Post"/>
 </domain>

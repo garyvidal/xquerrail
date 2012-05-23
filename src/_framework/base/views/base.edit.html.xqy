@@ -27,7 +27,7 @@ return
  
 <div class="content-box content-box-header ui-corner-all">
      <div class="content-box-wrapper">
-         <h2><?title?></h2>  
+         <h2>Edit <?title?></h2>  
          <form id="form_{response:controller()}" name="form_{response:controller()}" method="post"
               action="/{response:controller()}/save.html">        
              <?template name="fields"?> 
@@ -44,9 +44,11 @@ return
          </ul>
         </form>
      </div> <!-- end content-box -->
+     <script type="text/javascript" src="/resources/js/validate.js">//</script>
      <script type="text/javascript">
         var _id = "{$id-field}";
         {form:context($response)}
+        $("#form_{response:controller()}").validate({form:build-validation($domain-model)})
         </script>
  </div>
  </div>

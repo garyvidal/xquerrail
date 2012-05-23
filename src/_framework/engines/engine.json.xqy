@@ -110,6 +110,7 @@ declare function engine:render-json($node)
       if($is-listable)
       then domain:get-domain-model($node/@type)
       else domain:get-domain-model(fn:local-name($node)) 
+   let $_ := xdmp:log(($model,"Body:::",xdmp:describe($node)))
    return
      if($is-listable and $model) then  
          js:o((       
@@ -123,9 +124,10 @@ declare function engine:render-json($node)
                    model:to-json($model,$n)
             ))
          ))
-
-     else if($model) then
-        model:to-json(response:model(),response:body())
+     else if($model) 
+          then (
+             model:to-json($model,$node)
+          )
      else fn:error(xs:QName("JSON-PROCESSING-ERROR"),"Cannot generate JSON response without model")
 };
 (:~

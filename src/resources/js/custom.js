@@ -269,7 +269,11 @@ jQuery(document).ready(function() {
 		jQuery('#modal_confirmation').dialog('open');
 		return false;
 	});
-	
+
+	// Editor Links
+
+	jQuery('.html-editor').elrte({});
+
 	// Same height
 
 	var sidebarHeight = jQuery("#sidebar").height();
@@ -290,7 +294,8 @@ jQuery(document).ready(function() {
 		//get the index, set the selector, add class
 		myIndex = jQuery(".main1").index(this);
 		myMenu = jQuery(".drop-down a.btn:eq("+myIndex+")");
-	}, function(){
+	}, 
+	function(){
 		jQuery("ul",this).slideUp('fast');
 	});
 });

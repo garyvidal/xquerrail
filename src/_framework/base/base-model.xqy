@@ -1,8 +1,8 @@
 xquery version "1.0-ml";
 (:~
 : Model : Base
-: @author 
-: @version   
+: @author Gary Vidal
+: @version  1.0
 ~:)
 
 module namespace model = "http://www.xquerrail-framework.com/model/base";
@@ -135,7 +135,8 @@ as element()?
                if ($persistence = 'document') then
                    let $path := $domain-model/domain:document/text() 
                    let $doc := fn:doc($path)
-                   let $rootNode := fn:data($domain-model/domain:document/@root)
+                   let $root-node := fn:data($domain-model/domain:document/@root)
+                   let $root-namespace := domain:get-field-namespace($domain-model)
                    return 
                        if ($doc) then
                             (: create the instance of the model in the document :)      
@@ -143,7 +144,7 @@ as element()?
                        else
                            xdmp:document-insert(
                              $path,
-                             element { $rootNode } { $update },
+                             element { fn:QName($root-namespace,$root-node) } { $update },
                              xdmp:default-permissions(),
                              xdmp:default-collections()
                           )
@@ -612,8 +613,8 @@ declare function model:get-references($field as element(), $params as map:map) {
     return
         if(fn:function-available($tokens[3])) then
             let $domain-model := domain:get-domain-model($type)
-            let $identity := $domain-model/domain:element[@identity eq 'true']
-            let $key := domain:get-field-id($identity)  
+            let $identity := domain:get-model-id-field($domain-model)
+            let $key := domain:get-field-id($domain-model//(domain:element|domain:attribute)[@name  = $identity])  
             return
                 for $id at $pos in map:get($params,$fieldKey)
                 let $newParams := map:map()
@@ -828,7 +829,7 @@ declare function model:build-value(
   $current as item()*)
 {
   let $localName := fn:data($field/@name)
-  let $ns := ($field/@namespace,$field/ancestor::domain:model/@namespace)[1]
+  let $ns := domain:get-field-namespace($field)
   let $qName := fn:QName($ns,$localName)
   let $qtype := element {xs:QName(fn:data($field/@type))} { fn:data($field/*) }
   return
@@ -841,9 +842,10 @@ declare function model:build-value(
         let $fieldKey := domain:get-field-id($field)
         let $map := map:map()
         let $_ := map:put($map, $fieldKey, $value)
+        let $_ := xdmp:log(("reference::",$fieldKey,$value))
         return
             for $ref in model:get-references($field,$map)
-            return
+            return 
             element { fn:QName($ns, $localName) } {
                 $ref/@*,
                 $ref/text()

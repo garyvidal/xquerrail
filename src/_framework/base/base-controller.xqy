@@ -239,6 +239,7 @@ declare function controller:show()
 declare function controller:new()
 {(  
     response:set-template("main"),
+    response:set-title(controller:model()/@label),
     response:set-view("new"),  
     response:flush()
 )}; 
@@ -252,7 +253,7 @@ declare function controller:save()
    let $identity-value := for $fi in $identity-field return map:get(request:params(),$fi)[1]
    let $update := 
        try {
-         if (fn:not($identity-value  = "")) 
+         if (fn:not($identity-value  = "") and fn:exists($identity-value)) 
          then controller:update()
          else controller:create()
    } catch($exception) {
@@ -275,7 +276,7 @@ declare function controller:save()
 declare function controller:edit()
 {(
     response:set-body(controller:get()),
-    response:set-title(fn:concat("Edit ",(response:model()/@label, response:model()/@name)[1])),
+    response:set-title((controller:model()/@label, controller:model()/@name)[1]),
     response:set-template("main"),
     response:set-view("edit"), 
     response:flush()

@@ -85,9 +85,9 @@ declare function local:render-request($request)
    return
       <tr><td>{$k}</td>
           <td>{
-          if(map:get($request,$k) instance of binary())
-          then map:get($request,$k)
-          else "(binary)"
+          if(some $x in map:get($request,$k) satisfies $x castable as xs:hexBinary)
+          then "(binary)"
+          else try{ map:get($request,$k)} catch($ex){"error"}
           }
           </td>
       </tr>

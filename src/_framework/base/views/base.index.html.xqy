@@ -41,6 +41,16 @@ let $uuidKey := domain:get-field-id($domain-model/domain:element[@name = "uuid"]
 
 return
 <div xmlns="http://www.w3.org/1999/xhtml" class="body-wrapper">
+    <?if response:has-flash("error")?>
+       <div class="response-msg error ui-corner-all">
+           <span><?flash-message error?></span>
+       </div>
+    <?endif?>
+    <?if response:has-flash("save")?>
+       <div class="response-msg success ui-corner-all">
+           <span><?flash-message save?></span>
+       </div>
+    <?endif?>
     <div class="inner-page-title ui-layout-north">
         <div class="toolbar">
           <h2><?title?></h2>    

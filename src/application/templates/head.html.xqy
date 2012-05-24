@@ -7,13 +7,14 @@
         <link href="/resources/css/ui/ui.base.css" rel="stylesheet" media="all" />
         <link href="/resources/css/themes/black_rose/ui.css" rel="stylesheet" title="style" media="all" />
         <?if response:user() = config:anonymous-user(response:application())?>
-        <link href="/resources/css/ui/ui.login.css" rel="stylesheet" title="style" media="all" />   
+            <link href="/resources/css/ui/ui.login.css" rel="stylesheet" title="style" media="all" />   
         <?endif?>
         <link href="/resources/css/ui/ui.jqgrid.css" rel="stylesheet" title="style" media="all"/>
         <link href="/resources/css/ui/ui.layout.css" rel="stylesheet" title="style" media="all"/>        
         <link href="/resources/css/ui/ui.accordion.css" rel="stylesheet" media="all" />  
         <link href="/resources/css/elrte.min.css" rel="stylesheet" title="style" media="all"/>        
         <?controller-stylesheet?>
+        
         <script type="text/javascript" src="/resources/js/jquery-1.7.1.min.js"></script>
         <script type="text/javascript" src="/resources/js/ui/ui.core.js"></script>
         <script type="text/javascript" src="/resources/js/ui/ui.widget.js"></script>
@@ -26,7 +27,6 @@
         <script type="text/javascript" src="/resources/js/ui/ui.button.js"></script>
         <script type="text/javascript" src="/resources/js/ui/ui.dialog.js"></script>
         <script type="text/javascript" src="/resources/js/ui/ui.multiselect.js"></script>
-        
         
         <script type="text/javascript" src="/resources/js/superfish.js"></script>
         <script type="text/javascript" src="/resources/js/live_search.js"></script>

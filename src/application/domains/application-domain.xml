@@ -11,7 +11,7 @@
         <element name="uuid" type="identity" identity="true" label="Globally Unique Identifier">
             <navigation  searchable="true" sortable="true" facetable="true" />
             <constraint />
-            <ui type="hidden" gridWidth="0"/>
+            <ui type="hidden" colWidth="0"/>
         </element>
     </model>
     <!-- Georgraphic Related Models -->
@@ -19,12 +19,12 @@
         persistence="document" key="uuid" keyLabel="name" extends="base">
         <document root="countryCodes">/codetables/countryCodes.xml</document>
         <element name="id" type="string" label="ISO Country Code">
-            <navigation  searchable="true" sortable="true" facetable="true" />
-            <constraint required="true"  />
+            <navigation  searchable="true" sortable="true" facetable="true"  />
+            <constraint required="true" minLength="2" maxLength="2"  />
         </element>
         <element name="name" type="string" label="Name" >
             <navigation searchable="true" sortable="true"  />
-            <constraint required="true" />
+            <constraint required="true"  />
         </element>
         <element name="ISO3" type="string" label="ISO 3">
             <navigation  searchable="true" sortable="true" />
@@ -132,8 +132,16 @@
         </element>   
         <element name="roleType" type="string" label="Role Type">
             <navigation searchable="true" sortable="true"/>
-            <constraint  required="true"/>            
+            <constraint  required="true" inList="roleTypes"/>            
         </element>
+        <optionlist name="roleTypes" child-element="roleType" type="string">
+            <option label="none"></option>
+            <option label="admin" >Admin (Global)</option>
+            <option label="blog-reader">Blog Reader</option>
+            <option label="blog-editor">Blog Editor</option>
+            <option label="blog-admin">Blog Administrator</option>
+            
+        </optionlist>
     </model> 
     
     <model name="blog" label="Blog" description="A blog" 
@@ -170,6 +178,11 @@
             <ui type="html-editor">
             </ui>
         </element>
+        
+        <element name="modified" type="create-timestamp" label="Last Modified" >
+            <navigation searchable="true" sortable="true"  />
+            <constraint required="true" />
+        </element>
     </model>
     
     
@@ -180,7 +193,6 @@
     <controller name="users" model="user" label="Users"/>
     <controller name="roles" model="role" label="Roles"/>
     <controller name="companies" model="company" label="Companies"/>
-    
-    <controller name="blog" model="blog" label="Blog"/>
+    <controller name="blogs" model="blog" label="Blog"/>
     <controller name="posting" model="posting" label="Blog Post"/>
 </domain>

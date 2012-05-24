@@ -15,19 +15,29 @@ return
    <div class="inner-page-title">
       <h2>Show {response:controller()}</h2>
    </div>
-   <div id="show-box" class="content-box">
-      <form name="form_{response:controller()}" method="get" action="/{response:controller()}/edit.html">
-         <ul>
-          <?template name="fields"?>
-         </ul>
-      </form>
-      <h2>XML Format</h2>
-      <div style="width:400px">
-         <pre>{xdmp:quote(response:body())}</pre>
+   <div id="show-box" class="content-box content-box-header">
+     <div class="content-box-wrapper">
+         <form name="form_{response:controller()}" method="get" action="/{response:controller()}/edit.html">
+            <ul>
+             <?template name="fields"?>
+            </ul>
+         </form>
       </div>
-      <h2>JSON Format</h2>
-      <div style="width:400px">
-         <pre>{model:to-json(response:model(),response:body())}</pre>
+   </div>
+   <div class="content-box content-box-header">
+      <div class="content-box-wrapper">
+      <h2>XML Format</h2>
+         <div style="width:400px">
+            <pre class="codemirror">{xdmp:quote(response:body())}</pre>
+         </div>
+      </div>
+   </div>
+   <div class="content-box content-box-header">
+     <div class="content-box-wrapper">   
+          <h2>JSON Format</h2>
+          <div style="width:400px">
+             <pre>{model:to-json(response:model(),response:body())}</pre>
+          </div>
       </div>
    </div>
    <div class="clearfix"/>

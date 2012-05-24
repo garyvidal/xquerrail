@@ -33,7 +33,8 @@ declare variable $engine-tags :=
      xs:QName("engine:include-http-metas"),
      xs:QName("engine:controller-script"),
      xs:QName("engine:controller-stylesheet"),
-     xs:QName("engine:controller-list")
+     xs:QName("engine:controller-list"),
+     xs:QName("engine:flash-message")
 );
 
 (:~
@@ -154,6 +155,15 @@ declare function engine:transform-controller-list($node)
    }</ul>
 };
 (:~
+ :  Returns a list of controllers as a unordered list.
+ :  This can be used during app generation to quickly test
+ :  New controllers. 
+ :)
+declare function engine:transform-flash-message($node)
+{
+   response:flash(fn:data($node))
+};
+(:~
  : Custom Transformer handles HTML specific templates and
  : Tags.
 ~:)
@@ -169,6 +179,7 @@ declare function engine:custom-transform($node as node())
          case processing-instruction("controller-script") return engine:transform-controller-script($node)
          case processing-instruction("controller-stylesheet") return engine:transform-controller-stylesheet($node)
          case processing-instruction("controller-list") return engine:transform-controller-list($node)
+         case processing-instruction("flash-message") return engine:transform-flash-message($node)
          case processing-instruction() return engine:transform($node)   
          default return engine:transform($node)
      )    

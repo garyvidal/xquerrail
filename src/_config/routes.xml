@@ -23,30 +23,37 @@
       <default key="_controller">application:$1:list:xml</default>
    </route>  
 
-   <route id="_lookup" pattern="^/(\i\c*[^/])/lookup\.(xml|json)$">
+   <route id="_lookup" pattern="^/(\i\c*[^/])/lookup\.(html|xml|json)$">
       <default key="_controller">application:$1:lookup:$2</default>
    </route>
+   
    <route id="_createxml" pattern="^/(\i\c*)/create$">
       <default key="_controller">application:$1:create:xml</default>
    </route>     
+   
    <route id="_getxml" pattern="^/(\i\c*[^/])/get$">
       <default key="_controller">application:$1:get:xml</default>
    </route>    
+   
    <route id="_show" pattern="^/(\i\c*)/show/(\c*)$">
       <default key="_controller">application:$1:show:xml</default>
       <param key="id">$2</param>
    </route>
+   
    <route id="_edit" pattern="^/(\i\c*)/edit/(\c*)$">
       <default key="_controller">application:$1:edit:xml</default>
       <param key="id">$2</param>
    </route>
+   
    <!--Default Routes-->
-   <route id="default_index" pattern="^/(\i\c*)/?$">
+   <route id="default_index" pattern="^/(\i\c*[^/])/?$">
       <default key="_controller">application:$1:index:html</default>      
    </route>
-   <route id="default_index_format" pattern="^/(\i\c*)/(\i\c*).(json|html)$">
+   
+   <route id="default_index_format" pattern="^/(\i\c*)/(\i\c*)\.(json|html)$">
       <default key="_controller">application:$1:$2:$3</default>      
    </route>   
+   
    <route id="_default_get" pattern="^/(.*[^/])/(\i\c*[^/])\.(json|html|xml)$" method="get">
       <default key="_controller">application:$1:get:$3</default>
    </route>
@@ -58,10 +65,13 @@
    <route id="_default_delete" pattern="^/(\i\c*)/(\i\c*[^/])\.(json|html)$" method="delete">
       <default key="_controller">application:$1:delete:$3</default>
    </route> 
+   
    <route id="_default_create" pattern="^/(.*[^/])/(\i\c*[^/])\.(json|html)$" method="put">
       <default key="_controller">application:$1:create:$3</default>
    </route> 
+   
    <route id="_default_controller" pattern="^/(\i\c*[^/])/(\i\c*[^/])(\.json|\.html|\.xml)?$" method="put">
       <default key="_controller">application:$1:$2:$3</default>
    </route>   
+
 </routes>

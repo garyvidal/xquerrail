@@ -418,7 +418,7 @@ declare function model:lookup($domain-model as element(domain:model), $params as
                   </lookup>
         else ()
     return
-        <lookups>{$values}</lookups>
+        <lookups type="{$domain-model/@name}">{$values}</lookups>
 };
 
 (:~

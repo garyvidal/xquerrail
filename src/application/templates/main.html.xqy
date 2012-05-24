@@ -7,7 +7,7 @@ declare default element namespace "http://www.w3.org/1999/xhtml";
            <div class="clear"></div>
            <div id="page-layout">
                 <div id="page-content">
-                    <div id="page-content-wrapper" class="no-bg-image wrapper-full"> 
+                    <div id="page-content-wrapper" class="no-bg-image wrapper-full">                   
                         <?view?>
                         <div class="clear"></div>
                     </div>          

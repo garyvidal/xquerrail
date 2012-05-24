@@ -11,7 +11,6 @@ module namespace interceptor = "http://www.xquerrail-framework.com/interceptor";
 :)
 declare variable $interceptor-map := map:map();
 declare variable $interceptor-functions := map:map();
-
 (:~
  :  Register an interceptor with the global cache.
  :  Interceptors must be registered in the order in which the should 

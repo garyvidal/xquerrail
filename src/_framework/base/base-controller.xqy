@@ -54,6 +54,7 @@ declare function controller:invoke($action)
 {
  response:set-model(controller:model()),
  (
+   (:REST Actions:)
    if($action eq "create")      then controller:create()
    else if($action eq "update") then controller:update()
    else if($action eq "get")    then controller:get()
@@ -63,11 +64,12 @@ declare function controller:invoke($action)
    else if($action eq "put")    then controller:put()
    else if($action eq "post")   then controller:post()
    (:HTML:)   
+   else if($action eq "index")  then controller:index()
    else if($action eq "new")    then controller:new()
    else if($action eq "edit")   then controller:edit()
    else if($action eq "remove") then controller:remove()  
    else if($action eq "save")   then controller:save()
-   else if($action eq "index")  then controller:index()
+
    else if($action eq "show")   then controller:show()
    else if($action eq "lookup") then controller:lookup()
    else if($action eq "fields") then controller:fields()
@@ -253,22 +255,24 @@ declare function controller:save()
    let $identity-value := for $fi in $identity-field return map:get(request:params(),$fi)[1]
    let $update := 
        try {
-         if (fn:not($identity-value  = "") and fn:exists($identity-value)) 
+         if (fn:not($identity-value = "") and fn:exists($identity-value)) 
          then controller:update()
          else controller:create()
    } catch($exception) {
-         xdmp:rethrow()
+         response:set-error($exception/error:code,$exception/error:format-string)
        }
    return
    if(response:has-error()) 
    then (
-     response:set-flash("error_message","Could not save"),
-     response:flush()
+      response:set-flash("error",response:error()),
+      response:redirect(request:controller(),"index"),
+      response:flush()
    ) else (
+      response:set-flash("save","Record has been saved"),
       response:set-body($update),
       response:set-template("main"),
       response:set-format("html"),
-      response:set-view("save"),  
+      response:redirect(request:controller(),"index"),
       response:flush()
    )
 };

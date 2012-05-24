@@ -88,7 +88,8 @@ $request as map:map
      else ()  
 )};
 
-declare function interceptor:before-response()
+declare function interceptor:before-response(
+)
 {(
    for $int in config:get-interceptors("before-response")
    let $_ := xdmp:log(("interceptor:ml-security::before-response",()))

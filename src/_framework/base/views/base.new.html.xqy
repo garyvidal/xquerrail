@@ -33,17 +33,11 @@ return
               <ul>
                  <li class="buttons">
                  <button type="submit" class="ui-state-default ui-corner-all ui-button" href="#"
-                    onclick="return validateSave('form_{response:controller()}','{response:controller()}_table');">{$labels[2]}
+                    >{$labels[2]}
                  </button>
-                 {     
-                      (: If there is a UUID this will be an update form :)
-                      (: allow the user to remove the item from the DB :)
-                      if(response:body()/*:uuid) then      
-                      <a href="/{response:controller()}/remove.html?uuid={response:body()/*:uuid}" class="ui-state-default ui-corner-all ui-button"
-                                 onclick="return validateDelete(this,'{response:controller()}_table');">
-                       Remove</a>
-                      else ()
-                 }  
+                 <button type="button" class="ui-state-default ui-corner-all ui-button" href="#"
+                    onclick="window.location.href='/{response:controller()}/index.html';return false;">Cancel
+                 </button> 
                 </li>
              </ul>
             </form>

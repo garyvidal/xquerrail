@@ -19,13 +19,20 @@ declare function interceptor:before-request($request as map:map)
 {
   try {
   (:Do something interesting:)
+  
   } catch($ex) {
       (::)
   }
   
 };
-declare function interceptor:invoke-after($request as map:map,$response as map:map)
+declare function interceptor:after-request($request as map:map)
 {
-  ()
+   ()
 };
-
+declare function interceptor:before-response($response as map:map)
+{
+   ()
+};
+declare function interceptor:after-response($response as map:map,$output as item()) {
+ ()
+};

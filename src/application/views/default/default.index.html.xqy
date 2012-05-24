@@ -3,7 +3,7 @@ declare default element namespace "http://www.w3.org/1999/xhtml";
 <div class="default-main">
   <div class="inner-page-title">             
      <h2>XQuerrail Framework Getting Started</h2>
-     <span>You can start building your next user interface with this powerful UI framework !</span>
+     <span>You can start building your next user interface with this powerful Rails Framework framework !</span>
   </div>
           <div class="clear"></div>
                 <div class="content-box">
@@ -18,7 +18,7 @@ declare default element namespace "http://www.w3.org/1999/xhtml";
                         </div>
                         <div class="column column-right">
                             <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all">
-                                <div class="portlet-header ui-widget-header">Affiliate Program<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
+                                <div class="portlet-header ui-widget-header">Simple Container Layouts<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
                                 <div class="portlet-content">
                                      <p>Here is another content box to house information.</p>                                    
                                </div>

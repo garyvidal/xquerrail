@@ -24,7 +24,6 @@ declare variable $CONTROLLER  := "response:controller";
 declare variable $ACTION      := "response:action";
 declare variable $ERROR       := "response:error";
 declare variable $PARTIAL     := "response:partial";
-declare variable $FLASH       := "response:flash";
 declare variable $BASE        := "response:base";
 declare variable $MODEL       := "response:model";
 
@@ -38,7 +37,7 @@ declare variable $HTTPMETA     := "response:httpmeta::";
 declare variable $STYLESHEET   := "response:stylesheet::";
 declare variable $JAVASCRIPT   := "response:javascript::";
 declare variable $COOKIE       := "response:cookie::";
-
+declare variable $FLASH        := "response:flash::";
 (:~
  : Response Map used to store all response information
 ~:)
@@ -58,6 +57,7 @@ declare function response:initialize(
     $request as map:map?
 ) 
 {
+   let $init := response:initialize-flash()
    let $init := response:set-response($response)
    let $defaults := 
      if(fn:exists($request)) 
@@ -119,11 +119,30 @@ declare function response:user()
 {
    map:get($response,$USER)
 };
+
+declare private function response:save-flash() {
+  (
+    xdmp:log(("flash:set::",if(response:flash()) then map:keys(response:flash()) else ()
+    )),
+    xdmp:set-session-field("FLASH",response:flash())
+  )
+};
+declare private function response:initialize-flash() as empty-sequence() {
+    let $sess-field := xdmp:get-session-field("FLASH")
+    let $flash-map  := 
+        if($sess-field instance of map:map) 
+        then $sess-field
+        else map:map()
+    let $_ := $response + $flash-map
+    return ()
+};
+
 declare function response:has-flash() {
    fn:exists(map:get($response,$FLASH))  
 };
-declare function response:has-flash($id){
-   fn:exists(map:get($response,$FLASH))
+
+declare function response:has-flash($code){
+   fn:exists(map:get($response,fn:concat($FLASH,$code)))
 };
 (:~
  : The Flash message is a convenient may to store information 
@@ -133,7 +152,16 @@ declare function response:has-flash($id){
 ~:)
 declare function response:set-flash($name as xs:string,$message as xs:string)
 {
-  map:put($response,$FLASH,$message)
+  map:put($response,fn:concat($FLASH,$name),$message)
+};
+
+declare function response:flash($code){
+  let $map := map:map()
+  return (
+    for $k in map:keys($response)[fn:starts-with(.,$FLASH)]
+    return 
+       map:put($map,$k,map:get($response,$k))
+  )
 };
 declare function response:flash()
 {
@@ -146,7 +174,9 @@ declare function response:flash()
 ~:)
 declare function response:flush()
 {
-    $response
+    let $_ := response:save-flash()
+    return
+        $response
 };
 
 (:~

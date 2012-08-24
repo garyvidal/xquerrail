@@ -8,12 +8,12 @@ Running Demo Application
 
 * Create an anonymous role and anonymous user
 **  Do not set to admin role or you will just bypass all security.  admin role overrides all roles.
-** 
+
+* Set 'default user' to anonymous user
 
 * Create an appserver pointing code code base /src/
 
 * set url rewriter to /_framework/rewriter.xqy
-
 
 * Use application-level security 
 

@@ -480,13 +480,12 @@ as element(search:options)
 {
 
 let $properties := $domain-model//(domain:element|domain:attribute)[domain:navigation/@searchable = ('true')]
-let $modelNamespace :=  domain:get-field-namespace($domain-model)
 
 let $nav := $domain-model/domain:navigation
 let $constraints := 
         for $prop in $properties
         let $type := ($prop/domain:navigation/@search-type,"value")[1]
-        let $ns := ($prop/@namespace,$prop/ancestor::domain:model/@namespace, $modelNamespace)[1]
+        let $ns := domain:get-field-namespace($prop)
         return
             <search:constraint name="{$prop/@name}">{
               element { fn:QName("http://marklogic.com/appservices/search",$type) } {
@@ -512,7 +511,7 @@ let $constraints :=
             
   let $sortOptions := 
      for $prop in $properties
-     let $ns := ($prop/@namespace,$prop/ancestor::domain:model/@namespace, $modelNamespace)[1]
+     let $ns := domain:get-field-namespace($prop)
      return
         ( <search:state name="{$prop/@name}">
              <search:sort-order direction="ascending" type="{$prop/@type}" collation="{$COLLATION}">

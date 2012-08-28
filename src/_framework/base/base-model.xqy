@@ -480,7 +480,7 @@ as element(search:options)
 {
 
 let $properties := $domain-model//(domain:element|domain:attribute)[domain:navigation/@searchable = ('true')]
-let $modelNamespace :=  fn:data(model:get-namespaces($domain-model)/@namespace-uri)
+let $modelNamespace :=  domain:get-field-namespace($domain-model)
 
 let $nav := $domain-model/domain:navigation
 let $constraints := 
